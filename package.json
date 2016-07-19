@@ -1,0 +1,40 @@
+{
+  "name": "emissies-vlaanderen",
+  "version": "0.0.1",
+  "description": "Emission Explorer for Flanders",
+  "scripts": {
+    "npm-fresh": "rm -rf ./node_modules && npm install",
+    "polymer-serve": "./node_modules/.bin/polymer serve",
+    "test-e2e": "./node_modules/.bin/karma start dev/config/karma/e2e.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bnowackbiz/emissies-vlaanderen.git"
+  },
+  "keywords": [
+    "vlaanderen",
+    "emissies"
+  ],
+  "author": "Benjamin Nowack",
+  "license": "UNLICENSED",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/bnowackbiz/emissies-vlaanderen/issues"
+  },
+  "homepage": "https://github.com/bnowackbiz/emissies-vlaanderen#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "jquery": "*",
+    "bower": "^1.7.9",
+    "cucumber": "1.*",
+    "karma": "*",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-junit-reporter": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.7",
+    "karma-cukes": "1.*",
+    "polymer-cli": "^0.12.0"
+  }
+}
