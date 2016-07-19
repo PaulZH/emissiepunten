@@ -1,0 +1,24 @@
+{
+  "name": "emissies-vlaanderen",
+  "description": "Emission Explorer for Flanders",
+  "main": "src/app/index.html",
+  "authors": [
+    "Benjamin Nowack"
+  ],
+  "license": "UNLICENSED",
+  "keywords": [
+    "vlaanderen",
+    "emissies"
+  ],
+  "homepage": "https://github.com/bnowackbiz/emissies-vlaanderen",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "dev"
+  ],
+  "dependencies": {
+    "Polymer/polymer": "^1.6.0"
+  }  
+}
