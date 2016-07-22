@@ -5,7 +5,8 @@
   "scripts": {
     "npm-fresh": "rm -rf ./node_modules && npm install",
     "polymer-serve": "./node_modules/.bin/polymer serve",
-    "test-e2e": "./node_modules/.bin/karma start dev/config/karma/e2e.conf.js"
+    "test-e2e": "./node_modules/.bin/karma start dev/e2e/config/karma.conf.js",
+    "test-js": "./node_modules/.bin/karma start dev/js-specs/config/karma.conf.js"
   },
   "repository": {
     "type": "git",
