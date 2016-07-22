@@ -1,28 +1,32 @@
-/* global module */
-
-// Karma end-to-end configuration
 
 module.exports = function(config) {
     config.set({
         basePath: '../../../',// path to repo root
         frameworks: ['karma-cukes'],
         files: [
-            { pattern: 'src/**/*.feature', included: false, watched: true, served: true },
-            { pattern: 'dev/config/karma/e2e-step-definitions.js', included: true, watched: true, served: true }
+            { pattern: 'src/!(app)/*.feature', included: false, watched: true, served: true },
+            { pattern: 'dev/js-specs/config/step-definitions.js', included: true, watched: true, served: true }
         ],
         client: {
             args: process.argv.slice(4),
             captureConsole: true
         },
-        reporters: ['kc-pretty', 'kc-json', 'junit'],
+        preprocessors: {
+            'src/**/*.js': ['coverage']
+        },
+        reporters: ['kc-pretty', 'kc-json', 'junit', 'coverage'],
         kcJsonReporter: {
-            outputDir: 'dev/reports/behaviour',
-            outputFile: 'behaviour-{shortBrowserName}.json'
+            outputDir: 'dev/js-specs/reports',
+            outputFile: '{shortBrowserName}.json'
         },
         junitReporter: {
-            outputDir: 'dev/reports/behaviour',
-            outputFile: 'behaviour.xml',
+            outputDir: 'dev/js-specs/reports',
+            outputFile: 'junit.xml',
             useBrowserName: false
+        },
+        coverageReporter: { 
+            type : 'html',
+            dir : 'doc/reports/js-coverage/'
         },
         port: 9876,
         colors: true,
