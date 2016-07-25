@@ -26,7 +26,7 @@ module.exports = function(config) {
         },
         coverageReporter: { 
             type : 'html',
-            dir : 'doc/reports/js-coverage/'
+            dir : 'dev/js-specs/reports/coverage/'
         },
         port: 9876,
         colors: true,
