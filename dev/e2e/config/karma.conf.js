@@ -4,7 +4,7 @@ module.exports = function(config) {
         basePath: '../../../',// path to repo root
         frameworks: ['karma-cukes'],
         files: [
-            { pattern: 'src/app/*.feature', included: false, watched: true, served: true },
+            { pattern: 'src/app/**/*.feature', included: false, watched: true, served: true },
             { pattern: 'dev/e2e/config/step-definitions.js', included: true, watched: true, served: true }
         ],
         client: {
