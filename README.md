@@ -4,8 +4,8 @@ Flanders Emission Explorer
 
 ## Documentation
 
-* [User Manual](http://bnowack.github.io/emissies-vlaanderen/manual.html)
-* ["Living" documentation for project stakeholders and developers](http://bnowack.github.io/emissies-vlaanderen/documentation.html)
+* [User Manual](http://bnowackbiz.github.io/emissies-vlaanderen/manual.html)
+* ["Living" documentation for project stakeholders and developers](http://bnowackbiz.github.io/emissies-vlaanderen/documentation.html)
 
 ## Repository Layout
 
