@@ -38,8 +38,8 @@ Requirements for the "Emissies Vlaanderen" application.
 1. The application opens a data view for a selected emission point:
     * Details: throughput, type, ...
     * Zoomed-in map of the exploitation site
-    * Site information from [CBB](http://lodcbbomv-on-1.cumuli.be:8080/lodcbbomv/repositories/CBB) and [KBO](http://rdfstoreomv-on-1.cumuli.be:3030/rdfstoreomv/kbo/sparql
-    * Organisation information from [CBB](http://lodcbbomv-on-1.cumuli.be:8080/lodcbbomv/repositories/CBB) and [KBO](http://rdfstoreomv-on-1.cumuli.be:3030/rdfstoreomv/kbo/sparql
+    * Site information from [CBB](http://lodcbbomv-on-1.cumuli.be:8080/lodcbbomv/repositories/CBB) and [KBO](http://rdfstoreomv-on-1.cumuli.be:3030/rdfstoreomv/kbo/sparql)
+    * Organisation information from [CBB](http://lodcbbomv-on-1.cumuli.be:8080/lodcbbomv/repositories/CBB) and [KBO](http://rdfstoreomv-on-1.cumuli.be:3030/rdfstoreomv/kbo/sparql)
     * Emission graphs for each pollutant
         * x-axis: reported years
         * y-axis: emission
