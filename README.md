@@ -1,6 +1,6 @@
 # Emissies Vlaanderen
 
-Emission Explorer for Flanders
+Flanders Emission Explorer
 
 ## Documentation
 
