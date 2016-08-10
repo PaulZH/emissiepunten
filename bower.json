@@ -20,5 +20,8 @@
   ],
   "dependencies": {
     "Polymer/polymer": "^1.6.0"
+  },
+  "devDependencies": {
+    "living-cukes": "bnowack/living-cukes"
   }  
 }
