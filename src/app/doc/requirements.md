@@ -25,7 +25,7 @@ Requirements for the "Emissies Vlaanderen" application.
 
 1. The application provides a zoomable and pannable map of Flanders.
     1. The map is compatible with [OpenLayers](http://openlayers.org/).
-    1. The map uses OpenStreetMap or (preferably?) the [Flanders Web Map Tile Service](https://tile.informatievlaanderen.be/).
+    1. The map uses OpenStreetMap or (preferably, if time permits) the [Flanders Web Map Tile Service](https://tile.informatievlaanderen.be/).
 1. Users can set a map location.
     1. The application offers automatic geo-detection to retrieve a user's current position (HTML5 Geolocation API).
     1. The user can select a location by clicking on the map
@@ -52,7 +52,7 @@ Requirements for the "Emissies Vlaanderen" application.
     * Link to organisation view
     * Link to NACE comparison view
 1. The application provides site views
-    * A site view shows all pollutants for a given site (across multiple organisations)
+    * A site view shows all pollutants for a given site (across multiple emission points)
 1. The application provides organisation views
     * An organisaton view shows all pollutants for a given organisation (across multiple sites)
 1. The application provides NACE comparison views
