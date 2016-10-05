@@ -1,0 +1,95 @@
+
+<!-- create a module to avoid chrome warnings -->
+<dom-module id="app-fonts">
+    <template>
+        <style></style>
+    </template>
+</dom-module>
+
+<!-- keep @font-face declarations in global scope, see https://github.com/Polymer/polymer/issues/2386 -->
+<style>
+
+    @font-face {
+        font-family: 'Flanders Sans';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 300;
+        src: url('fonts/FlandersArt/FlandersArtSans-Light.eot');
+        src: local('Flanders Art Sans Light'),
+        url('fonts/FlandersArt/FlandersArtSans-Light.eot?#iefix') format('embedded-opentype'),
+        url('fonts/FlandersArt/FlandersArtSans-Light.woff') format('woff'),
+        url('fonts/FlandersArt/FlandersArtSans-Light.ttf') format('truetype'),
+        url('fonts/FlandersArt/FlandersArtSans-Light.svg#222d09d62eecf7d55dbbce60a3976b34') format('svg');
+    }
+
+    @font-face {
+        font-family: 'Flanders Sans';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 400;
+        src: url('fonts/FlandersArt/FlandersArtSans-Regular.eot');
+        src: local('☺'),
+        url('fonts/FlandersArt/FlandersArtSans-Regular.eot?#iefix') format('embedded-opentype'),
+        url('fonts/FlandersArt/FlandersArtSans-Regular.woff') format('woff'),
+        url('fonts/FlandersArt/FlandersArtSans-Regular.ttf') format('truetype'),
+        url('fonts/FlandersArt/FlandersArtSans-Regular.svg#a781d42e8795b6c33f49152946c2a117') format('svg');
+    }
+
+    @font-face {
+        font-family: 'Flanders Sans';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 500;
+        src: url('fonts/FlandersArt/FlandersArtSans-Medium.eot');
+        src: local('☺'),
+        url('fonts/FlandersArt/FlandersArtSans-Medium.eot?#iefix') format('embedded-opentype'),
+        url('fonts/FlandersArt/FlandersArtSans-Medium.woff') format('woff'),
+        url('fonts/FlandersArt/FlandersArtSans-Medium.ttf') format('truetype'),
+        url('fonts/FlandersArt/FlandersArtSans-Medium.svg#a00e3e9aae2b74f48ebe54da93879a7b') format('svg');
+    }
+
+    @font-face {
+        font-family: 'Flanders Sans';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 700;
+        src: url('fonts/FlandersArt/FlandersArtSans-Bold.eot');
+        src: local('☺'),
+        url('fonts/FlandersArt/FlandersArtSans-Bold.eot?#iefix') format('embedded-opentype'),
+        url('fonts/FlandersArt/FlandersArtSans-Bold.woff') format('woff'),
+        url('fonts/FlandersArt/FlandersArtSans-Bold.ttf') format('truetype'),
+        url('fonts/FlandersArt/FlandersArtSans-Bold.svg#ccf2aa22c7445e01b2080bbe048caaae') format('svg');
+    }
+
+    @font-face {
+        font-family: 'Flanders Serif';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 300;
+        src: url('fonts/FlandersArt/FlandersArtSerif-Light.otf');
+    }
+
+    @font-face {
+        font-family: 'Flanders Serif';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 400;
+        src: url('fonts/FlandersArt/FlandersArtSerif-Regular.otf');
+    }
+
+    @font-face {
+        font-family: 'Flanders Serif';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 500;
+        src: url('fonts/FlandersArt/FlandersArtSerif-Medium.otf');
+    }
+
+    @font-face {
+        font-family: 'Flanders Serif';
+        font-display: swap;
+        font-style: normal;
+        font-weight: 700;
+        src: url('fonts/FlandersArt/FlandersArtSerif-Bold.otf');
+    }
+</style>
