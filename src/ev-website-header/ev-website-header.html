@@ -1,0 +1,95 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+
+<dom-module id="ev-website-header">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                display: block;
+                background: var(--ev-website-header-bg-color) url("img/website-header-bg.png") center top no-repeat;
+                border-bottom: 2px solid var(--ev-app-green-1);
+                font-family: "Flanders Sans", sans-serif;
+            }
+
+            header {
+                height: 130px;
+                @apply(--ev-app-container);
+                @apply(--layout-horizontal);
+                @apply(--layout-wrap);
+            }
+
+            /* department styles */
+
+            .department {
+                @apply(--layout-flex-9);
+                @apply(--layout-self-center);
+            }
+
+            .department > a {
+                display: inline-block;
+                font-size: 20px;
+                line-height: 19px;
+                color: var(--ev-app-green-1);
+                background: transparent;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            [w8b] .department > a {
+                background: transparent url("img/logo-lne.png") right center no-repeat;
+                padding-right: 250px;
+            }
+
+            .department > a > span {
+                display: block;
+                font-weight: 500;
+            }
+
+            .department > a > span:first-child {
+                font-weight: 100;
+            }
+
+            /* service nav styles */
+
+            .service-nav {
+                @apply(--layout-flex-3);
+            }
+
+
+        </style>
+
+        <ev-responsive>
+            <header>
+                <div class="department">
+                    <a class="lne" href="http://www.lne.be/">
+                        <span>Departement</span>
+                        <span>Leefmilieu,</span>
+                        <span>Natuur &</span>
+                        <span>Energie</span>
+                    </a>
+                </div>
+                <nav class="service-nav"></nav>
+            </header>
+        </ev-responsive>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-website-header'
+
+        });
+
+    </script>
+
+</dom-module>

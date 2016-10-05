@@ -1,0 +1,103 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-contact-link/ev-contact-link.html"/>
+
+<dom-module id="ev-global-header">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            /* layout */
+
+            ev-responsive {
+                @apply(--layout-horizontal);
+            }
+
+            .app-nav {
+                @apply(--layout-flex-8);
+            }
+
+            .sys-nav {
+                text-align: right;
+                display: none;
+            }
+
+            [w2b] .sys-nav {
+                display: block;
+            }
+
+            .sys-nav > * {
+                text-align: left;
+            }
+
+            /* general styling */
+
+            :host {
+                line-height: 40px;
+                font-family: "Flanders Sans", "Roboto-Light", sans-serif;
+                font-style: normal;
+                font-weight: 300;
+                height: 40px;
+            }
+
+            /* app-nav styling */
+
+            .vlaanderen-be {
+                font-weight: 500;
+                font-size: 16px;
+                color: var(--ev-global-header-link-color);
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .project {
+                display: none;
+            }
+
+            [w4b] .project {
+                display: inline;
+                border-left: 1px solid var(--ev-app-grey-6);
+                margin-left: 12px;
+                padding-left: 12px;
+                color: var(--ev-global-header-link-color);
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        </style>
+
+        <ev-responsive>
+            <div class="app-nav">
+                <a class="vlaanderen-be" href="http://www.vlaanderen.be/nl">Vlaanderen.be</a>
+                <a class="project" href$="[[appPath]]">Emissies Vlaanderen</a>
+            </div>
+            <div class="sys-nav">
+                <ev-contact-link>Contacteer ons</ev-contact-link>
+            </div>
+        </ev-responsive>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-global-header',
+
+            properties: {
+                appPath: {
+                    type: String,
+                    value: app.base || location.pathname
+                }
+            }
+
+        });
+
+    </script>
+
+</dom-module>

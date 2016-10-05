@@ -1,0 +1,166 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+
+<dom-module id="ev-website-footer">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                display: block;
+                background-color: var(--ev-website-footer-bg-color);
+                font-family: "Flanders Sans", sans-serif;
+            }
+
+            :host > footer {
+                height: 120px;
+                @apply(--ev-app-container);
+            }
+
+            /* credits */
+
+            .credits {
+                @apply(--layout-horizontal);
+                @apply(--layout-wrap);
+                height: 80px;
+            }
+
+            .credits > div {
+                @apply(--layout-self-center);
+            }
+
+            /* vlaanderen-be credits */
+
+            .vlaanderen-be a {
+                display: inline-block;
+                background: transparent url("img/footer-logo.png") left center no-repeat;
+                text-decoration: none;
+                width: 44px;
+                height: 51px;
+                cursor: pointer;
+            }
+
+            [w2a] .vlaanderen-be a {
+                width: 200px;
+            }
+
+            /* lne-be credits */
+
+            .lne-be {
+                @apply(--layout-flex-7);
+                display: none;
+            }
+
+            [w8b] .lne-be {
+                display: block;
+            }
+
+            /* version credits */
+
+            .credits > .version {
+                @apply(--layout-self-center);
+                @apply(--layout-flex);
+                height: 42px;
+                font-size: 0.9em;
+                color: var(--ev-app-grey-3);
+                text-align: right;
+            }
+
+            .credits span.version {
+            }
+
+            p {
+                margin: 4px 0;
+            }
+
+            a {
+                color: var(--ev-app-blue-1);
+            }
+
+            .main-info {
+                font-weight: 500;
+            }
+
+            /* disclaimer styles */
+
+            .disclaimer {
+                border-top: 1px solid var(--ev-app-grey-6);
+                line-height: 40px;
+                box-sizing: border-box;
+                height: 40px;
+                overflow: hidden;
+                font-weight: 500;
+                font-size: 14px;
+            }
+
+            .disclaimer a {
+                color: var(--ev-app-grey-3);
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+        </style>
+
+        <iron-ajax id="bower" auto url="../../bower.json" handle-as="json" on-response="onBowerJsonLoaded"></iron-ajax>
+
+        <ev-responsive>
+            <footer>
+                <div class="credits">
+                    <div class="vlaanderen-be" >
+                        <a href="http://www.vlaanderen.be/"></a>
+                    </div>
+
+                    <div class="lne-be" >
+                        <p class="main-info">Dit is een officiële website van de Vlaamse overheid</p>
+                        <p>uitgegeven door het <a href="http://www.lne.be/">Departement Leefmilieu, Natuur en Energie (LNE)</a>
+                    </div>
+
+                    <div class="version">
+                        <template is="dom-if" if="{{version}}">
+                            <span class="main-info">Versie:</span>
+                            <span class="version">{{version}}</span>
+                        </template>
+                    </div>
+
+                </div>
+                <div class="disclaimer">
+                    <a href="http://www.lne.be/disclaimer">Disclaimer</a>
+                </div>
+            </footer>
+        </ev-responsive>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-website-footer',
+
+            properties: {
+                version: {
+                    type: String,
+                    value: ''
+                },
+                breakpoint820: {
+                    type: Boolean,
+                    observer: 'onLayoutChanged'
+                }
+            },
+
+            onBowerJsonLoaded: function () {
+                this.set('version', this.$.bower.lastResponse.version || null);
+            }
+
+        });
+
+    </script>
+
+</dom-module>

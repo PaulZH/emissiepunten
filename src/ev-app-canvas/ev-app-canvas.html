@@ -1,0 +1,38 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+
+<dom-module id="ev-app-canvas">
+
+    <template>
+
+        <style include="app-styles">
+
+            :host {
+                display: block;
+                background: var(--ev-app-background-color) url("img/background-pattern.png");
+            }
+
+            :host > section {
+                @apply(--ev-app-container);
+            }
+
+        </style>
+
+        <section>
+            <content></content>
+        </section>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-app-canvas'
+
+        });
+
+    </script>
+
+</dom-module>

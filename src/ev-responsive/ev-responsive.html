@@ -1,0 +1,66 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html"/>
+
+<dom-module id="ev-responsive">
+
+    <template>
+        <iron-media-query query="(min-width: 200px)" query-matches="{{w2a}}"></iron-media-query>
+        <iron-media-query query="(min-width: 260px)" query-matches="{{w2b}}"></iron-media-query>
+        <iron-media-query query="(min-width: 400px)" query-matches="{{w4a}}"></iron-media-query>
+        <iron-media-query query="(min-width: 440px)" query-matches="{{w4b}}"></iron-media-query>
+        <iron-media-query query="(min-width: 600px)" query-matches="{{w6a}}"></iron-media-query>
+        <iron-media-query query="(min-width: 800px)" query-matches="{{w8a}}"></iron-media-query>
+        <iron-media-query query="(min-width: 820px)" query-matches="{{w8b}}"></iron-media-query>
+
+        <content></content>
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-responsive',
+
+            properties: {
+                w2a: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w2b: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w4a: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w4b: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w6a: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w8a: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w8b: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                }
+            },
+
+            onMediaQuery: function () {
+
+                this.toggleClass('breakpoint820', this.breakpoint820, this.$$('footer'));
+            }
+
+
+        });
+
+    </script>
+
+</dom-module>
