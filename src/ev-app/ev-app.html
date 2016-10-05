@@ -1,0 +1,76 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
+
+<dom-module id="ev-app">
+    <template>
+
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <app-location route="{{route}}" xuse-hash-as-path></app-location>
+        <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
+        <iron-ajax id="app-api" url="" handle-as="json" on-response="onApiResponse" on-error="onApiError"></iron-ajax>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'ev-app',
+
+            properties: {
+                base: {
+                    type: String,
+                    value: app.base
+                },
+                /**
+                 * The application's current view (a path)
+                 */
+                view: {
+                    type: String,
+                    reflectToAttribute: true,
+                    value: app.activeView,
+                    observer: 'onViewChanged'
+                },
+                query: {
+                    type: Object
+                }
+            },
+
+            observers: [
+                'onRouteChanged(routeData)',    // trigger onRouteChanged when routeData changes
+                'onRouteChanged(tailData)'      // trigger onRouteChanged when tailData changes
+            ],
+
+            /**
+             * Sets the element's `view` parameter when the route changes
+             */
+            onRouteChanged: function () {
+                if (!this.tailData || this.tailData.prefix === null) {
+                    return; // route not parsed yet
+                }
+                this.view = (this.tailData.prefix || '') + (this.tailData.path || '');
+                this.query = this.tailData.__queryParams;
+            },
+
+            /**
+             * Handles a view-change
+             */
+            onViewChanged: function () {
+                if (this.view === app.activeView) {
+                    return; // false positive
+                }
+                // set active view
+                app.activeView = this.view;
+            }
+
+        });
+    </script>
+
+</dom-module>
