@@ -4,6 +4,7 @@ module.exports = function(config) {
         basePath: '../../../',// path to repo root
         frameworks: ['karma-cukes'],
         files: [
+            { pattern: 'src/**/*.html', included: false, watched: true, served: false },
             { pattern: 'src/app/**/*.feature', included: false, watched: true, served: true },
             { pattern: 'dev/e2e/config/step-definitions.js', included: true, watched: true, served: true }
         ],
@@ -11,7 +12,7 @@ module.exports = function(config) {
             args: process.argv.slice(4),
             captureConsole: true
         },
-        reporters: ['kc-pretty', 'kc-json', 'junit'],
+        reporters: ['kc-pretty', 'kc-json'],
         kcJsonReporter: {
             outputDir: 'dev/e2e/reports',
             outputFile: '{shortBrowserName}.json'
@@ -34,7 +35,7 @@ module.exports = function(config) {
         proxies: {
             "/": "http://localhost:8080/"
         },
-        browsers: ['PhantomJS'],
+        browsers: ['PhantomJS2'],
         autoWatch: true,
         singleRun: false
     });
