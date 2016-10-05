@@ -1,0 +1,33 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+
+<dom-module id="ev-layout">
+
+    <template>
+        <style include="app-styles">
+            :host {
+                display: block;
+                min-height: 100vh;
+            }
+
+        </style>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-layout',
+
+            created: function () {
+                // de-flag body
+                document.querySelector("body").classList.remove('initializing');
+            }
+
+        });
+
+    </script>
+
+</dom-module>

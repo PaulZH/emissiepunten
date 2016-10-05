@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <link rel="shortcut icon" href="favicon.ico" data-size="32x32"/>
+        <link rel="apple-touch-icon" href="src/app/img/app-icon.png" data-size="152x152"/>
+        <link rel="manifest" href="config/manifest.json"/>
+
+        <title data-suffix=" - Emissies Vlaanderen">Welcome - Emissies Vlaanderen</title>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+            }
+
+            body.initializing  {
+                background: #fff url("src/ev-website-header/img/logo-lne.png") center no-repeat;
+            }
+
+            body.initializing > * {
+                display: none;
+            }
+
+        </style>
+
+        <script type="text/javascript">
+
+            window.app = {
+                base: location.pathname,
+                activeView: location.pathname
+            };
+
+            // set up Polymer options
+            window.Polymer = {
+                lazyRegister: true,
+                dom: 'shadow'
+            };
+
+            // inject polyfill, if needed
+            var hasWebComponents = 'registerElement' in document
+                    && 'import' in document.createElement('link')
+                    && 'content' in document.createElement('template');
+
+            if (!hasWebComponents) {
+                var script = document.createElement('script');
+                script.src = 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
+                document.head.appendChild(script);
+            }
+
+        </script>
+
+        <link rel="import" href="bower_components/polymer/polymer.html"/>
+        <link rel="import" href="src/ev-layout/ev-layout.html"/>
+
+    </head>
+    <body class="initializing">
+        <ev-layout>
+        </ev-layout>
+    </body>
+</html>
