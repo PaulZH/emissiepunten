@@ -1,0 +1,118 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/paper-button/paper-button.html"/>
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+
+<dom-module id="ev-result-list">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                --ev-card-content: {
+                    height: 410px;
+                }
+            }
+
+            p {
+                padding: 20px 20px;
+                text-align: center;
+                line-height: 1.5;
+            }
+
+            p.intro {
+                margin-top: 20px;
+            }
+
+            p.get-started .heading {
+                display: block;
+                font-weight: 500;
+                margin-bottom: 16px;
+            }
+
+            span.sub-info {
+                display: block;
+                margin-top: 8px;
+                color: var(--ev-app-grey-4);
+            }
+
+            paper-button {
+                background-color: var(--ev-app-green-2);
+                color: #fff;
+                font-size: 15px;
+                font-weight: 500;
+                font-family: "Flanders Sans", sans-serif;
+                padding-right: 20px;
+            }
+
+            iron-icon {
+                margin-right: 12px;
+                --iron-icon-width: 20px;
+                --iron-icon-height: 20px;
+            }
+
+
+        </style>
+
+        <ev-card title="{{title}}">
+            <template is="dom-if" if="{{points.length}}">
+                got points
+            </template>
+            <template is="dom-if" if="{{!points.length}}">
+                <p class="intro">
+                    Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
+                </p>
+                <p class="get-started">
+                    <span class="heading">Get started:</span>
+                    <paper-button raised>
+                        <iron-icon icon="maps:my-location"></iron-icon>
+                        Use my location
+                    </paper-button>
+                    <span class="sub-info">or just click on the map</span>
+                </p>
+            </template>
+        </ev-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-result-list',
+
+            properties: {
+                title: {
+                    type: String
+                },
+                points: {
+                    type: Array,
+                    notify: true,
+                    observer: "onPointsChanged"
+                }
+            },
+
+            attached: function () {
+                this.updateTitle();
+            },
+
+            updateTitle: function () {
+                this.title = this.points && this.points.length
+                    ? this.points.length + ' Emission Points found'
+                    : 'Emission Points in Flanders';
+            },
+
+            onPointsChanged: function() {
+                this.updateTitle();
+            }
+
+        });
+
+    </script>
+
+</dom-module>
