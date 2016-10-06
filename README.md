@@ -7,6 +7,16 @@ Flanders Emission Explorer
 * [User Manual](http://bnowackbiz.github.io/emissies-vlaanderen/manual.html)
 * ["Living" documentation for project stakeholders and developers](http://bnowackbiz.github.io/emissies-vlaanderen/documentation.html)
 
+## Preview
+
+* [Preview](http://bnowackbiz.github.io/emissies-vlaanderen/) (LNE VPN required for SPARQL queries)
+
+## Installation
+
+* `npm install`
+* `bower install`
+* `npm run polymer-serve` => `http://localhost:8080/`
+
 ## Repository Layout
 
 * `/bower_components`               - Client-side dependencies
