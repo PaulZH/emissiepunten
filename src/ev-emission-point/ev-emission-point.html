@@ -1,0 +1,41 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../app/app-styles.html"/>
+
+<dom-module id="ev-emission-point">
+
+    <template>
+
+        <style include="app-styles">
+
+            :host {
+
+                display: block;
+                -width: 100%;
+
+                --ev-card-content: {
+                    height: 410px;
+                }
+            }
+
+
+        </style>
+
+        <ev-card title="">
+            data
+        </ev-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-emission-point'
+
+        });
+
+    </script>
+
+</dom-module>
