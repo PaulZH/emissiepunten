@@ -3,6 +3,12 @@
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-result-list/ev-result-list.html"/>
+<link rel="import" href="../ev-map/ev-map.html"/>
+<link rel="import" href="../ev-emission-point/ev-emission-point.html"/>
 
 <dom-module id="ev-app">
     <template>
@@ -11,11 +17,52 @@
             :host {
                 display: block;
             }
+
+            /* list and map */
+
+            #list-and-map {
+                @apply(--layout-horizontal);
+            }
+
+            ev-result-list {
+                display: none;
+            }
+
+            [w8a] ev-result-list {
+                display: block;
+                @apply(--layout-flex-3);
+                margin-right: 16px;
+            }
+
+            ev-map {
+                @apply(--layout-flex-9);
+                max-width: 100%;
+            }
+
+            /* emission point */
+
+            #emission-point {
+                margin-top: 16px;
+            }
+
         </style>
 
         <app-location route="{{route}}" xuse-hash-as-path></app-location>
         <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
         <iron-ajax id="app-api" url="" handle-as="json" on-response="onApiResponse" on-error="onApiError"></iron-ajax>
+
+        <ev-responsive>
+            <section id="list-and-map">
+                <ev-result-list points="{{points}}"></ev-result-list>
+                <ev-map></ev-map>
+            </section>
+
+            <template is="dom-if" if="{{point}}">
+                <section id="emission-point">
+                    <ev-emission-point></ev-emission-point>
+                </section>
+            </template>
+        </ev-responsive>
 
     </template>
 
@@ -30,7 +77,7 @@
                     value: app.base
                 },
                 /**
-                 * The application's current view (a path)
+                 * The app's current view (a path)
                  */
                 view: {
                     type: String,
@@ -38,8 +85,26 @@
                     value: app.activeView,
                     observer: 'onViewChanged'
                 },
+                /**
+                 * Request parameters
+                 */
                 query: {
                     type: Object
+                },
+                /**
+                 * Matching emission points
+                 */
+                points: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                },
+                /**
+                 * Selected emission point
+                 */
+                point: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
