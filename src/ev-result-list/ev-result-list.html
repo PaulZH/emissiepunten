@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html"/>
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
 <link rel="import" href="../../bower_components/iron-icons/maps-icons.html"/>
+<link rel="import" href="../../bower_components/iron-list/iron-list.html"/>
 <link rel="import" href="../ev-card/ev-card.html"/>
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
@@ -56,26 +57,68 @@
                 --iron-icon-height: 20px;
             }
 
+            /* list */
+
+            iron-list {
+                height: 100%;
+            }
+
+            .list-item {
+                padding: 16px 16px 16px 60px;
+                min-height: 60px;
+                background: transparent url("img/emission-icon.png") 16px 16px no-repeat;
+                border-bottom: 1px solid var(--ev-app-grey-6);
+            }
+
+            .list-item a {
+                color: var(--ev-app-green-1);
+                text-decoration: none;
+            }
+
+            .list-item:last-child {
+                border-bottom: none;
+            }
+
+            .list-item.selected {
+                background-color: var(--ev-app-green-2);
+                color: #fff;
+                border-top: 1px solid #fff;
+            }
+
+            .list-item.selected a {
+                color: #fff;
+            }
 
         </style>
 
         <ev-card title="{{title}}">
-            <template is="dom-if" if="{{points.length}}">
-                got points
-            </template>
+
+            <!-- no points -->
             <template is="dom-if" if="{{!points.length}}">
                 <p class="intro">
                     Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
                 </p>
                 <p class="get-started">
                     <span class="heading">Get started:</span>
-                    <paper-button raised>
+                    <paper-button raised on-tap="onGeolocate">
                         <iron-icon icon="maps:my-location"></iron-icon>
                         Use my location
                     </paper-button>
                     <span class="sub-info">or just click on the map</span>
                 </p>
             </template>
+
+            <!-- points found -->
+            <template is="dom-if" if="{{points.length}}">
+                <iron-list items="[[points]]" selection-enabled selected-item="{{selectedItem}}">
+                    <template>
+                        <div class$="[[getItemClass(selected)]]" data-uri="[[item.ep.value]]">
+                            <a href="[[item.ep.value]]" on-tap="onItemLinkTapped">[[item.label.value]]</a></div>
+                        </div>
+                    </template>
+                </iron-list>
+            </template>
+
         </ev-card>
 
     </template>
@@ -90,10 +133,26 @@
                 title: {
                     type: String
                 },
+                location: {
+                    type: Object,
+                    notify: true
+                },
                 points: {
                     type: Array,
-                    notify: true,
                     observer: "onPointsChanged"
+                },
+                point: {
+                    type: Object,
+                    observer: "onPointChanged",
+                    notify: true
+                },
+                selectedItem: {
+                    type: Object,
+                    observer: "onSelectionChanged"
+                },
+                geolocate: {
+                    type: Boolean,
+                    notify: true
                 }
             },
 
@@ -101,14 +160,62 @@
                 this.updateTitle();
             },
 
-            updateTitle: function () {
-                this.title = this.points && this.points.length
-                    ? this.points.length + ' Emission Points found'
-                    : 'Emission Points in Flanders';
+            listeners: {
+                //'tap': 'onTap'
             },
 
-            onPointsChanged: function() {
+            updateTitle: function () {
+                if (this.location && this.location.point) {
+                    var hits = (this.points.length || 0);
+                    this.title = (hits === 1)
+                        ? '1 Emission Point found'
+                        : hits + ' Emission Points found';
+                } else {
+                    this.title = 'Emission Points in Flanders';
+                }
+            },
+
+            onPointsChanged: function () {
                 this.updateTitle();
+            },
+
+            onPointChanged: function (point) {
+                var $list = this.$$('iron-list');
+                var selectedItem = $list ? $list.selectedItem : null;
+                if (point && (!selectedItem || selectedItem.ep.value !== point.ep.value)) {
+                    this.points.forEach(function (item) {
+                        if (item.ep.value === point.ep.value) {
+                            $list.selectItem(item);
+                            $list.scrollToItem(item);
+                        }
+                    })
+                } else if (!point && selectedItem) {
+                    $list.clearSelection();
+                }
+            },
+
+            getItemClass: function (selected) {
+                return selected
+                    ? 'list-item selected'
+                    : 'list-item';
+            },
+
+            onItemLinkTapped: function (event) {
+                event.preventDefault();
+                var nEvent = Polymer.dom(event);
+                var $a = nEvent.rootTarget || nEvent.event.explicitOriginalTarget || nEvent.event.originalTarget || nEvent.event.target;
+                var $item = Polymer.dom($a).parentNode;
+                var $list = this.$$('iron-list');
+                var item = $list.modelForElement($item).item;
+                $list.toggleSelectionForItem(item);
+            },
+
+            onSelectionChanged: function (selectedItem) {
+                this.point = selectedItem;// propagates to map
+            },
+
+            onGeolocate: function () {
+                this.set('geolocate', true);
             }
 
         });
