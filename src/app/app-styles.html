@@ -12,6 +12,7 @@
                 --ev-app-grey-4: #b8b8b8;
                 --ev-app-grey-5: #cbd2da;
                 --ev-app-grey-6: #e8ebee;
+                --ev-app-grey-7: #f6f6f6;
 
                 --ev-app-green-1: #42796d;
                 --ev-app-green-2: #4da692;
@@ -31,6 +32,36 @@
                 };
 
                 --ev-global-header-link-color: var(--ev-app-grey-3);
+            }
+
+            /* table */
+
+            table {
+                border-collapse: collapse;
+            }
+
+            th {
+                text-align: left;
+                background-color: var(--ev-app-grey-7);
+                font-family: "Flanders Sans", "Roboto-Light", sans-serif;
+                font-weight: 300;
+                line-height: 40px;
+                padding: 1px 16px 0;
+            }
+
+            td {
+                line-height: 32px;
+                padding: 0 16px;
+                font-size: 0.9em;
+            }
+
+            tr + tr td {
+                border-top: 1px solid var(--ev-app-grey-7);
+            }
+
+            td.label {
+                font-weight: 500;
+                text-align: right;
             }
 
         </style>
