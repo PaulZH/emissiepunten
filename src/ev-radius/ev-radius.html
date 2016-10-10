@@ -1,0 +1,97 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html"/>
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html"/>
+<link rel="import" href="../../bower_components/paper-item/paper-item.html"/>
+
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+
+<dom-module id="ev-radius">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                display: block;
+                position: absolute;
+                right: 0.5em;
+                top: 0.5em;
+                font-family: "Flanders Sans", sans-serif;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 0 4px;
+
+                --paper-dropdown-menu-focus-color: var(--ev-app-green-2);
+                --list-width: 120px;
+            }
+
+            paper-dropdown-menu-light {
+
+                width: var(--list-width);
+
+                --paper-dropdown-menu: {
+                    width: var(--list-width);
+                };
+            }
+            paper-dropdown-menu-light paper-listbox {
+                --paper-listbox: {
+                    width: var(--list-width);
+                };
+            }
+
+        </style>
+
+        <paper-dropdown-menu-light label="Radius (km)">
+            <paper-listbox id="list" class="dropdown-content" selected="{{selected}}">
+                <paper-item>1</paper-item>
+                <paper-item>5</paper-item>
+                <paper-item>10</paper-item>
+                <paper-item>20</paper-item>
+                <paper-item>25</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu-light>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-radius',
+
+            ready: function () {
+                // select provided radius
+                var items = this.$.list.querySelectorAll('paper-item');
+                for (var i = 0; i < items.length; i++) {
+                    if (parseInt(items[i].textContent) === this.radius) {
+                        this.set('selected', i);
+                    }
+                }
+            },
+
+            properties: {
+                selected: {
+                    type: Number,
+                    observer: 'onSelectionChange'
+                },
+                radius: {
+                    type: Number,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            },
+
+            onSelectionChange: function (selectedIndex) {
+                var selectedItem = this.$$('#list paper-item:nth-child(' + (selectedIndex + 1) + ')');
+                if (selectedItem) {
+                    this.set('radius', parseInt(selectedItem.textContent));
+                }
+            }
+
+        });
+
+    </script>
+
+</dom-module>

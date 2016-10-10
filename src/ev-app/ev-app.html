@@ -53,13 +53,13 @@
 
         <ev-responsive>
             <section id="list-and-map">
-                <ev-result-list points="{{points}}"></ev-result-list>
-                <ev-map></ev-map>
+                <ev-result-list geolocate={{geolocate}} location={{location}} points="{{emissionPoints}}" point="{{selectedEmissionPoint}}"></ev-result-list>
+                <ev-map location={{location}} geolocate={{geolocate}} emission-points="{{emissionPoints}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
             </section>
 
-            <template is="dom-if" if="{{point}}">
+            <template is="dom-if" if="{{selectedEmissionPoint}}">
                 <section id="emission-point">
-                    <ev-emission-point></ev-emission-point>
+                    <ev-emission-point point="{{selectedEmissionPoint}}"></ev-emission-point>
                 </section>
             </template>
         </ev-responsive>
@@ -94,7 +94,7 @@
                 /**
                  * Matching emission points
                  */
-                points: {
+                emissionPoints: {
                     type: Array,
                     notify: true,
                     value: []

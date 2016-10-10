@@ -1,0 +1,135 @@
+<!--suppress JSCheckFunctionSignatures -->
+<script>
+    evMapLocation = {
+
+        properties: {
+            locationLayer: {
+                type: Object
+            },
+            locationMarkerOverlay: {
+                type: Object
+            },
+            locationRadiusFeature: {
+                type: Object
+            },
+            location: {
+                type: Object, // lat, lon, radius
+                value: {lat: null, lon: null, radius: 10, point: null},
+                notify: true
+            },
+            geolocate: {
+                type: Boolean,
+                observer: 'onGeolocate'
+            }
+        },
+
+        listeners: {
+            'mapCreated': 'onMapCreated'
+        },
+
+        observers: [
+            'onLocationChanged(location.*)'
+        ],
+
+        onMapCreated: function (event, map) {
+            var self = this;
+            // create vector layer
+            this.createLocationLayer();
+            // register click events
+            map.on('singleclick', function (event) {
+                if (!self.isFeatureClick(event, 'emissionPoint')) {
+                    self.onLocationClicked(event);
+                }
+            });
+            // register geolocate
+            this.geolocation = new ol.Geolocation({
+                projection: this.getProjection()
+            });
+            this.geolocation.on('change:position', function() {
+                var point = self.geolocation.getPosition();
+                var wgs84 = ol.proj.transform(point, 'EPSG:31370', 'EPSG:4326');
+                self.set('location.point', point);
+                self.set('location.lon', wgs84[0]);
+                self.set('location.lat', wgs84[1]);
+            });
+        },
+
+        createLocationLayer: function () {
+            // layer
+            this.locationLayer = new ol.layer.Vector({
+                name: 'location',
+                source: new ol.source.Vector({})
+            });
+            this.olMap.addLayer(this.locationLayer);
+        },
+
+        createLocationMarkerOverlay: function () {
+            var markerEl = document.createElement('iron-icon');
+            markerEl.setAttribute('icon', 'maps:my-location');
+            markerEl.classList.add('location-marker');
+            this.locationMarkerOverlay = new ol.Overlay({
+                position: this.location.point,
+                element: markerEl
+            });
+            this.olMap.addOverlay(this.locationMarkerOverlay);
+        },
+
+        createLocationRadiusFeature: function () {
+            var center = this.location.point;
+            var circleGeom = new ol.geom.Circle(center, this.location.radius * 1000);
+            this.locationRadiusFeature = new ol.Feature({
+                name: 'locationRadius',
+                geometry: circleGeom
+            });
+            var style = new ol.style.Style({
+                fill: new ol.style.Fill({ color: [77, 166, 146, 0.5] })
+            });
+            this.locationRadiusFeature.setStyle(style);
+            this.locationLayer.getSource().addFeature(this.locationRadiusFeature);
+        },
+
+        onLocationClicked: function (event) {
+            var point = event.coordinate;
+            var wgs84 = ol.proj.transform(point, 'EPSG:31370', 'EPSG:4326');
+            this.set('location.point', point);
+            this.set('location.lon', wgs84[0]);
+            this.set('location.lat', wgs84[1]);
+        },
+
+        onLocationChanged: function () {
+            this.debounce('onLocationChanged', function() {
+                if (!this.location || !this.location.point) {
+                    return;
+                }
+                // position marker
+                if (!this.locationMarkerOverlay) {
+                    this.createLocationMarkerOverlay();
+                } else {
+                    this.locationMarkerOverlay.setPosition(this.location.point);
+                }
+                // radius viz
+                if (!this.locationRadiusFeature) {
+                    this.createLocationRadiusFeature();
+                } else {
+                    this.locationRadiusFeature.getGeometry().setCenterAndRadius(this.location.point, this.location.radius * 1000)
+                }
+                // pan to new location
+                this.async(this.panToLocation, 100);
+            }, 10);
+        },
+
+        panToLocation: function () {
+            var view = this.olMap.getView();
+            var pan = ol.animation.pan({
+                source: view.getCenter()
+            });
+            this.olMap.beforeRender(pan);
+            view.setCenter(this.location.point);
+        },
+
+        onGeolocate: function () {
+            this.geolocation.setTracking(true);
+        }
+
+    }
+</script>

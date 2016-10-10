@@ -1,9 +1,17 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html"/>
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
 <link rel="import" href="../openlayers/openlayers-assets.html"/>
 <link rel="import" href="../openlayers/openlayers-styles.html"/>
-
 <link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../ev-radius/ev-radius.html"/>
+
+<link rel="import" href="../ev-map/ev-map-core-behavior.html"/>
+<link rel="import" href="../ev-map/ev-map-location-behavior.html"/>
+<link rel="import" href="../ev-map/ev-map-emission-points-behavior.html"/>
+<link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
 
 <dom-module id="ev-map">
 
@@ -21,13 +29,84 @@
                 height: 100%;
                 width: 100%;
                 overflow: hidden;
+                box-sizing: border-box;
+            }
+
+            .title-template {
+                display: none;
+            }
+
+            .location-marker {
+                display: block;
+                width: 20px;
+                height: 20px;
+                color: #fff;
+                margin-top: -10px;
+                margin-left: -10px;
+            }
+
+            .ep-marker {
+                display: block;
+                width: 20px;
+                height: 20px;
+                background: #fff;
+                margin-top: -10px;
+                margin-left: -10px;
             }
 
         </style>
 
         <ev-card title="{{title}}">
             <div id="map"></div>
+            <ev-radius radius="{{location.radius}}"></ev-radius>
         </ev-card>
+
+        <iron-ajax id="emission-points-api"
+                   url="{{sparqlApi}}"
+                   headers='{"Accept": "application/json"}'
+                   params='{{epApiParams}}'
+                   handle-as="json"
+                   on-response="epOnApiResponse"
+                   on-error="epOnApiError"
+                   debounce-duration="300"
+        ><pre>
+            {{sparqlPrologue}}
+
+            SELECT DISTINCT ?ep ?label ?lat ?lon ?owner WHERE {
+                SERVICE geo:search {
+                    ?ep geo:search "inCircle";
+                    geo:searchDatatype geoliteral:lat-lon ;
+                    geo:predicate wgs84:lat_long;
+                    geo:spatialCircleCenter "{{location.lat}}#{{location.lon}}";
+                    geo:spatialCircleRadius "{{location.radius}}" .
+                }
+                ?ep a milieu:Emissiepunt ;
+                    rdfs:label ?label ;
+                    wgs84_pos:lat ?lat ;
+                    wgs84_pos:long ?lon ;
+                    protontop:isOwnedBy ?owner .
+            }
+            ORDER BY DESC(?lat) DESC(?lon)
+            LIMIT 1000
+
+        </pre>
+        </iron-ajax>
+
+        <iron-ajax id="helper-api"
+                   url="{{sparqlApi}}"
+                   headers='{"Accept": "application/json"}'
+                   params='{{helperApiParams}}'
+                   handle-as="json"
+                   on-response="helperOnApiResponse"
+                   debounce-duration="300"
+        ><pre>
+            {{sparqlPrologue}}
+            SELECT DISTINCT ?p WHERE {
+                ?s a milieu:Emissiepunt ;
+                    ?p ?o .
+            }
+        </pre>
+        </iron-ajax>
 
     </template>
 
@@ -37,114 +116,44 @@
 
             is: 'ev-map',
 
+            behaviors: [
+                evMapCore,
+                evMapLocation,
+                evAppRdf,
+                evMapEmissionPoints
+            ],
+
             properties: {
-                title: {
-                    type: String
+                /**
+                 * map container element
+                 */
+                $map: {
+                    type: Object
                 },
-                points: {
-                    type: Array,
-                    notify: true,
-                    observer: "onPointsChanged"
+                title: {
+                    type: String,
+                    computed: 'getTitle(location.*)'
                 }
             },
 
             attached: function () {
-                this.updateTitle();
+                this.$map = this.$.map;
                 this.createMap();
-                this.scopeSubtree(this.$.map, true);
             },
 
-            updateTitle: function () {
-                this.title = this.points && this.points.length
-                        ? 'Emission Points within xkm of latlon'
-                        : 'Select a location';
-            },
-
-            createMap: function () {
-
-                var map = new ol.Map({
-                    target: this.$.map,
-                    controls: [
-                        new ol.control.ScaleLine(),
-                        new ol.control.Zoom(),
-                        new ol.control.ZoomSlider()
-                    ],
-                    view: this.getView()
-                });
-
-                var tileGrid = new ol.tilegrid.WMTS({
-                    extent: [9928.000000, 66928.000000, 272072.000000, 329072.000000],
-                    resolutions: this.getResolutions(),
-                    matrixIds: this.getMatrixIds()
-                });
-
-                var source = new ol.source.WMTS({
-                    url: 'https://tile.informatievlaanderen.be/ws/raadpleegdiensten/wmts',
-                    layer: 'grb_bsk_grijs',
-                    matrixSet: 'BPL72VL',
-                    format: 'image/png',
-                    projection: 'EPSG:31370',
-                    tileGrid: tileGrid,
-                    style: ''
-                });
-
-                var layer = new ol.layer.Tile({
-                    source: source
-                });
-
-                map.addLayer(layer);
-                var self = this;
-                map.on('singleclick', function(evt) {
-                    var coordinate = evt.coordinate;
-                    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
-                            coordinate, 'EPSG:31370', 'EPSG:4326'));
-                    var wgs84 = ol.proj.transform(coordinate, 'EPSG:31370', 'EPSG:4326');
-                    self.set('title', wgs84[0] + ', ' + wgs84[1]);
-                    //console.log(coordinate, hdms, wgs84);
-                });
-            },
-
-            getExtent: function () {
-                return [9928.000000, 66928.000000, 272072.000000, 329072.000000];
-            },
-
-            getResolutions: function () {
-                var resolutions = [];
-                var maxResolution = ol.extent.getHeight(this.getExtent()) / 256;
-                for (var i = 0; i < 12; i++) {
-                    resolutions[i] = maxResolution / Math.pow(2, i);
+            getTitle: function () {
+                if (this.location && this.location.lat) {
+                    var t = 'Emission Points within {radius}km of {lat},{lon}';
+                    return t
+                            .replace('{radius}', this.location.radius)
+                            .replace('{lat}', this.location.lat.toFixed(5))
+                            .replace('{lon}', this.location.lon.toFixed(5));
+                } else {
+                    return 'Select a location';
                 }
-                return resolutions;
-            },
-
-            getMatrixIds: function () {
-                var ids = [];
-                for (var i = 0; i < 12; i++) {
-                    ids[i] = i.toString();
-                }
-                return ids;
-            },
-
-            getProjection: function () {
-                if (!ol.proj.get('EPSG:31370')) {
-                    var code = 'EPSG:31370';
-                    var definition = '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1 +units=m +no_defs';
-                    proj4.defs(code, definition);
-                }
-                return ol.proj.get('EPSG:31370');
-            },
-
-            getView: function () {
-                return new ol.View({
-                    center: [140860.69299028325, 190532.7165957574],
-                    extent: this.getExtent(),
-                    projection: this.getProjection(),
-                    resolutions: this.getResolutions(),
-                    zoom: 2
-                });
             }
-
         });
+
 
     </script>
 

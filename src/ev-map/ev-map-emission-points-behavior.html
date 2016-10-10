@@ -1,0 +1,192 @@
+<script>
+    evMapEmissionPoints = {
+
+        properties: {
+            emissionPointsLayer: {
+                type: Object
+            },
+            emissionPoints: {
+                type: Array,
+                notify: true,
+                observer: 'epOnEmissionPointsChanged'
+            },
+            selectedEmissionPoint: {
+                type: Object,
+                notify: true,
+                observer: 'epOnSelectedEmissionPointChanged'
+            },
+            selectedEmissionPointFeature: {
+                type: Object,
+                notify: true
+            },
+            epApi: {
+                type: Object
+            },
+            epApiParams: {
+                type: Object
+            }
+        },
+
+        listeners: {
+            'mapCreated': 'epOnMapCreated'
+        },
+
+
+        observers: [
+            'epOnLocationChanged(location.*)'
+        ],
+
+        ready: function () {
+            this.epApi = this.$['emission-points-api'];
+            this.helperApi = this.$['helper-api'];
+        },
+
+        epOnMapCreated: function (event, map) {
+            // create vector layer
+            this.createEmissionPointsLayer();
+            // register click events
+            var self = this;
+            map.on('singleclick', function (event) {
+                self.epOnMapClicked(event);
+            });
+        },
+
+        createEmissionPointsLayer: function () {
+            this.emissionPointsLayer = new ol.layer.Vector({
+                name: 'emissionPoints',
+                source: new ol.source.Vector({}),
+                style: new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, 1],
+                        size: [34, 36],
+                        opacity: 0.9,
+                        scale: 1,
+                        src: 'src/ev-map/img/ep-marker.png'
+                    })
+                })
+            });
+            this.olMap.addLayer(this.emissionPointsLayer);
+        },
+
+        epOnLocationChanged: function () {
+            this.debounce('epOnLocationChanged', this.retrieveEmissionPoints, 10);
+        },
+
+        retrieveEmissionPoints: function () {
+            if (!this.location || !this.location.point) {
+                return;
+            }
+            this.epApiParams = { query: this.epApi.textContent };
+            this.epApi.generateRequest();
+        },
+
+        callHelperApi: function() {
+            this.helperApiParams = { query: this.helperApi.textContent };
+            this.helperApi.generateRequest();
+        },
+
+        epOnApiResponse: function () {
+            this.set('emissionPoints', this.epApi.lastResponse.results.bindings)
+        },
+
+        epOnApiError: function () {
+            console.log('err', arguments)
+        },
+
+        epOnEmissionPointsChanged: function (emissionPoints) {
+            var self = this;
+            if (!this.olMap) return;
+
+            var features = [];
+            emissionPoints.forEach(function (emissionPoint) {
+                var wgs84Point = [parseFloat(emissionPoint.lon.value), parseFloat(emissionPoint.lat.value)];
+                var olPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
+                var feature = new ol.Feature({
+                    name: 'emissionPoint',
+                    geometry: new ol.geom.Point(olPoint),
+                    emissionPoint: emissionPoint
+                });
+                features.push(feature);
+            });
+
+            this.emissionPointsLayer.getSource().clear();
+            this.emissionPointsLayer.getSource().addFeatures(features);
+        },
+
+        epOnMapClicked: function (event) {
+            var features = this.getFeaturesAtPixel(event.pixel, 'emissionPoint');
+            if (!features.length) {
+                return;
+            }
+            var feature = features[0];// pick top feature in case of stacked markers
+            this.toggleFeature(feature);
+        },
+
+        toggleFeature: function (feature) {
+            if (this.selectedEmissionPointFeature === feature) {
+                this.deselectFeature(feature);
+            } else {
+                this.selectFeature(feature);
+            }
+        },
+
+        deselectFeature: function (feature) {
+            feature.setStyle(new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 1],
+                    size: [34, 36],
+                    opacity: 0.9,
+                    scale: 1,
+                    src: 'src/ev-map/img/ep-marker.png'
+                })
+            }));
+            if (this.selectedEmissionPointFeature === feature) {
+                this.set('selectedEmissionPointFeature', null);
+                this.set('selectedEmissionPoint', null);
+            }
+        },
+
+        selectFeature: function (feature) {
+            // cancel if already selected
+            if (this.selectedEmissionPointFeature === feature) {
+                return;
+            }
+            // unselect existing
+            if (this.selectedEmissionPointFeature) {
+                this.deselectFeature(this.selectedEmissionPointFeature);
+            }
+            // select given
+            feature.setStyle(new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 1],
+                    size: [38, 41],
+                    opacity: 0.9,
+                    scale: 1,
+                    src: 'src/ev-map/img/ep-marker-selected.png'
+                })
+            }));
+            this.set('selectedEmissionPointFeature', feature);
+            this.set('selectedEmissionPoint', feature.get('emissionPoint'));
+        },
+
+        /**
+         * processes changes in the result list
+         *
+         * @param emissionPoint
+         */
+        epOnSelectedEmissionPointChanged: function (emissionPoint) {
+            if (emissionPoint === null && this.selectedEmissionPointFeature) {
+                this.deselectFeature(this.selectedEmissionPointFeature)
+            } else if (emissionPoint) {
+                var features = this.emissionPointsLayer.getSource().getFeatures();
+                var self = this;
+                features.forEach(function (feature) {
+                    if (feature.get('emissionPoint') === emissionPoint) {
+                        self.selectFeature(feature);
+                    }
+                });
+            }
+        }
+
+    }
+</script>
