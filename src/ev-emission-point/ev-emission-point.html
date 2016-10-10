@@ -1,7 +1,11 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../ev-card/ev-card.html"/>
 <link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
+<link rel="import" href="../ev-emission/ev-emission-selector.html"/>
+<link rel="import" href="../ev-emission/ev-emission-chart.html"/>
 
 <dom-module id="ev-emission-point">
 
@@ -15,16 +19,136 @@
                 -width: 100%;
 
                 --ev-card-content: {
-                    height: 410px;
+                    min-height: 410px;
+                    @apply(--layout-horizontal);
                 }
             }
 
+            #data {
+                @apply(--layout-flex);
+                padding: 16px;
+                border-right: 1px solid var(--ev-app-grey-6);
+            }
+
+            #emissions {
+                @apply(--layout-flex);
+                @apply(--layout-vertical);
+                padding: 16px;
+                position: relative;
+            }
+
+            #emissions .controls {
+                position: relative;
+                height: 80px;
+            }
+            #emissions .chart {
+                @apply(--layout-flex);
+            }
 
         </style>
 
-        <ev-card title="">
-            data
+        <ev-card title="{{point.label.value}}">
+            <div id="data">
+
+                <template is="dom-if" if="{{pointData}}">
+                    <table>
+                        <thead>
+                            <tr><th colspan="2">Emission point data</th></tr>
+                        </thead>
+                        <tbody>
+                            <template is="dom-repeat" items="{{pointData}}">
+                                <tr>
+                                    <td class="label">{{item.name}}</td>
+                                    <td>{{item.value}}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+
+
+                <template is="dom-if" if="{{siteData}}">
+                    site data
+                </template>
+
+
+                <template is="dom-if" if="{{orgData}}">
+                    org data
+                </template>
+            </div>
+            <div id="emissions">
+                <template is="dom-if" if="{{emiData.substances}}">
+                    <div class="controls">
+                        <ev-emission-selector emissions="{{emiData.substances}}" emission="{{selectedSubstance}}"></ev-emission-selector>
+                        Emissions
+                    </div>
+                    <div class="chart">
+                        <ev-emission-chart data="{{emiData}}" substance="{{selectedSubstance}}"></ev-emission-chart>
+                    </div>
+                </template>
+
+                <template is="dom-if" if="{{!emiData.substances}}">
+                    <em>no emission data available</em>
+                </template>
+
+            </div>
         </ev-card>
+
+        <iron-ajax url="{{sparqlApi}}" headers='{"Accept": "application/json"}' handle-as="json" on-error="onApiError" debounce-duration="300"
+                   params='{{schemaParams}}' id="schemaApi" on-response="onSchemaResponse">
+            <pre>
+            {{sparqlPrologue}}
+
+            SELECT DISTINCT ?term ?label WHERE {
+                {
+                    ?ep a milieu:Emissiepunt ;
+                        ?term ?o .
+                }
+                UNION {
+                    ?obs milieu:substantie ?term .
+                }
+                UNION {
+                    ?obs sdmx:unitMeasure ?term .
+                }
+                UNION {
+                    ?ep dct:type ?term .
+                }
+                ?term ?labelProp ?label .
+                FILTER (?labelProp = rdfs:label || ?labelProp = skos:prefLabel )
+            }
+            LIMIT 500
+            </pre>
+        </iron-ajax>
+
+        <iron-ajax url="{{sparqlApi}}" headers='{"Accept": "application/json"}' handle-as="json" on-error="onApiError" debounce-duration="300"
+                   params='{{pointParams}}' id="pointApi" on-response="onPointResponse">
+            <pre>
+            {{sparqlPrologue}}
+
+            SELECT ?p ?o WHERE {
+                <{{point.ep.value}}> ?p ?o .
+            }
+            LIMIT 100
+            </pre>
+        </iron-ajax>
+
+        <iron-ajax url="{{sparqlApi}}" headers='{"Accept": "application/json"}' handle-as="json" on-error="onApiError" debounce-duration="300"
+                   params='{{emiParams}}' id="emiApi" on-response="onEmiResponse">
+            <pre>
+            {{sparqlPrologue}}
+
+            SELECT ?year ?substance ?amount ?unit WHERE {
+                ?obs a cube:Observation ;
+                    milieu:referentiegebied <{{point.ep.value}}> ;
+                    milieu:tijdsperiode ?year ;
+                    milieu:substantie ?substance ;
+                    milieu:hoeveelheid ?amount ;
+                    sdmx:unitMeasure ?unit .
+            }
+            ORDER BY ?year ?substance
+            LIMIT 100
+            </pre>
+        </iron-ajax>
 
     </template>
 
@@ -32,7 +156,127 @@
 
         Polymer({
 
-            is: 'ev-emission-point'
+            is: 'ev-emission-point',
+
+            behaviors: [
+                evAppRdf
+            ],
+
+            ready: function () {
+                // expand layout so that scroll bars don't get removed during EP-change
+                setTimeout(function() {
+                    var $app = document.querySelector('ev-app');
+                    $app.style.minHeight = $app.offsetHeight + 'px';
+                }, 1);
+                this.fetchSchemaData();
+            },
+
+            properties: {
+                point: {
+                    type: Object,
+                    observer: "onPointChanged"
+                },
+                api: {
+                    type: Object
+                },
+                selectedSubstance: {
+                    type: String
+                }
+            },
+
+            onPointChanged: function (point) {
+                this.debounce('onPointChanged', function () {
+                    this.fetchPointData();
+                    this.fetchEmissionData();
+                }, 10);
+            },
+
+            fetchSchemaData: function () {
+                this.schemaParams = { query: this.$.schemaApi.textContent };
+                this.$.schemaApi.generateRequest();
+            },
+
+            onSchemaResponse: function () {
+                var data = {};
+                this.$.schemaApi.lastResponse.results.bindings.forEach(function(row) {
+                    var term = row.term.value;
+                    var label = row.label.value;
+                    data[term] = label;
+                });
+                this.set('schemaData', data);
+                this.onPointResponse();
+                this.onEmiResponse();
+            },
+
+            fetchPointData: function () {
+                if (!this.point) {
+                    return;
+                }
+                this.pointParams = { query: this.$.pointApi.textContent };
+                this.$.pointApi.generateRequest();
+            },
+
+            onPointResponse: function () {
+                if (!this.$.pointApi.lastResponse) {
+                    return;
+                }
+                var rows = this.$.pointApi.lastResponse.results.bindings;
+                var data = [];
+                var self = this;
+                rows.forEach(function (row) {
+                    var pLabel, oLabel;
+                    var pLabel = self.getTermLabel(row.p.value);
+                    // special: type
+                    if (row.p.value === 'http://purl.org/dc/terms/type') {
+                        oLabel = self.getTermLabel(row.o.value);
+                    } else if (row.o.type === 'uri' ||  row.o.type === 'bnode') {
+                        return;
+                    } else if (row.p.value.match(/[#\/](lambert.*|lat|long|lat_long)$/i)) {
+                        return;
+                    } else {
+                        var oLabel = row.o.value;
+                    }
+                    data.push({name: pLabel, value: oLabel })
+                });
+                this.set('pointData', null);
+                this.set('pointData', data);
+            },
+
+            fetchEmissionData: function () {
+                if (!this.point) {
+                    return;
+                }
+                this.emiParams = { query: this.$.emiApi.textContent };
+                this.$.emiApi.generateRequest();
+            },
+
+            onEmiResponse: function () {
+                if (!this.$.emiApi.lastResponse) {
+                    return;
+                }
+                var rows = this.$.emiApi.lastResponse.results.bindings;
+                var emis = { substances: []};
+                var self = this;
+                rows.forEach(function (row) {
+                    var year = row.year.value;
+                    var substance = self.getTermLabel(row.substance.value);
+                    var amount = parseFloat(row.amount.value);
+                    var unit = self.getTermLabel(row.unit.value);
+                    if (!emis[substance]) {
+                        emis[substance] = {};
+                        emis.substances.push(substance);
+                    }
+                    if (!emis[substance][year]) {
+                        emis[substance][year] = { unit: unit, amount: 0};
+                    }
+                    emis[substance][year].amount += amount;
+                });
+
+                this.set('emiData', null);
+                if (emis.substances.length) {
+                    this.set('emiData', emis);
+                }
+            }
 
         });
 

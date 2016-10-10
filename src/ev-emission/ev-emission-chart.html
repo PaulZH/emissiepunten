@@ -1,0 +1,102 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/google-chart/google-chart.html"/>
+
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+
+<dom-module id="ev-emission-chart">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                display: block;
+                font-family: "Flanders Sans", sans-serif;
+                height: 300px;
+            }
+
+            #chart {
+                width: 100%;
+                height: 100%;
+            }
+
+
+        </style>
+
+        <template is="dom-if" if="{{substance}}">
+            <google-chart id="chart" type='area' options='{{options}}' cols="{{chartCols}}" rows="{{chartRows}}"></google-chart>
+        </template>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-emission-chart',
+
+            properties: {
+                data: {
+                    type: Object,
+                    observer: 'onDataChanged'
+                },
+                substance: {
+                    type: String,
+                    observer: 'onSubstanceChanged'
+                },
+                options: {
+                    type: Object,
+                    value: {
+                        title: "Substance",
+                        hAxis: {title: "Years"},
+                        colors: ['#4da692', '#42796d']
+                    }
+                },
+                chartCols: {
+                    type: Object,
+                    value: [
+                        { label: "Years", type: "string"},
+                        { label: "Amount", type: "number"}
+                    ]
+                },
+                chartRows: {
+                    type: Object,
+                    value: []
+                }
+            },
+
+            onSubstanceChanged: function (substance) {
+                this.updateChart();
+            },
+
+            onDataChanged: function (data) {
+                this.updateChart();
+            },
+
+            updateChart: function () {
+                if (!this.data || !this.substance) {
+                    return;
+                }
+                // title
+                this.options.title = this.substance;
+                // rows
+                var rows = [];
+                var years = this.data[this.substance];
+                for (var year in years) {
+                    var yearData = years[year];
+                    var amount = yearData.amount;
+                    var unit = yearData.unit;
+                    rows.push([year, amount]);
+                }
+                this.chartRows = rows;
+                // cols
+                this.chartCols[1].label = unit;
+            }
+
+        });
+
+    </script>
+
+</dom-module>
