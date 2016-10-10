@@ -74,7 +74,7 @@
         <ev-responsive>
             <div class="app-nav">
                 <a class="vlaanderen-be" href="http://www.vlaanderen.be/nl">Vlaanderen.be</a>
-                <a class="project" href$="[[appPath]]">Emissies Vlaanderen</a>
+                <a class="project" href$="[[appPath]]" on-tap="resetApp">Emissies Vlaanderen</a>
             </div>
             <div class="sys-nav">
                 <ev-contact-link>Contacteer ons</ev-contact-link>
@@ -94,6 +94,10 @@
                     type: String,
                     value: app.base || location.pathname
                 }
+            },
+
+            resetApp: function () {
+                location.href = this.appPath; // poor man's reset for now
             }
 
         });
