@@ -68,11 +68,7 @@
                 min-height: 60px;
                 background: transparent url("img/emission-icon.png") 16px 16px no-repeat;
                 border-bottom: 1px solid var(--ev-app-grey-6);
-            }
-
-            .list-item a {
                 color: var(--ev-app-green-1);
-                text-decoration: none;
             }
 
             .list-item:last-child {
@@ -83,10 +79,6 @@
                 background-color: var(--ev-app-green-2);
                 color: #fff;
                 border-top: 1px solid #fff;
-            }
-
-            .list-item.selected a {
-                color: #fff;
             }
 
         </style>
@@ -113,7 +105,7 @@
                 <iron-list items="[[points]]" selection-enabled selected-item="{{selectedItem}}">
                     <template>
                         <div class$="[[getItemClass(selected)]]" data-uri="[[item.ep.value]]">
-                            <a href="[[item.ep.value]]" on-tap="onItemLinkTapped">[[item.label.value]]</a></div>
+                            [[item.label.value]]
                         </div>
                     </template>
                 </iron-list>
