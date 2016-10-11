@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../ev-card/ev-card.html"/>
 <link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
 <link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
 <link rel="import" href="../ev-emission/ev-emission-selector.html"/>
 <link rel="import" href="../ev-emission/ev-emission-chart.html"/>
@@ -16,25 +17,36 @@
             :host {
 
                 display: block;
-                -width: 100%;
+                min-height: 410px;
 
-                --ev-card-content: {
-                    min-height: 410px;
-                    @apply(--layout-horizontal);
-                }
             }
 
-            #data {
-                @apply(--layout-flex);
+            [w7a] .columns {
+                @apply(--layout-horizontal);
+            }
+
+            .columns > * {
                 padding: 16px;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            [w7a] .columns > * {
+                flex: 0 0 50%;
+                @apply(--layout-self-stretch);
+                min-width: 0;/* needed by firefox to keep flex-basis 50% */
+            }
+
+            .columns > :first-child {
+                border-bottom: 1px solid var(--ev-app-grey-6);
+            }
+
+            [w7a] .columns > :first-child {
                 border-right: 1px solid var(--ev-app-grey-6);
             }
 
-            #emissions {
-                @apply(--layout-flex);
+            #emissions > div {
                 @apply(--layout-vertical);
-                padding: 16px;
-                position: relative;
             }
 
             #emissions .controls {
@@ -45,54 +57,62 @@
                 @apply(--layout-flex);
             }
 
+            #emissions .no-emissions {
+                @apply(--layout-flex);
+            }
+
         </style>
 
-        <ev-card title="{{point.label.value}}">
-            <div id="data">
+        <ev-responsive>
+            <ev-card title="{{point.label.value}}">
+                <div class="columns">
+                    <div id="data">
+                        <template is="dom-if" if="{{pointData}}">
+                            <table>
+                                <thead>
+                                <tr><th colspan="2">Emission point data</th></tr>
+                                </thead>
+                                <tbody>
+                                <template is="dom-repeat" items="{{pointData}}">
+                                    <tr>
+                                        <td class="label">{{item.name}}</td>
+                                        <td>{{item.value}}</td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </template>
 
-                <template is="dom-if" if="{{pointData}}">
-                    <table>
-                        <thead>
-                            <tr><th colspan="2">Emission point data</th></tr>
-                        </thead>
-                        <tbody>
-                            <template is="dom-repeat" items="{{pointData}}">
-                                <tr>
-                                    <td class="label">{{item.name}}</td>
-                                    <td>{{item.value}}</td>
-                                </tr>
+                        <template is="dom-if" if="{{siteData}}">
+                            site data
+                        </template>
+
+                        <template is="dom-if" if="{{orgData}}">
+                            org data
+                        </template>
+                    </div>
+                    <div id="emissions">
+                        <div>
+                            <template is="dom-if" if="{{emiData.substances}}">
+                                <div class="controls">
+                                    <ev-emission-selector emissions="{{emiData.substances}}" emission="{{selectedSubstance}}"></ev-emission-selector>
+                                    <span class="heading">Emissions</span>
+                                </div>
+                                <div class="chart">
+                                    <ev-emission-chart data="{{emiData}}" substance="{{selectedSubstance}}"></ev-emission-chart>
+                                </div>
                             </template>
-                        </tbody>
-                    </table>
-                </template>
 
-
-                <template is="dom-if" if="{{siteData}}">
-                    site data
-                </template>
-
-
-                <template is="dom-if" if="{{orgData}}">
-                    org data
-                </template>
-            </div>
-            <div id="emissions">
-                <template is="dom-if" if="{{emiData.substances}}">
-                    <div class="controls">
-                        <ev-emission-selector emissions="{{emiData.substances}}" emission="{{selectedSubstance}}"></ev-emission-selector>
-                        Emissions
+                            <template is="dom-if" if="{{!emiData.substances}}">
+                                <div class="no-emissions">
+                                    no emission data available
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="chart">
-                        <ev-emission-chart data="{{emiData}}" substance="{{selectedSubstance}}"></ev-emission-chart>
-                    </div>
-                </template>
-
-                <template is="dom-if" if="{{!emiData.substances}}">
-                    <em>no emission data available</em>
-                </template>
-
-            </div>
-        </ev-card>
+                </div>
+            </ev-card>
+        </ev-responsive>
 
         <iron-ajax url="{{sparqlApi}}" headers='{"Accept": "application/json"}' handle-as="json" on-error="onApiError" debounce-duration="300"
                    params='{{schemaParams}}' id="schemaApi" on-response="onSchemaResponse">
