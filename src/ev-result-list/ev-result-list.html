@@ -103,7 +103,7 @@
             </template>
 
             <!-- points found -->
-            <template is="dom-if" if="{{points.length}}">
+            <template is="dom-if" if="{{points.length}}" restamp="true">
                 <iron-list items="[[points]]" selection-enabled selected-item="{{selectedItem}}">
                     <template>
                         <div class$="[[getItemClass(selected)]]" data-uri="[[item.ep.value]]">
