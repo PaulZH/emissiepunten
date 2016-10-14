@@ -92,22 +92,6 @@
         </pre>
         </iron-ajax>
 
-        <iron-ajax id="helper-api"
-                   url="{{sparqlApi}}"
-                   headers='{"Accept": "application/json"}'
-                   params='{{helperApiParams}}'
-                   handle-as="json"
-                   on-response="helperOnApiResponse"
-                   debounce-duration="300"
-        ><pre>
-            {{sparqlPrologue}}
-            SELECT DISTINCT ?p WHERE {
-                ?s a milieu:Emissiepunt ;
-                    ?p ?o .
-            }
-        </pre>
-        </iron-ajax>
-
     </template>
 
     <script>
