@@ -9,7 +9,7 @@ Flanders Emission Explorer
 
 ## Preview
 
-* [Preview](http://bnowackbiz.github.io/emissies-vlaanderen/) (LNE VPN required for SPARQL queries)
+* [Preview](https://bnowackbiz.github.io/emissies-vlaanderen/) (LNE VPN required for SPARQL queries)
 
 ## Installation
 
