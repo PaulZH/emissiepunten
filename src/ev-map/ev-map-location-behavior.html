@@ -47,6 +47,13 @@
                 projection: this.getProjection()
             });
             this.geolocation.on('change:position', function() {
+                // only set the location if geolocation is turned on
+                if (!self.geolocate) {
+                    return;
+                }
+                // geolocate only once per button-click
+                self.set('geolocate', false);
+                // set location to detected coordinates
                 var point = self.geolocation.getPosition();
                 var wgs84 = ol.proj.transform(point, 'EPSG:31370', 'EPSG:4326');
                 self.set('location.point', point);
