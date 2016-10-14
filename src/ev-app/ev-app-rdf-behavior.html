@@ -50,7 +50,15 @@
 
         getTermLabel: function (term) {
             if (typeof this.schemaData[term] === 'undefined') {
-                this.schemaData[term] = term.replace(/^.*[#\/]([^#\/]+)/, '$1');
+                // use the hash as label, but not if hash is `id`, `this`, `self`
+                var label;
+                if (term.match(/#(id|this|self)$/)) {
+                    label = term.replace(/^.*[\/]([^#\/]+).*/, '$1');
+                } else {
+                    label = term.replace(/^.*[#\/]([^#\/]+)/, '$1');
+                }
+                label = label.replace(/_/g, ' ');
+                this.schemaData[term] = label;
             }
             return this.schemaData[term];
         }
