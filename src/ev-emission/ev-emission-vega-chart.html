@@ -1,0 +1,127 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../vega/vega-assets.html"/>
+
+
+<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-fonts.html"/>
+
+<dom-module id="ev-emission-vega-chart">
+
+    <template>
+
+        <style include="app-styles app-fonts">
+
+            :host {
+                display: block;
+                font-family: "Flanders Sans", sans-serif;
+                min-height: 300px;
+                margin-top: 20px;
+                box-sizing: border-box;
+            }
+
+            #chart {
+                width: 100%;
+                height: 100%;
+            }
+
+            #chart-title {
+                text-align: center;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+        </style>
+
+        <div id="chart-title">{{ substance }}</div>
+        <div id="chart"></div>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-emission-vega-chart',
+
+            properties: {
+                data: {
+                    type: Object,
+                    observer: 'onDataChanged'
+                },
+                substance: {
+                    type: String,
+                    value: "Substance",
+                    observer: 'onSubstanceChanged'
+                }
+            },
+
+            onSubstanceChanged: function () {
+                this.updateChart();
+            },
+
+            onDataChanged: function () {
+                this.updateChart();
+            },
+
+            updateChart: function () {
+                if (!this.data || !this.substance) {
+                    return;
+                }
+                var chartData = this.getChartData();
+                var spec = {
+                    "data": chartData,
+                    "mark": "area",
+                    width: this.$.chart.offsetWidth - 80,
+                    "encoding": {
+                        "x": {
+                            "field": "year",
+                            "type": "ordinal",
+                            "axis": {
+                                "title": "Year", labelAngle: 0
+                            }
+                        },
+                        "y": {
+                            "field": "amount",
+                            "type": "quantitative",
+                            "axis": {
+                                "title": chartData.unit
+                            }
+                        }
+                    },
+                    config: {
+                        mark: {
+                            color: '#4da692'
+                        }
+                    }
+                };
+                var embedSpec = {
+                    mode: "vega-lite",
+                    spec: spec,
+                    actions: false
+                };
+                vg.embed(this.$.chart, embedSpec);
+            },
+
+            getChartData: function () {
+                var values = [];
+                var years = this.data[this.substance];
+                var unit;
+                for (var year in years) {
+                    if (!years.hasOwnProperty(year)) {
+                        continue;
+                    }
+                    values.push({
+                        amount: years[year].amount,
+                        year: year
+                    });
+                    unit = years[year].unit;
+                }
+                return { values: values, unit: unit };
+            }
+
+        });
+
+    </script>
+
+</dom-module>

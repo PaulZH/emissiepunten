@@ -6,7 +6,7 @@
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
 <link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
 <link rel="import" href="../ev-emission/ev-emission-selector.html"/>
-<link rel="import" href="../ev-emission/ev-emission-chart.html"/>
+<link rel="import" href="../ev-emission/ev-emission-vega-chart.html"/>
 
 <dom-module id="ev-emission-point">
 
@@ -99,7 +99,7 @@
                                     <span class="heading">Emissions</span>
                                 </div>
                                 <div class="chart">
-                                    <ev-emission-chart data="{{emiData}}" substance="{{selectedSubstance}}"></ev-emission-chart>
+                                    <ev-emission-vega-chart data="{{emiData}}" substance="{{selectedSubstance}}"></ev-emission-vega-chart>
                                 </div>
                             </template>
 
