@@ -85,8 +85,8 @@
 
             onSelectionChanged: function (selectedIndex) {
                 var selectedItem = Polymer.dom(this.root).querySelector('paper-item:nth-child(' + (selectedIndex + 1) + ')');
-                if (selectedItem && selectedItem.textContent !== 'id') {
-                    this.set('emission', selectedItem.textContent);
+                if (selectedItem && selectedItem.textContent.trim()) {
+                    this.set('emission', selectedItem.textContent.trim());
                 }
             }
 
