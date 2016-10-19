@@ -15,8 +15,7 @@
 
             :host {
                 display: block;
-                position: absolute;
-                right: 16px;
+                float: right;
                 font-family: "Flanders Sans", sans-serif;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
                 background-color: rgba(255, 255, 255, 0.9);
@@ -26,10 +25,12 @@
                 --list-width: 300px;
             }
 
+            paper-dropdown-menu-light[emission-count="1"]  {
+                display: none;
+            }
+
             paper-dropdown-menu-light {
-
                 width: var(--list-width);
-
                 --paper-dropdown-menu: {
                     width: var(--list-width);
                 };
@@ -42,7 +43,7 @@
 
         </style>
 
-        <paper-dropdown-menu-light label="Emission">
+        <paper-dropdown-menu-light label="Emission" emission-count$="{{emissionCount}}">
             <paper-listbox id="list" class="dropdown-content" selected="{{selected}}">
                 <template is="dom-repeat" items="{{emissions}}">
                     <paper-item>[[item]]</paper-item>
@@ -63,6 +64,9 @@
                     type: Array,
                     observer: 'onEmissionsChanged'
                 },
+                emissionCount: {
+                    type: Number
+                },
                 emission: {
                     type: String,
                     notify: true,
@@ -74,9 +78,10 @@
                 }
             },
 
-            onEmissionsChanged: function () {
+            onEmissionsChanged: function (emissions) {
                 this.set('selected', null);
                 this.set('emission', null);
+                this.set('emissionCount', emissions ? emissions.length : 0);
                 var self = this;
                 setTimeout(function () {
                     self.set('selected', 0);
