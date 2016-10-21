@@ -70,22 +70,24 @@
                 }
                 var chartData = this.getChartData();
                 var spec = {
-                    "data": chartData,
-                    "mark": "area",
+                    data: chartData,
+                    mark: (chartData.values.length === 1)
+                            ? "bar"
+                            : "area",
                     width: this.$.chart.offsetWidth - 80,
-                    "encoding": {
-                        "x": {
-                            "field": "year",
-                            "type": "ordinal",
-                            "axis": {
-                                "title": "Year", labelAngle: 0
+                    encoding: {
+                        x: {
+                            field: "year",
+                            type: "ordinal",
+                            axis: {
+                                title: "Year", labelAngle: 0
                             }
                         },
-                        "y": {
-                            "field": "amount",
-                            "type": "quantitative",
-                            "axis": {
-                                "title": chartData.unit
+                        y: {
+                            field: "amount",
+                            type: "quantitative",
+                            axis: {
+                                title: chartData.unit
                             }
                         }
                     },
