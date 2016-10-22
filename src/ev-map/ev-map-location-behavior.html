@@ -71,15 +71,19 @@
             this.olMap.addLayer(this.locationLayer);
         },
 
-        createLocationMarkerOverlay: function () {
-            var markerEl = document.createElement('iron-icon');
-            markerEl.setAttribute('icon', 'maps:my-location');
-            markerEl.classList.add('location-marker');
-            this.locationMarkerOverlay = new ol.Overlay({
-                position: this.location.point,
-                element: markerEl
+        createLocationMarkerFeature: function () {
+            this.locationMarkerFeature = new ol.Feature({
+                name: 'locationMarker',
+                geometry: new ol.geom.Point(this.location.point)
             });
-            this.olMap.addOverlay(this.locationMarkerOverlay);
+            this.locationMarkerFeature.setStyle(new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 0.5],
+                    size: [20, 20],
+                    src: 'src/ev-map/img/my-location.png'
+                })
+            }));
+            this.locationLayer.getSource().addFeature(this.locationMarkerFeature);
         },
 
         createLocationRadiusFeature: function () {
@@ -110,10 +114,10 @@
                     return;
                 }
                 // position marker
-                if (!this.locationMarkerOverlay) {
-                    this.createLocationMarkerOverlay();
+                if (!this.locationMarkerFeature) {
+                    this.createLocationMarkerFeature();
                 } else {
-                    this.locationMarkerOverlay.setPosition(this.location.point);
+                    this.locationMarkerFeature.getGeometry().setCoordinates(this.location.point);
                 }
                 // radius viz
                 if (!this.locationRadiusFeature) {
