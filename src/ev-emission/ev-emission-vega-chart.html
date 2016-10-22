@@ -71,9 +71,7 @@
                 var chartData = this.getChartData();
                 var spec = {
                     data: chartData,
-                    mark: (chartData.values.length === 1)
-                            ? "bar"
-                            : "area",
+                    mark: chartData.mark,
                     width: this.$.chart.offsetWidth - 80,
                     encoding: {
                         x: {
@@ -109,6 +107,7 @@
                 var values = [];
                 var years = this.data[this.substance];
                 var unit;
+                var allZero = true;
                 for (var year in years) {
                     if (!years.hasOwnProperty(year)) {
                         continue;
@@ -118,8 +117,18 @@
                         year: year
                     });
                     unit = years[year].unit;
+                    if (years[year].amount !== 0) {
+                        allZero = false;
+                    }
                 }
-                return { values: values, unit: unit };
+                var mark = 'area';
+                if (values.length === 1) {
+                    mark = 'bar';
+                }
+                if (allZero) {
+                    mark = 'point';
+                }
+                return { values: values, unit: unit, mark: mark };
             }
 
         });
