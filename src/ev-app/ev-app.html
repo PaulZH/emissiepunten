@@ -1,4 +1,5 @@
 
+<!--suppress JSUnresolvedVariable, JSUnusedGlobalSymbols -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <dom-module id="ev-app">
@@ -38,7 +39,7 @@
 
         </style>
 
-        <app-location route="{{route}}" xuse-hash-as-path></app-location>
+        <app-location route="{{route}}"></app-location>
         <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
 
         <ev-responsive>
@@ -92,8 +93,8 @@
             },
 
             observers: [
-                'onRouteChanged(routeData)',    // trigger onRouteChanged when routeData changes
-                'onRouteChanged(tailData)',      // trigger onRouteChanged when tailData changes
+                'onRouteChanged(routeData)',
+                'onRouteChanged(tailData)',
                 'onLocationSelected(location.point,selectedEmissionPoint)'
             ],
 
@@ -141,7 +142,7 @@
                 var targetTop = this.offsetTop;
                 var currentTop = document.body.scrollTop || document.documentElement.scrollTop;
                 if (targetTop > currentTop && loops < 20) {
-                    var nextTop = currentTop + (targetTop - currentTop) / (20 - loops)
+                    var nextTop = currentTop + (targetTop - currentTop) / (20 - loops);
                     document.body.scrollTop = nextTop;
                     document.documentElement.scrollTop = nextTop;
                     this.async(function () {
