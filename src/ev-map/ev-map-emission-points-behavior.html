@@ -1,3 +1,4 @@
+<!--suppress JSCheckFunctionSignatures, JSUnusedGlobalSymbols -->
 <script>
     evMapEmissionPoints = {
 
@@ -38,7 +39,6 @@
 
         ready: function () {
             this.epApi = this.$['emission-points-api'];
-            this.helperApi = this.$['helper-api'];
         },
 
         epOnMapCreated: function (event, map) {
@@ -80,11 +80,6 @@
             this.epApi.generateRequest();
         },
 
-        callHelperApi: function() {
-            this.helperApiParams = { query: this.helperApi.textContent };
-            this.helperApi.generateRequest();
-        },
-
         epOnApiResponse: function () {
             this.set('emissionPoints', this.epApi.lastResponse.results.bindings)
         },
@@ -94,9 +89,9 @@
         },
 
         epOnEmissionPointsChanged: function (emissionPoints) {
-            var self = this;
-            if (!this.olMap) return;
-
+            if (!this.olMap) {
+                return;
+            }
             var features = [];
             emissionPoints.forEach(function (emissionPoint) {
                 var wgs84Point = [parseFloat(emissionPoint.lon.value), parseFloat(emissionPoint.lat.value)];
@@ -108,7 +103,6 @@
                 });
                 features.push(feature);
             });
-
             this.emissionPointsLayer.getSource().clear();
             this.emissionPointsLayer.getSource().addFeatures(features);
         },
@@ -151,7 +145,7 @@
             if (this.selectedEmissionPointFeature === feature) {
                 return;
             }
-            // unselect existing
+            // deselect existing
             if (this.selectedEmissionPointFeature) {
                 this.deselectFeature(this.selectedEmissionPointFeature);
             }
