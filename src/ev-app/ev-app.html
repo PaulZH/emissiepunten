@@ -1,13 +1,5 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/app-route/app-location.html">
-<link rel="import" href="../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
-
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
-<link rel="import" href="../ev-result-list/ev-result-list.html"/>
-<link rel="import" href="../ev-map/ev-map.html"/>
-<link rel="import" href="../ev-emission-point/ev-emission-point.html"/>
 
 <dom-module id="ev-app">
     <template>
@@ -104,6 +96,17 @@
                 'onRouteChanged(tailData)',      // trigger onRouteChanged when tailData changes
                 'onLocationSelected(location.point,selectedEmissionPoint)'
             ],
+
+            ready: function () {
+                // lazy-load elements
+                this.importHref(this.resolveUrl("../../bower_components/iron-flex-layout/iron-flex-layout.html"), null, null, true);
+                this.importHref(this.resolveUrl("../../bower_components/app-route/app-location.html"), null, null, true);
+                this.importHref(this.resolveUrl("../../bower_components/app-route/app-route.html"), null, null, true);
+                this.importHref(this.resolveUrl("../ev-responsive/ev-responsive.html"), null, null, true);
+                this.importHref(this.resolveUrl("../ev-result-list/ev-result-list.html"), null, null, true);
+                this.importHref(this.resolveUrl("../ev-map/ev-map.html"), null, null, true);
+                this.importHref(this.resolveUrl("../ev-emission-point/ev-emission-point.html"), null, null, true);
+            },
 
             /**
              * Sets the element's `view` parameter when the route changes
