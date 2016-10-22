@@ -4,7 +4,6 @@
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
-<link rel="import" href="../ev-contact-link/ev-contact-link.html"/>
 
 <dom-module id="ev-global-header">
 
@@ -94,6 +93,11 @@
                     type: String,
                     value: app.base || location.pathname
                 }
+            },
+
+            ready: function () {
+                // upgrade contact link lazily
+                this.importHref(this.resolveUrl("../ev-contact-link/ev-contact-link.html"), null, null, true);
             },
 
             resetApp: function () {
