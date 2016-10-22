@@ -6,7 +6,6 @@
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
 <link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
 <link rel="import" href="../ev-emission/ev-emission-selector.html"/>
-<link rel="import" href="../ev-emission/ev-emission-vega-chart.html"/>
 
 <dom-module id="ev-emission-point">
 
@@ -189,6 +188,9 @@
                     var $app = document.querySelector('ev-app');
                     $app.style.minHeight = $app.offsetHeight + 'px';
                 }, 1);
+                // lazy-load vega assets
+                this.importHref(this.resolveUrl("../ev-emission/ev-emission-vega-chart.html"), null, null, true);
+                // fetch labels
                 this.fetchSchemaData();
             },
 
