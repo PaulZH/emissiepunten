@@ -1,3 +1,4 @@
+<!--suppress JSCheckFunctionSignatures -->
 <script>
     evMapCore = {
 
@@ -28,7 +29,6 @@
         },
 
         createMap: function () {
-            var self = this;
             var view = this.getView();
             this.olMap = new ol.Map({
                 target: this.$map,
@@ -109,7 +109,7 @@
         isFeatureClick: function (event, name) {
             var pixelPoint = event.pixel;
             var result = false;
-            this.olMap.forEachFeatureAtPixel(pixelPoint, function(feature, layer) {
+            this.olMap.forEachFeatureAtPixel(pixelPoint, function(feature) {
                 if (!name || feature.get('name') === name) {
                     result = true;
                     return true;
@@ -120,7 +120,7 @@
 
         getFeaturesAtPixel: function (pixelPoint, name) {
             var result = [];
-            this.olMap.forEachFeatureAtPixel(pixelPoint, function(feature, layer) {
+            this.olMap.forEachFeatureAtPixel(pixelPoint, function(feature) {
                 if (!name || feature.get('name') === name) {
                     result.push(feature);
                 }
