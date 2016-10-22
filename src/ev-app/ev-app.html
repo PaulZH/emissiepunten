@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
@@ -49,7 +48,6 @@
 
         <app-location route="{{route}}" xuse-hash-as-path></app-location>
         <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
-        <iron-ajax id="app-api" url="" handle-as="json" on-response="onApiResponse" on-error="onApiError"></iron-ajax>
 
         <ev-responsive>
             <section id="list-and-map">
