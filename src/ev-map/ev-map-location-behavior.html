@@ -133,7 +133,8 @@
         panToLocation: function () {
             var view = this.olMap.getView();
             var pan = ol.animation.pan({
-                source: view.getCenter()
+                source: view.getCenter(),
+                duration: 500
             });
             this.olMap.beforeRender(pan);
             view.setCenter(this.location.point);
