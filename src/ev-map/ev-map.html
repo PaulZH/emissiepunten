@@ -29,13 +29,48 @@
                 box-sizing: border-box;
             }
 
-            .ep-marker {
-                display: block;
-                width: 20px;
-                height: 20px;
-                background: #fff;
-                margin-top: -10px;
-                margin-left: -10px;
+            #emission-points {
+                background-color: #fff;
+                box-shadow: 4px 4px 20px rgba(0,0,0,0.4);
+                width: 240px;
+                display: none;
+            }
+
+            #emission-points ev-card {
+                --ev-card-content: {
+                    max-height: 300px;
+                };
+                --ev-card-title: {
+                    height: 32px;
+                    line-height: 32px;
+                    border-bottom: 1px solid #fff;
+                };
+            }
+
+            #emission-points:after {
+                left: 100%;
+                top: 0;
+                content: "";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+                border: 16px solid transparent;
+                border-left-color: var(--ev-app-green-2);
+            }
+
+            #emission-points .ep {
+                border-bottom: 1px solid;
+                padding: 8px 16px;
+                border-bottom: 1px solid var(--ev-app-grey-6);
+                color: var(--ev-app-green-1);
+                cursor: pointer;
+                font-size: 0.95em;
+            }
+
+            #emission-points .ep.selected {
+                background-color: var(--ev-app-green-2);
+                color: #fff;
             }
 
         </style>
@@ -44,6 +79,14 @@
             <div id="map"></div>
             <ev-radius radius="{{location.radius}}"></ev-radius>
         </ev-card>
+
+        <div id="emission-points">
+            <ev-card title="[[selectedSite.label]]">
+                <template is="dom-repeat" items="[[emissionPoints]]" restamp="true">
+                    <div class="ep" on-tap="epOnEmissionPointClicked" ep="[[item]]">[[item.shortLabel]]</div>
+                </template>
+            </ev-card>
+        </div>
 
         <iron-ajax id="emission-points-api"
                    url="{{sparqlApi}}"
@@ -56,7 +99,7 @@
             <pre>
             {{sparqlPrologue}}
 
-            SELECT DISTINCT ?ep ?label ?lat ?lon ?owner WHERE {
+            SELECT DISTINCT ?ep ?label ?lat ?lon ?site ?siteLabel WHERE {
                 SERVICE geo:search {
                     ?ep geo:search "inCircle";
                     geo:searchDatatype geoliteral:lat-lon ;
@@ -68,7 +111,8 @@
                     rdfs:label ?label ;
                     wgs84_pos:lat ?lat ;
                     wgs84_pos:long ?lon ;
-                    protontop:isOwnedBy ?owner .
+                    protontop:isOwnedBy ?site .
+                ?site rdfs:label ?siteLabel .
             }
             ORDER BY DESC(?lat) DESC(?lon)
             LIMIT 1000
@@ -111,7 +155,7 @@
 
             getTitle: function () {
                 if (this.location && this.location.lat) {
-                    var t = 'Emission Points within {radius}km of {lat},{lon}';
+                    var t = 'Emission Sites within {radius}km of {lat},{lon}';
                     return t
                             .replace('{radius}', this.location.radius)
                             .replace('{lat}', this.location.lat.toFixed(5))

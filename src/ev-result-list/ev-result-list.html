@@ -72,6 +72,7 @@
                 background: transparent url("img/emission-icon.png") 16px 16px no-repeat;
                 border-bottom: 1px solid var(--ev-app-grey-6);
                 color: var(--ev-app-green-1);
+                cursor: pointer;
             }
 
             .list-item.selected {
@@ -79,12 +80,17 @@
                 color: #fff;
             }
 
+            .ep-count {
+                font-size: 0.9em;
+                padding-top: 4px;
+            }
+
         </style>
 
         <ev-card title="{{title}}">
 
-            <!-- no points -->
-            <template is="dom-if" if="{{!points.length}}">
+            <!-- no sites -->
+            <template is="dom-if" if="{{!sites.length}}">
                 <p class="intro">
                     Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
                 </p>
@@ -98,12 +104,13 @@
                 </p>
             </template>
 
-            <!-- points found -->
-            <template is="dom-if" if="{{points.length}}" restamp="true">
-                <iron-list items="[[points]]" selection-enabled selected-item="{{selectedItem}}">
+            <!-- sites found -->
+            <template is="dom-if" if="{{sites.length}}" restamp="true">
+                <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
                     <template>
-                        <div class$="[[getItemClass(selected)]]" data-uri="[[item.ep.value]]">
-                            [[item.label.value]]
+                        <div class$="[[getItemClass(selected)]]" data-uri="[[item.uri]]">
+                            [[item.label]]
+                            <div class="ep-count">Emission Points: [[item.eps.length]]</div>
                         </div>
                     </template>
                 </iron-list>
@@ -127,13 +134,14 @@
                     type: Object,
                     notify: true
                 },
-                points: {
+                sites: {
                     type: Array,
-                    observer: "onPointsChanged"
+                    observer: "onSitesChanged",
+                    value: []
                 },
-                point: {
+                selectedSite: {
                     type: Object,
-                    observer: "onPointChanged",
+                    observer: "onSiteSelected",
                     notify: true
                 },
                 selectedItem: {
@@ -152,30 +160,30 @@
 
             updateTitle: function () {
                 if (this.location && this.location.point) {
-                    var hits = (this.points.length || 0);
+                    var hits = (this.sites.length || 0);
                     this.title = (hits === 1)
-                        ? '1 Emission Point found'
-                        : hits + ' Emission Points found';
+                        ? '1 emission site found'
+                        : hits + ' emission sites found';
                 } else {
-                    this.title = 'Emission Points in Flanders';
+                    this.title = 'Emission Sites in Flanders';
                 }
             },
 
-            onPointsChanged: function () {
+            onSitesChanged: function () {
                 this.updateTitle();
             },
 
-            onPointChanged: function (point) {
+            onSiteSelected: function (site) {
                 var $list = this.$$('iron-list');
                 var selectedItem = $list ? $list.selectedItem : null;
-                if (point && (!selectedItem || selectedItem.ep.value !== point.ep.value)) {
-                    this.points.forEach(function (item) {
-                        if (item.ep.value === point.ep.value) {
+                if (site && (!selectedItem || selectedItem.uri !== site.uri)) {
+                    this.sites.forEach(function (item) {
+                        if (item.uri === site.uri) {
                             $list.selectItem(item);
                             $list.scrollToItem(item);
                         }
                     })
-                } else if (!point && selectedItem) {
+                } else if (!site && selectedItem) {
                     $list.clearSelection();
                 }
             },
@@ -186,18 +194,8 @@
                     : 'list-item';
             },
 
-            onItemLinkTapped: function (event) {
-                event.preventDefault();
-                var nEvent = Polymer.dom(event);
-                var $a = nEvent.rootTarget || nEvent.event.explicitOriginalTarget || nEvent.event.originalTarget || nEvent.event.target;
-                var $item = Polymer.dom($a).parentNode;
-                var $list = this.$$('iron-list');
-                var item = $list.modelForElement($item).item;
-                $list.toggleSelectionForItem(item);
-            },
-
             onSelectionChanged: function (selectedItem) {
-                this.point = selectedItem;// propagates to map
+                this.selectedSite = selectedItem;// propagates to map
             },
 
             onGeolocate: function () {

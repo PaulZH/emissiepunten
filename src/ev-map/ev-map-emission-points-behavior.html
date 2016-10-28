@@ -3,8 +3,33 @@
     evMapEmissionPoints = {
 
         properties: {
-            emissionPointsLayer: {
+            epApi: {
                 type: Object
+            },
+            epApiParams: {
+                type: Object
+            },
+            sitesLayer: {
+                type: Object
+            },
+            selectedSiteFeature: {
+                type: Object,
+                notify: true,
+                observer: 'epOnSiteFeatureSelected'
+            },
+            sites: {
+                type: Array,
+                notify: true,
+                observer: 'epOnSitesChanged'
+            },
+            selectedSite: {
+                type: Object,
+                notify: true,
+                observer: 'epOnSiteSelected'
+            },
+            emissionPointsListTitle: {
+                type: String,
+                notify: true
             },
             emissionPoints: {
                 type: Array,
@@ -14,17 +39,7 @@
             selectedEmissionPoint: {
                 type: Object,
                 notify: true,
-                observer: 'epOnSelectedEmissionPointChanged'
-            },
-            selectedEmissionPointFeature: {
-                type: Object,
-                notify: true
-            },
-            epApi: {
-                type: Object
-            },
-            epApiParams: {
-                type: Object
+                observer: 'epOnEmissionPointSelected'
             }
         },
 
@@ -43,7 +58,9 @@
 
         epOnMapCreated: function (event, map) {
             // create vector layer
-            this.createEmissionPointsLayer();
+            this.createSitesLayer();
+            // create ep overlay
+            this.createEmissionPointsOverlay();
             // register click events
             var self = this;
             map.on('singleclick', function (event) {
@@ -51,9 +68,9 @@
             });
         },
 
-        createEmissionPointsLayer: function () {
-            this.emissionPointsLayer = new ol.layer.Vector({
-                name: 'emissionPoints',
+        createSitesLayer: function () {
+            this.sitesLayer = new ol.layer.Vector({
+                name: 'sites',
                 source: new ol.source.Vector({}),
                 style: new ol.style.Style({
                     image: new ol.style.Icon({
@@ -61,11 +78,21 @@
                         size: [34, 36],
                         opacity: 0.9,
                         scale: 1,
-                        src: 'src/ev-map/img/ep-marker.png'
+                        src: 'src/ev-map/img/site-marker.png'
                     })
                 })
             });
-            this.olMap.addLayer(this.emissionPointsLayer);
+            this.olMap.addLayer(this.sitesLayer);
+        },
+
+        createEmissionPointsOverlay: function () {
+            this.epOverlay = new ol.Overlay({
+                element: this.$['emission-points'],
+                positioning: 'top-right',
+                autoPan: true,
+                offset: [-40, -42]
+            });
+            this.olMap.addOverlay(this.epOverlay);
         },
 
         epOnLocationChanged: function () {
@@ -81,34 +108,65 @@
         },
 
         epOnApiResponse: function () {
-            this.set('emissionPoints', this.epApi.lastResponse.results.bindings)
+            this.set('sites', this.getSites());
         },
 
         epOnApiError: function () {
-            console.log('err', arguments)
+            console.log('API Error', arguments)
         },
 
-        epOnEmissionPointsChanged: function (emissionPoints) {
+        getSites: function () {
+            var rows = this.epApi.lastResponse.results.bindings;
+            var sites = [];
+            var sitesByUri = {};
+            rows.forEach(function (row) {
+                var siteUri = row.site.value;
+                var siteLabel = row.siteLabel.value;
+                if (!sitesByUri[siteUri]) {
+                    sitesByUri[siteUri] = {
+                        label: siteLabel,
+                        uri: siteUri,
+                        lat: row.lat.value,// use ep.lat instead of site.lambert_y
+                        lon: row.lon.value,// use ep.lon instead of site.lambert_x
+                        eps: []
+                    };
+                    sites.push(sitesByUri[siteUri]);
+                }
+                // add shortened EP label (site label prefix removed)
+                row.shortLabel = row.label.value.replace(new RegExp('^' + siteLabel + '\\s*:\\s*'), '');
+                sitesByUri[siteUri].eps.push(row);
+            });
+            return sites;
+        },
+
+        epOnSitesChanged: function (sites) {
             if (!this.olMap) {
                 return;
             }
             var features = [];
-            emissionPoints.forEach(function (emissionPoint) {
-                var wgs84Point = [parseFloat(emissionPoint.lon.value), parseFloat(emissionPoint.lat.value)];
-                var olPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
+            sites.forEach(function (site) {
+                var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+                var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
                 var feature = new ol.Feature({
-                    name: 'emissionPoint',
-                    geometry: new ol.geom.Point(olPoint),
-                    emissionPoint: emissionPoint
+                    name: 'site',
+                    geometry: new ol.geom.Point(lambertPoint),
+                    site: site
                 });
                 features.push(feature);
             });
-            this.emissionPointsLayer.getSource().clear();
-            this.emissionPointsLayer.getSource().addFeatures(features);
+            this.sitesLayer.getSource().clear();
+            this.sitesLayer.getSource().addFeatures(features);
+        },
+
+        epOnEmissionPointsChanged: function (emissionPoints) {
+            var plural = (emissionPoints.length === 1)
+                    ? ''
+                    : 's';
+            this.set('emissionPointsListTitle', emissionPoints.length + ' Emission Point' + plural);
         },
 
         epOnMapClicked: function (event) {
-            var features = this.getFeaturesAtPixel(event.pixel, 'emissionPoint');
+            var features = this.getFeaturesAtPixel(event.pixel, 'site');
             if (!features.length) {
                 return;
             }
@@ -117,7 +175,7 @@
         },
 
         toggleFeature: function (feature) {
-            if (this.selectedEmissionPointFeature === feature) {
+            if (this.selectedSiteFeature === feature) {
                 this.deselectFeature(feature);
             } else {
                 this.selectFeature(feature);
@@ -131,23 +189,24 @@
                     size: [34, 36],
                     opacity: 0.9,
                     scale: 1,
-                    src: 'src/ev-map/img/ep-marker.png'
+                    src: 'src/ev-map/img/site-marker.png'
                 })
             }));
-            if (this.selectedEmissionPointFeature === feature) {
-                this.set('selectedEmissionPointFeature', null);
+            if (this.selectedSiteFeature === feature) {
+                this.set('selectedSiteFeature', null);
+                this.set('selectedSite', null);
                 this.set('selectedEmissionPoint', null);
             }
         },
 
         selectFeature: function (feature) {
             // cancel if already selected
-            if (this.selectedEmissionPointFeature === feature) {
+            if (this.selectedSiteFeature === feature) {
                 return;
             }
             // deselect existing
-            if (this.selectedEmissionPointFeature) {
-                this.deselectFeature(this.selectedEmissionPointFeature);
+            if (this.selectedSiteFeature) {
+                this.deselectFeature(this.selectedSiteFeature);
             }
             // select given
             feature.setStyle(new ol.style.Style({
@@ -156,11 +215,11 @@
                     size: [38, 41],
                     opacity: 0.9,
                     scale: 1,
-                    src: 'src/ev-map/img/ep-marker-selected.png'
+                    src: 'src/ev-map/img/site-marker-selected.png'
                 })
             }));
-            this.set('selectedEmissionPointFeature', feature);
-            this.set('selectedEmissionPoint', feature.get('emissionPoint'));
+            this.set('selectedSiteFeature', feature);
+            this.set('selectedSite', feature.get('site'));
         },
 
         /**
@@ -168,18 +227,60 @@
          *
          * @param emissionPoint
          */
-        epOnSelectedEmissionPointChanged: function (emissionPoint) {
-            if (emissionPoint === null && this.selectedEmissionPointFeature) {
-                this.deselectFeature(this.selectedEmissionPointFeature)
-            } else if (emissionPoint) {
-                var features = this.emissionPointsLayer.getSource().getFeatures();
+        epOnSiteSelected: function (site) {
+            if (site === null && this.selectedSiteFeature) {
+                this.deselectFeature(this.selectedSiteFeature)
+            } else if (site) {
+                var features = this.sitesLayer.getSource().getFeatures();
                 var self = this;
                 features.forEach(function (feature) {
-                    if (feature.get('emissionPoint') === emissionPoint) {
+                    if (feature.get('site') === site) {
                         self.selectFeature(feature);
                     }
                 });
             }
+        },
+
+        epOnSiteFeatureSelected: function (feature) {
+            var element = this.epOverlay.getElement();
+            if (!feature) {
+                element.style.display = 'none';
+                return;
+            }
+            element.style.display = 'block';
+            var site = feature.get('site');
+            var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+            var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
+            this.set('emissionPoints', site.eps);
+            this.async(function() {
+                this.epOverlay.setPosition(lambertPoint);
+                this.$['emission-points'].querySelectorAll('.selected').forEach(function(item) {
+                    item.classList.remove('selected');
+                });
+            }, 1);
+        },
+
+        epOnEmissionPointClicked: function (event) {
+            var $ep = Polymer.dom(event).rootTarget;
+            var ep = $ep.ep;
+            ep.element = $ep;
+            // toggle current
+            if (this.selectedEmissionPoint === ep) {
+                $ep.classList.remove('selected');
+                this.set('selectedEmissionPoint', null);
+                return;
+            }
+            // deselect previous
+            if (this.selectedEmissionPoint) {
+                this.selectedEmissionPoint.element.classList.remove('selected');
+            }
+            // select new
+            $ep.classList.add('selected');
+            this.set('selectedEmissionPoint', ep);
+        },
+
+        epOnEmissionPointSelected: function (ep) {
+
         }
 
     }

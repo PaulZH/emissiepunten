@@ -44,8 +44,8 @@
 
         <ev-responsive>
             <section id="list-and-map">
-                <ev-result-list geolocate={{geolocate}} location={{location}} points="{{emissionPoints}}" point="{{selectedEmissionPoint}}"></ev-result-list>
-                <ev-map location={{location}} geolocate={{geolocate}} emission-points="{{emissionPoints}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
+                <ev-result-list geolocate={{geolocate}} location={{location}} sites="{{sites}}" selected-site="{{selectedSite}}"></ev-result-list>
+                <ev-map location={{location}} geolocate={{geolocate}} sites="{{sites}}" selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
             </section>
 
             <template is="dom-if" if="{{selectedEmissionPoint}}">

@@ -38,7 +38,7 @@
             this.createLocationLayer();
             // register click events
             map.on('singleclick', function (event) {
-                if (!self.isFeatureClick(event, 'emissionPoint')) {
+                if (!self.isFeatureClick(event, 'site')) {
                     self.onLocationClicked(event);
                 }
             });
