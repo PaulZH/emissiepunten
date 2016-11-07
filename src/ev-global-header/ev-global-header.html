@@ -1,14 +1,13 @@
-
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-app/ev-app-lazyload-behavior.html"/>
 
 <dom-module id="ev-global-header">
 
     <template>
-
         <style include="app-styles app-fonts">
 
             /* layout */
@@ -67,7 +66,6 @@
                 text-decoration: none;
                 cursor: pointer;
             }
-
         </style>
 
         <ev-responsive>
@@ -76,17 +74,22 @@
                 <a class="project" href$="[[appPath]]" on-tap="resetApp">Emissies Vlaanderen</a>
             </div>
             <div class="sys-nav">
-                <ev-contact-link>Contacteer ons</ev-contact-link>
+                <template is="dom-if" if="{{contactLinkLoaded}}">
+                    <ev-contact-link>Contacteer ons</ev-contact-link>
+                </template>
             </div>
         </ev-responsive>
 
     </template>
 
     <script>
-
         Polymer({
 
             is: 'ev-global-header',
+
+            behaviors: [
+                evAppLazyLoad
+            ],
 
             properties: {
                 appPath: {
@@ -96,8 +99,16 @@
             },
 
             ready: function () {
-                // upgrade contact link lazily
-                this.importHref(this.resolveUrl("../ev-contact-link/ev-contact-link.html"), null, null, true);
+                this.renderContactLink();
+            },
+
+            renderContactLink: function () {
+                var self = this;
+                this.lazyLoad([
+                    "../ev-contact-link/ev-contact-link.html"
+                ]).then(function () {
+                    self.set('contactLinkLoaded', true);
+                });
             },
 
             resetApp: function () {
@@ -105,7 +116,6 @@
             }
 
         });
-
     </script>
 
 </dom-module>
