@@ -1,0 +1,40 @@
+<script>
+    /**
+     * Polymer behavior that lazy-loads element sets
+     */
+    evAppLazyLoad = {
+
+        properties: {
+            /**
+             * Registry for lazy-loaded elements
+             */
+            lazyLoaded: {
+                type: Object,
+                value: {}
+            }
+        },
+
+        /**
+         * Lazy-loads an element and triggers the provided callback
+         *
+         * @param {Array} elements A list of element paths
+         * @return {Promise}
+         */
+        lazyLoad: function (elements) {
+            var self = this;
+            return new Promise(function (resolve, reject) {
+                var queueSize = elements.length;
+                elements.forEach(function (path) {
+                    var elementName = path.replace(/^.*\/([^\/]+)\.html.*/, '$1');
+                    self.importHref(self.resolveUrl(path), function () {
+                        queueSize--;
+                        self.lazyLoaded[elementName] = true;
+                        if (queueSize === 0) {
+                            resolve();
+                        }
+                    }, reject);
+                });
+            });
+        }
+    }
+</script>
