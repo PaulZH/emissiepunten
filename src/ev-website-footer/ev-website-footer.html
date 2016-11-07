@@ -1,8 +1,7 @@
-
+<!--suppress JSUnusedGlobalSymbols -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
-<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html"/>
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
@@ -10,7 +9,6 @@
 <dom-module id="ev-website-footer">
 
     <template>
-
         <style include="app-styles app-fonts">
 
             :host {
@@ -20,7 +18,7 @@
             }
 
             :host > footer {
-                height: 120px;
+                min-height: 120px;
                 @apply(--ev-app-container);
             }
 
@@ -139,7 +137,6 @@
     </template>
 
     <script>
-
         Polymer({
 
             is: 'ev-website-footer',
@@ -152,11 +149,10 @@
             },
 
             onBowerJsonLoaded: function () {
-                this.set('version', this.$.bower.lastResponse.version || null);
+                this.set('version', this.$.bower['lastResponse'].version || null);
             }
 
         });
-
     </script>
 
 </dom-module>
