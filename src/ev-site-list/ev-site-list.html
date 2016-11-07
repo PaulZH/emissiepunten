@@ -1,14 +1,11 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../bower_components/paper-button/paper-button.html"/>
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
-<link rel="import" href="../../bower_components/iron-icons/maps-icons.html"/>
-<link rel="import" href="../../bower_components/iron-list/iron-list.html"/>
-<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../ev-app/ev-app-lazyload-behavior.html"/>
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
 
-<dom-module id="ev-result-list">
+<dom-module id="ev-site-list">
 
     <template>
 
@@ -69,7 +66,7 @@
             .list-item {
                 padding: 16px 16px 16px 60px;
                 min-height: 60px;
-                background: transparent url("img/emission-icon.png") 16px 16px no-repeat;
+                background: transparent url("img/site-icon.png") 16px 16px no-repeat;
                 border-bottom: 1px solid var(--ev-app-grey-6);
                 color: var(--ev-app-green-1);
                 cursor: pointer;
@@ -88,9 +85,8 @@
         </style>
 
         <ev-card title="{{title}}">
-
             <!-- no sites -->
-            <template is="dom-if" if="{{!sites.length}}">
+            <template is="dom-if" if="{{isIntroActive(introElementsLoaded, sites)}}">
                 <p class="intro">
                     Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
                 </p>
@@ -105,17 +101,16 @@
             </template>
 
             <!-- sites found -->
-            <template is="dom-if" if="{{sites.length}}" restamp="true">
+            <template is="dom-if" if="{{isListActive(listElementsLoaded, sites)}}" restamp="true">
                 <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
                     <template>
-                        <div class$="[[getItemClass(selected)]]" data-uri="[[item.uri]]">
+                        <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
                             [[item.label]]
                             <div class="ep-count">Emission Points: [[item.eps.length]]</div>
                         </div>
                     </template>
                 </iron-list>
             </template>
-
         </ev-card>
 
     </template>
@@ -124,9 +119,15 @@
 
         Polymer({
 
-            is: 'ev-result-list',
+            is: 'ev-site-list',
+
+            behaviors: [
+                evAppLazyLoad
+            ],
 
             properties: {
+                introElementsLoaded: Boolean,
+                listElementsLoaded: Boolean,
                 title: {
                     type: String
                 },
@@ -154,19 +155,51 @@
                 }
             },
 
-            attached: function () {
+            ready: function () {
+                var self = this;
                 this.updateTitle();
+                this.loadIntroElements().then(function() {
+                    self.loadListElements();
+                });
+            },
+
+            isIntroActive: function (introElementsLoaded, sites) {
+                return (introElementsLoaded && !sites.length);
+            },
+
+            isListActive: function (listElementsLoaded, sites) {
+                return (listElementsLoaded && !!sites.length);
             },
 
             updateTitle: function () {
                 if (this.location && this.location.point) {
                     var hits = (this.sites.length || 0);
                     this.title = (hits === 1)
-                        ? '1 emission site found'
-                        : hits + ' emission sites found';
+                        ? '1 site found'
+                        : hits + ' sites found';
                 } else {
                     this.title = 'Emission Sites in Flanders';
                 }
+            },
+
+            loadIntroElements: function () {
+                var self = this;
+                return this.lazyLoad([
+                    "../../bower_components/paper-button/paper-button.html",
+                    "../../bower_components/iron-icon/iron-icon.html",
+                    "../../bower_components/iron-icons/maps-icons.html"
+                ]).then(function () {
+                    self.set('introElementsLoaded', true);
+                });
+            },
+
+            loadListElements: function () {
+                var self = this;
+                return this.lazyLoad([
+                    "../../bower_components/iron-list/iron-list.html"
+                ]).then(function () {
+                    self.set('listElementsLoaded', true);
+                });
             },
 
             onSitesChanged: function () {
@@ -175,17 +208,25 @@
 
             onSiteSelected: function (site) {
                 var $list = this.$$('iron-list');
-                var selectedItem = $list ? $list.selectedItem : null;
-                if (site && (!selectedItem || selectedItem.uri !== site.uri)) {
-                    this.sites.forEach(function (item) {
-                        if (item.uri === site.uri) {
-                            $list.selectItem(item);
-                            $list.scrollToItem(item);
-                        }
-                    })
-                } else if (!site && selectedItem) {
-                    $list.clearSelection();
+                // nothing to do if list is not stamped yet
+                if (!$list) {
+                    return;
                 }
+                // clear list selection if no site is selected
+                if (!site) {
+                    return $list.clearSelection();
+                }
+                // nothing to do if site is already selected
+                if ($list.selectedItem && $list.selectedItem.uri === site.uri) {
+                    return;
+                }
+                // highlight new selected site in list
+                this.sites.forEach(function (item) {
+                    if (item.uri === site.uri) {
+                        $list.selectItem(item);
+                        $list.scrollToItem(item);
+                    }
+                });
             },
 
             getItemClass: function (selected) {
