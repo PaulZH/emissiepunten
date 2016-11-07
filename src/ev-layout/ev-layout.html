@@ -1,9 +1,7 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../ev-app/ev-app-lazyload-behavior.html"/>
 <link rel="import" href="../app/app-styles.html"/>
-<link rel="import" href="../ev-global-header/ev-global-header.html"/>
-<link rel="import" href="../ev-website-header/ev-website-header.html"/>
-<link rel="import" href="../ev-app-canvas/ev-app-canvas.html"/>
 
 <dom-module id="ev-layout">
 
@@ -24,32 +22,87 @@
                 padding-top: 40px;
                 padding-bottom: 40px;
             }
-
         </style>
 
-        <ev-global-header></ev-global-header>
-        <ev-website-header></ev-website-header>
-        <ev-app-canvas>
-            <content></content>
-        </ev-app-canvas>
-        <ev-website-footer></ev-website-footer>
+        <template is="dom-if" if="{{headersLoaded}}">
+            <ev-global-header></ev-global-header>
+            <ev-website-header></ev-website-header>
+        </template>
+
+        <template is="dom-if" if="{{canvasLoaded}}">
+            <ev-app-canvas>
+                <content></content>
+            </ev-app-canvas>
+        </template>
+
+        <template is="dom-if" if="{{footerLoaded}}">
+            <ev-website-footer></ev-website-footer>
+        </template>
     </template>
 
     <script>
-
         Polymer({
 
             is: 'ev-layout',
 
+            behaviors: [
+                evAppLazyLoad
+            ],
+
             ready: function () {
-                // de-flag body
-                document.querySelector("body").classList.remove('initializing');
-                // upgrade footer lazily
-                this.importHref(this.resolveUrl("../ev-website-footer/ev-website-footer.html"), null, null, true);
+                var self = this;
+                this.renderAppCanvas().then(function () {
+                    self.renderHeaders();
+                }).then(function () {
+                    self.renderFooter();
+                });
+            },
+
+            /**
+             * Renders the app canvas
+             *
+             * @return {Promise}
+             */
+            renderAppCanvas: function () {
+                var self = this;
+                return this.lazyLoad([
+                    "../ev-app-canvas/ev-app-canvas.html"
+                ]).then(function () {
+                    // de-flag body to hide "loading" indicator
+                    document.querySelector("body").classList.remove('initializing');
+                    // stamp canvas template
+                    self.set('canvasLoaded', true);
+                });
+            },
+
+            /**
+             * Renders the header elements
+             *
+             * @return {Promise}
+             */
+            renderHeaders: function () {
+                var self = this;
+                return this.lazyLoad([
+                    "../ev-global-header/ev-global-header.html",
+                    "../ev-website-header/ev-website-header.html"
+                ]).then(function () {
+                    self.set('headersLoaded', true);
+                });
+            },
+
+            /**
+             * Renders the footer element
+             * @return {Promise}
+             */
+            renderFooter: function () {
+                var self = this;
+                return this.lazyLoad([
+                    "../ev-website-footer/ev-website-footer.html"
+                ]).then(function () {
+                    self.set('footerLoaded', true);
+                });
             }
-
         });
-
     </script>
 
 </dom-module>
