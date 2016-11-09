@@ -74,36 +74,31 @@
             ],
 
             properties: {
-                selectedSite: {
-                    type: Object,
-                    value: null
-                },
-                selectedEmissionPoint: {
-                    type: Object,
-                    value: null
-                },
-                /**
-                 * Currently selected map location
-                 */
-                location: {
-                    type: Object, // lat, lon, radius
-                    value: {lat: null, lon: null, radius: 10, point: null},
-                    notify: true
-                },
-                /**
-                 * The app's current view (a path)
-                 */
+                /** The app's current view (a path) */
                 view: {
                     type: String,
                     reflectToAttribute: true,
                     value: app.activeView,
                     observer: 'onViewChanged'
                 },
-                /**
-                 * Request parameters
-                 */
+                /** Request parameters */
                 query: {
                     type: Object
+                },
+                /** Currently selected map location */
+                location: {
+                    type: Object, // lat, lon, radius
+                    value: {lat: null, lon: null, radius: 10, point: null}
+                },
+                /** Currently selected site */
+                selectedSite: {
+                    type: Object,
+                    value: null
+                },
+                /** currently selected emission point */
+                selectedEmissionPoint: {
+                    type: Object,
+                    value: null
                 }
             },
 
@@ -143,8 +138,7 @@
              * Expands the layout so that scroll bars don't get removed when the pane is temporarily inactive
              */
             expandCanvas: function () {
-                var $app = document.querySelector('ev-app');
-                $app.style.minHeight = $app.offsetHeight + 'px';
+                this.style.minHeight = this.offsetHeight + 'px';
             },
 
             /**
