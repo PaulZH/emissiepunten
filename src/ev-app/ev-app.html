@@ -48,8 +48,10 @@
 
         <ev-responsive>
             <section id="list-and-map">
-                <ev-site-list geolocate="{{geolocate}}" location="{{location}}" sites="{{sites}}" selected-site="{{selectedSite}}"></ev-site-list>
-                <ev-map location="{{location}}" geolocate="{{geolocate}}" sites="{{sites}}" selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
+                <ev-site-list geolocate="{{geolocate}}" location="{{location}}" sites="{{sites}}"
+                              selected-site="{{selectedSite}}"></ev-site-list>
+                <ev-map location="{{location}}" geolocate="{{geolocate}}" sites="{{sites}}"
+                        selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
             </section>
 
             <template is="dom-if" if="[[deferredElementsLoaded]]">
@@ -62,6 +64,7 @@
     </template>
 
     <script>
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-app',
@@ -129,13 +132,6 @@
                 });
             },
 
-            /**
-             * Returns TRUE when the data pane should be shown
-             */
-            isPaneActive: function(paneLoaded, selectedSite, selectedEmissionPoint) {
-                return paneLoaded && (selectedSite || selectedEmissionPoint);
-            },
-
             onDataPaneActive: function (selectedSite, selectedEmissionPoint) {
                 if (selectedSite || selectedEmissionPoint) {
                     this.expandCanvas();
@@ -156,7 +152,7 @@
              *
              * @param loops Number of animation ticks
              */
-            scrollIn: function(loops) {
+            scrollIn: function (loops) {
                 var self = this;
                 loops = loops || 0;
                 var targetTop = this.offsetTop;
@@ -172,13 +168,16 @@
             },
 
             /**
-             * Sets the element's `view` parameter when the route changes
+             * Sets the element's `view` parameter when the route changes (not used yet)
              */
             onRouteChanged: function () {
+                //noinspection JSUnresolvedVariable
                 if (!this.tailData || this.tailData.prefix === null) {
                     return; // route not parsed yet
                 }
+                //noinspection JSUnresolvedVariable
                 this.view = (this.tailData.prefix || '') + (this.tailData.path || '');
+                //noinspection JSUnusedGlobalSymbols,JSUnresolvedVariable
                 this.query = this.tailData.__queryParams;
             },
 
