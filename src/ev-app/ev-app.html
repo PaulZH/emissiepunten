@@ -1,11 +1,18 @@
-
-<!--suppress JSUnresolvedVariable, JSUnusedGlobalSymbols -->
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-site-list/ev-site-list.html"/>
+<link rel="import" href="../ev-map/ev-map.html"/>
+<!-- styles -->
+<link rel="import" href="../app/app-styles.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
 
 <dom-module id="ev-app">
     <template>
 
-        <style>
+        <style include="app-styles">
             :host {
                 display: block;
             }
@@ -16,11 +23,11 @@
                 @apply(--layout-horizontal);
             }
 
-            ev-result-list {
+            ev-site-list {
                 display: none;
             }
 
-            [w8a] ev-result-list {
+            [w8a] ev-site-list {
                 display: block;
                 @apply(--layout-flex-3);
                 margin-right: 16px;
@@ -31,27 +38,24 @@
                 max-width: 100%;
             }
 
-            /* emission point */
+            /* data-pane */
 
-            #emission-point {
+            ev-data-pane {
                 margin-top: 16px;
             }
 
         </style>
 
-        <app-location route="{{route}}"></app-location>
-        <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
-
         <ev-responsive>
             <section id="list-and-map">
-                <ev-result-list geolocate={{geolocate}} location={{location}} sites="{{sites}}" selected-site="{{selectedSite}}"></ev-result-list>
-                <ev-map location={{location}} geolocate={{geolocate}} sites="{{sites}}" selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
+                <ev-site-list geolocate="{{geolocate}}" location="{{location}}" sites="{{sites}}" selected-site="{{selectedSite}}"></ev-site-list>
+                <ev-map location="{{location}}" geolocate="{{geolocate}}" sites="{{sites}}" selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
             </section>
 
-            <template is="dom-if" if="{{selectedEmissionPoint}}">
-                <section id="emission-point">
-                    <ev-emission-point point="{{selectedEmissionPoint}}"></ev-emission-point>
-                </section>
+            <template is="dom-if" if="[[deferredElementsLoaded]]">
+                <ev-data-pane site="{{selectedSite}}" emission-point="{{selectedEmissionPoint}}"></ev-data-pane>
+                <app-location route="{{route}}"></app-location>
+                <app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
             </template>
         </ev-responsive>
 
@@ -62,10 +66,26 @@
 
             is: 'ev-app',
 
+            behaviors: [
+                appLazyloading
+            ],
+
             properties: {
-                base: {
-                    type: String,
-                    value: app.base
+                selectedSite: {
+                    type: Object,
+                    value: null
+                },
+                selectedEmissionPoint: {
+                    type: Object,
+                    value: null
+                },
+                /**
+                 * Currently selected map location
+                 */
+                location: {
+                    type: Object, // lat, lon, radius
+                    value: {lat: null, lon: null, radius: 10, point: null},
+                    notify: true
                 },
                 /**
                  * The app's current view (a path)
@@ -81,32 +101,74 @@
                  */
                 query: {
                     type: Object
-                },
-                /**
-                 * Matching emission points
-                 */
-                emissionPoints: {
-                    type: Array,
-                    notify: true,
-                    value: []
                 }
             },
 
             observers: [
                 'onRouteChanged(routeData)',
                 'onRouteChanged(tailData)',
-                'onLocationSelected(location.point,selectedEmissionPoint)'
+                'onDataPaneActive(selectedSite,selectedEmissionPoint)'
             ],
 
-            ready: function () {
-                // lazy-load elements
-                this.importHref(this.resolveUrl("../../bower_components/iron-flex-layout/iron-flex-layout.html"), null, null, true);
-                this.importHref(this.resolveUrl("../../bower_components/app-route/app-location.html"), null, null, true);
-                this.importHref(this.resolveUrl("../../bower_components/app-route/app-route.html"), null, null, true);
-                this.importHref(this.resolveUrl("../ev-responsive/ev-responsive.html"), null, null, true);
-                this.importHref(this.resolveUrl("../ev-result-list/ev-result-list.html"), null, null, true);
-                this.importHref(this.resolveUrl("../ev-map/ev-map.html"), null, null, true);
-                this.importHref(this.resolveUrl("../ev-emission-point/ev-emission-point.html"), null, null, true);
+            attached: function () {
+                // render deferred elements
+                this.async(this.renderDeferredElements, 100);
+            },
+
+            /**
+             * Defers expensive and/or less important elements
+             */
+            renderDeferredElements: function () {
+                var self = this;
+                this.lazyload([
+                    "../ev-data-pane/ev-data-pane.html",
+                    "../../bower_components/app-route/app-location.html",
+                    "../../bower_components/app-route/app-route.html"
+                ]).then(function () {
+                    self.set('deferredElementsLoaded', true);
+                });
+            },
+
+            /**
+             * Returns TRUE when the data pane should be shown
+             */
+            isPaneActive: function(paneLoaded, selectedSite, selectedEmissionPoint) {
+                return paneLoaded && (selectedSite || selectedEmissionPoint);
+            },
+
+            onDataPaneActive: function (selectedSite, selectedEmissionPoint) {
+                if (selectedSite || selectedEmissionPoint) {
+                    this.expandCanvas();
+                    this.scrollIn();
+                }
+            },
+
+            /**
+             * Expands the layout so that scroll bars don't get removed when the pane is temporarily inactive
+             */
+            expandCanvas: function () {
+                var $app = document.querySelector('ev-app');
+                $app.style.minHeight = $app.offsetHeight + 'px';
+            },
+
+            /**
+             * Scroll the viewport to the top of the app element so that the data pane becomes visible
+             *
+             * @param loops Number of animation ticks
+             */
+            scrollIn: function(loops) {
+                var self = this;
+                loops = loops || 0;
+                var targetTop = this.offsetTop;
+                var currentTop = document.body.scrollTop || document.documentElement.scrollTop;
+                if (targetTop > currentTop && loops < 20) {
+                    var nextTop = currentTop + (targetTop - currentTop) / (20 - loops);
+                    document.body.scrollTop = nextTop;
+                    document.documentElement.scrollTop = nextTop;
+                    this.async(function () {
+                        self.scrollIn(loops + 1);
+                    }, 10);
+                }
             },
 
             /**
@@ -129,28 +191,7 @@
                 }
                 // set active view
                 app.activeView = this.view;
-            },
-
-            onLocationSelected: function () {
-                // scroll down to top of map  so that emission point moves above the fold
-                this.scrollIn();
-            },
-
-            scrollIn: function(loops) {
-                var self = this;
-                loops = loops || 0;
-                var targetTop = this.offsetTop;
-                var currentTop = document.body.scrollTop || document.documentElement.scrollTop;
-                if (targetTop > currentTop && loops < 20) {
-                    var nextTop = currentTop + (targetTop - currentTop) / (20 - loops);
-                    document.body.scrollTop = nextTop;
-                    document.documentElement.scrollTop = nextTop;
-                    this.async(function () {
-                        self.scrollIn(loops + 1);
-                    }, 10);
-                }
             }
-
         });
     </script>
 
