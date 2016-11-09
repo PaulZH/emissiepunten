@@ -1,0 +1,182 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+
+<dom-module id="ev-map-location-layer">
+
+    <script>
+        Polymer({
+
+            is: 'ev-map-location-layer',
+
+            properties: {
+                olMap: Object,
+                locationLayer: {
+                    type: Object
+                },
+                radiusFeature: {
+                    type: Object
+                },
+                markerFeature: {
+                    type: Object
+                },
+                location: {
+                    type: Object, // lat, lon, radius
+                    notify: true
+                },
+                geolocate: {
+                    type: Boolean,
+                    notify: true
+                },
+                geolocationPoint: {
+                    type: Array,
+                    value: null
+                }
+            },
+
+            observers: [
+                'onLocationChanged(location.*)',
+                'onGeolocate(geolocate)'
+            ],
+
+            attached: function () {
+                this.renderLocationLayer();
+                this.registerMapClicks();
+            },
+
+            renderLocationLayer: function () {
+                //noinspection JSCheckFunctionSignatures
+                this.locationLayer = new ol.layer.Vector({
+                    name: 'location',
+                    source: new ol.source.Vector({})
+                });
+                this.olMap.addLayer(this.locationLayer);
+            },
+
+            registerMapClicks: function () {
+                var self = this;
+                this.olMap.on('singleclick', function (event) {
+                    if (!self.isMapClick(event)) {
+                        return;// ignore clicks on markers
+                    }
+                    // update location
+                    self.updateLocationFromPoint(event.coordinate);
+                });
+            },
+
+            /**
+             * Checks whether a click on the map should change the location
+             *
+             * @param {ol.MapBrowserEvent} event Click-event
+             * @return {Boolean} TRUE for map-clicks, FALSE for clicks on site features
+             */
+            isMapClick: function (event) {
+                var result = true;
+                this.olMap.forEachFeatureAtPixel(event.pixel, function(feature) {
+                    if (feature.get('name').match(/^(site)$/)) {
+                        result = false;
+                        return true;
+                    }
+                });
+                return result;
+            },
+
+            updateLocationFromPoint: function (point) {
+                //noinspection JSCheckFunctionSignatures
+                var wgs84 = ol.proj.transform(point, 'EPSG:31370', 'EPSG:4326');
+                this.set('location.point', point);
+                this.set('location.lon', wgs84[0]);
+                this.set('location.lat', wgs84[1]);
+            },
+
+            onLocationChanged: function () {
+                this.debounce('onLocationChanged', function() {
+                    if (!this.location || !this.location.point) {
+                        return;
+                    }
+                    // re-position marker
+                    this.getMarkerFeature().getGeometry().setCoordinates(this.location.point);
+                    // re-position radius disc
+                    this.getRadiusFeature().getGeometry().setCenterAndRadius(this.location.point, this.location.radius * 1000);
+                    // pan to new location
+                    this.async(this.panToLocation, 100);
+                }, 10);
+            },
+
+            getMarkerFeature: function () {
+                if (this.markerFeature) {
+                    return this.markerFeature;
+                }
+                this.markerFeature = new ol.Feature({
+                    name: 'locationMarker',
+                    geometry: new ol.geom.Point(this.location.point)
+                });
+                //noinspection JSCheckFunctionSignatures
+                this.markerFeature.setStyle(new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, 0.5],
+                        size: [20, 20],
+                        src: window.app.base + 'src/ev-map-location-layer/img/my-location.png'
+                    })
+                }));
+                this.locationLayer.getSource().addFeature(this.markerFeature);
+                return this.markerFeature;
+            },
+
+            getRadiusFeature: function () {
+                if (this.radiusFeature) {
+                    return this.radiusFeature;
+                }
+                this.radiusFeature = new ol.Feature({
+                    name: 'locationRadius',
+                    geometry: new ol.geom.Circle(this.location.point, this.location.radius * 1000)
+                });
+                //noinspection JSCheckFunctionSignatures
+                var style = new ol.style.Style({
+                    fill: new ol.style.Fill({ color: [77, 166, 146, 0.5] })
+                });
+                this.radiusFeature.setStyle(style);
+                this.locationLayer.getSource().addFeature(this.radiusFeature);
+                return this.radiusFeature;
+            },
+
+            panToLocation: function () {
+                var view = this.olMap.getView();
+                //noinspection JSCheckFunctionSignatures
+                var pan = ol.animation.pan({
+                    source: view.getCenter(),
+                    duration: 500
+                });
+                this.olMap.beforeRender(pan);
+                view.setCenter(this.location.point);
+            },
+
+            onGeolocate: function () {
+                var self = this;
+                if (!this.geolocate || !this.olMap) {// not active or not ready yet
+                    this.set('geolocate', false);
+                    return;
+                }
+                if (this.geolocationPoint) {// already detected earlier
+                    this.set('geolocate', false);
+                    return self.updateLocationFromPoint(this.geolocationPoint);
+                }
+                if (this.geolocation) {// initiated, but no point detected yet, nothing to do
+                    return;
+                }
+                // init geolocation
+                this.geolocation = new ol.Geolocation({
+                    projection: this.olMap.getView().getProjection()
+                });
+                this.geolocation.on('change:position', function() {
+                    self.set('geolocationPoint', self.geolocation.getPosition());
+                    if (self.geolocate) {
+                        self.updateLocationFromPoint(self.geolocationPoint);
+                        self.set('geolocate', false);// require another button click for geo-locating
+                    }
+                });
+                this.geolocation.setTracking(true);// trigger `change:position` events
+            }
+        });
+    </script>
+
+</dom-module>
