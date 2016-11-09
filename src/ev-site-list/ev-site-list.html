@@ -1,9 +1,11 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-app/ev-app-lazyload-behavior.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
-<link rel="import" href="../ev-card/ev-card.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
 
 <dom-module id="ev-site-list">
 
@@ -63,6 +65,7 @@
                 height: 100%;
             }
 
+            /*noinspection CssUnusedSymbol*/
             .list-item {
                 padding: 16px 16px 16px 60px;
                 min-height: 60px;
@@ -72,6 +75,7 @@
                 cursor: pointer;
             }
 
+            /*noinspection CssUnusedSymbol*/
             .list-item.selected {
                 background-color: var(--ev-app-green-2);
                 color: #fff;
@@ -85,31 +89,33 @@
         </style>
 
         <ev-card title="{{title}}">
-            <!-- no sites -->
-            <template is="dom-if" if="{{isIntroActive(introElementsLoaded, sites)}}">
-                <p class="intro">
-                    Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
-                </p>
-                <p class="get-started">
-                    <span class="heading">Get started:</span>
-                    <paper-button raised on-tap="onGeolocate">
-                        <iron-icon icon="maps:my-location"></iron-icon>
-                        Use my location
-                    </paper-button>
-                    <span class="sub-info">or just click on the map</span>
-                </p>
-            </template>
+            <template is="dom-if" if="[[deferredElementsLoaded]]">
+                <!-- no sites -->
+                <template is="dom-if" if="[[!sites.length]]">
+                    <p class="intro">
+                        Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
+                    </p>
+                    <p class="get-started">
+                        <span class="heading">Get started:</span>
+                        <paper-button raised on-tap="onGeolocate">
+                            <iron-icon icon="maps:my-location"></iron-icon>
+                            Use my location
+                        </paper-button>
+                        <span class="sub-info">or just click on the map</span>
+                    </p>
+                </template>
 
-            <!-- sites found -->
-            <template is="dom-if" if="{{isListActive(listElementsLoaded, sites)}}" restamp="true">
-                <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
-                    <template>
-                        <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
-                            [[item.label]]
-                            <div class="ep-count">Emission Points: [[item.eps.length]]</div>
-                        </div>
-                    </template>
-                </iron-list>
+                <!-- sites found -->
+                <template is="dom-if" if="[[sites.length]]" restamp="true">
+                    <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
+                        <template>
+                            <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
+                                [[item.label]]
+                                <div class="ep-count">Emission Points: [[item.eps.length]]</div>
+                            </div>
+                        </template>
+                    </iron-list>
+                </template>
             </template>
         </ev-card>
 
@@ -117,27 +123,29 @@
 
     <script>
 
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-site-list',
 
             behaviors: [
-                evAppLazyLoad
+                appLazyloading
             ],
 
             properties: {
-                introElementsLoaded: Boolean,
-                listElementsLoaded: Boolean,
+                deferredElementsLoaded: {
+                    type: Boolean,
+                    value: false
+                },
                 title: {
-                    type: String
+                    type: String,
+                    computed: 'getTitle(location.*,sites)'
                 },
                 location: {
-                    type: Object,
-                    notify: true
+                    type: Object
                 },
                 sites: {
                     type: Array,
-                    observer: "onSitesChanged",
                     value: []
                 },
                 selectedSite: {
@@ -155,55 +163,35 @@
                 }
             },
 
-            ready: function () {
+            attached: function () {
+                // render deferred elements
+                this.async(this.renderDeferredElements, 100);
+            },
+
+            /**
+             * Defers expensive and/or less important elements
+             */
+            renderDeferredElements: function () {
                 var self = this;
-                this.updateTitle();
-                this.loadIntroElements().then(function() {
-                    self.loadListElements();
+                this.lazyload([
+                    "../../bower_components/paper-button/paper-button.html",
+                    "../../bower_components/iron-icon/iron-icon.html",
+                    "../../bower_components/iron-icons/maps-icons.html",
+                    "../../bower_components/iron-list/iron-list.html"
+                ]).then(function () {
+                    self.set('deferredElementsLoaded', true);
                 });
             },
 
-            isIntroActive: function (introElementsLoaded, sites) {
-                return (introElementsLoaded && !sites.length);
-            },
-
-            isListActive: function (listElementsLoaded, sites) {
-                return (listElementsLoaded && !!sites.length);
-            },
-
-            updateTitle: function () {
+            getTitle: function () {
                 if (this.location && this.location.point) {
                     var hits = (this.sites.length || 0);
-                    this.title = (hits === 1)
+                    return (hits === 1)
                         ? '1 site found'
                         : hits + ' sites found';
                 } else {
-                    this.title = 'Emission Sites in Flanders';
+                    return 'Emission Sites in Flanders';
                 }
-            },
-
-            loadIntroElements: function () {
-                var self = this;
-                return this.lazyLoad([
-                    "../../bower_components/paper-button/paper-button.html",
-                    "../../bower_components/iron-icon/iron-icon.html",
-                    "../../bower_components/iron-icons/maps-icons.html"
-                ]).then(function () {
-                    self.set('introElementsLoaded', true);
-                });
-            },
-
-            loadListElements: function () {
-                var self = this;
-                return this.lazyLoad([
-                    "../../bower_components/iron-list/iron-list.html"
-                ]).then(function () {
-                    self.set('listElementsLoaded', true);
-                });
-            },
-
-            onSitesChanged: function () {
-                this.updateTitle();
             },
 
             onSiteSelected: function (site) {
@@ -242,7 +230,6 @@
             onGeolocate: function () {
                 this.set('geolocate', true);
             }
-
         });
 
     </script>
