@@ -1,9 +1,12 @@
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
-<link rel="import" href="../ev-app/ev-app-lazyload-behavior.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
 
 <dom-module id="ev-global-header">
 
@@ -73,11 +76,7 @@
                 <a class="vlaanderen-be" href="http://www.vlaanderen.be/nl">Vlaanderen.be</a>
                 <a class="project" href$="[[appPath]]" on-tap="resetApp">Emissies Vlaanderen</a>
             </div>
-            <div class="sys-nav">
-                <template is="dom-if" if="{{contactLinkLoaded}}">
-                    <ev-contact-link>Contacteer ons</ev-contact-link>
-                </template>
-            </div>
+            <div class="sys-nav"></div>
         </ev-responsive>
 
     </template>
@@ -88,7 +87,7 @@
             is: 'ev-global-header',
 
             behaviors: [
-                evAppLazyLoad
+                appLazyloading
             ],
 
             properties: {
@@ -98,23 +97,24 @@
                 }
             },
 
-            ready: function () {
-                this.renderContactLink();
+            attached: function () {
+                // render deferred elements
+                this.async(this.renderDeferredElements, 1000);
             },
 
-            renderContactLink: function () {
+            /**
+             * Defers expensive and/or less important elements
+             */
+            renderDeferredElements: function () {
                 var self = this;
-                this.lazyLoad([
-                    "../ev-contact-link/ev-contact-link.html"
-                ]).then(function () {
-                    self.set('contactLinkLoaded', true);
+                this.lazyload(["../ev-contact-link/ev-contact-link.html"]).then(function () {
+                    self.$$('.sys-nav').appendChild(document.createElement('ev-contact-link'));
                 });
             },
 
             resetApp: function () {
                 location.href = this.appPath; // poor man's reset for now
             }
-
         });
     </script>
 

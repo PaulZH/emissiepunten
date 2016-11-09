@@ -1,4 +1,4 @@
-<!--suppress JSUnusedGlobalSymbols -->
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-in-animation.html"/>
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html"/>
@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html"/>
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html"/>
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 
@@ -132,7 +133,7 @@
         </style>
 
         <a class="contact" href="http://www.lne.be/contact" target="lne" on-tap="togglePopup">
-            <content></content>
+            Contacteer ons
         </a>
         <paper-dialog class="contact-popup no-padding" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
             <h4 class="popup-title">Departement Leefmilieu, Natuur en Energie</h4>
@@ -167,6 +168,7 @@
         </paper-dialog>
     </template>
     <script>
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: "ev-contact-link",
