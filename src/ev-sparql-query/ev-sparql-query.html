@@ -1,0 +1,71 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
+<!-- behaviors -->
+<link rel="import" href="../../config/app-config.html"/>
+
+<dom-module id="ev-sparql-query">
+
+    <template>
+        <iron-ajax id="api" url="{{apiUrl}}" params='{{params}}' headers='{"Accept": "application/json"}'
+                   handle-as="json" on-response="onResponse" on-error="onError" debounce-duration="300">
+            <content></content>
+        </iron-ajax>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-sparql-query',
+
+            behaviors: [
+                appConfig
+            ],
+
+            properties: {
+                /** API name, set by parent element */
+                api: String,
+                /** API params */
+                params: Object,
+                /** API results */
+                results: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            attached: function () {
+                // set api url
+                this.set('apiUrl', this.config('apis')[this.api]);
+            },
+
+            getSparqlPrologue: function () {
+                var result = '';
+                var prefixes = this.config('prefixes');
+                for (var prefix in prefixes) {
+                    if (prefixes.hasOwnProperty(prefix)) {
+                        result += 'PREFIX ' + prefix + ': <' + prefixes[prefix] + '>' + "\n";
+                    }
+                }
+                return result;
+            },
+
+            execute: function () {
+                var query = this.getSparqlPrologue() + Polymer.dom(this).textContent;
+                this.$.api.set('params', {query: query});
+                this.$.api.generateRequest();
+            },
+
+            onError: function () {
+                //noinspection JSUnresolvedVariable
+                console.log('SPARQL Error', arguments[1].error.message, this.apiUrl, this.$.api.params.query);
+            },
+
+            onResponse: function () {
+                this.set('results', this.$.api.lastResponse.results);
+            }
+        });
+    </script>
+
+</dom-module>
