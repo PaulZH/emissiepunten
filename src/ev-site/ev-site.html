@@ -5,7 +5,7 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 
-<dom-module id="ev-emission-point">
+<dom-module id="ev-site">
 
     <template>
 
@@ -20,7 +20,7 @@
             <div class="columns">
                 <div id="data">
                     <template is="dom-if" if="[[data]]">
-                        <ev-data-table title="Emission Point Data" items="[[data]]"></ev-data-table>
+                        <ev-data-table title="Site data" items="[[data]]"></ev-data-table>
                     </template>
                 </div>
                 <div id="charts">
@@ -34,15 +34,15 @@
 
         Polymer({
 
-            is: 'ev-emission-point',
+            is: 'ev-site',
 
             attached: function () {
             },
 
             properties: {
-                emissionPoint: {
+                site: {
                     type: Object,
-                    observer: "onEmissionPointChanged"
+                    observer: "onSiteChanged"
                 },
                 data: {
                     type: Array
