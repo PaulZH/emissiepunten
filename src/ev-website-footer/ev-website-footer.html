@@ -1,10 +1,11 @@
-<!--suppress JSUnusedGlobalSymbols -->
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
 
 <dom-module id="ev-website-footer">
 
@@ -71,9 +72,6 @@
                 text-align: right;
             }
 
-            .credits span.version {
-            }
-
             p {
                 margin: 4px 0;
             }
@@ -137,6 +135,7 @@
     </template>
 
     <script>
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-website-footer',
@@ -151,7 +150,6 @@
             onBowerJsonLoaded: function () {
                 this.set('version', this.$.bower['lastResponse'].version || null);
             }
-
         });
     </script>
 
