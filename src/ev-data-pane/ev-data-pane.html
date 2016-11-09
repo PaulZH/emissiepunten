@@ -1,0 +1,102 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
+
+<dom-module id="ev-data-pane">
+
+    <template>
+
+        <style>
+
+            ev-card {
+                display: none;
+                min-height: 410px;
+            }
+
+            /*noinspection CssUnusedSymbol*/
+            ev-card.active {
+                display: block;
+            }
+
+        </style>
+
+
+        <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site,emissionPoint)]]">
+            <template is="dom-if" if="[[site]]" restamp="true">
+                <ev-site site="[[site]]"></ev-site>
+            </template>
+            <template is="dom-if" if="[[emissionPoint]]" restamp="true">
+                <ev-emission-point point="[[emissionPoint]]"></ev-emission-point>
+            </template>
+        </ev-card>
+
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-data-pane',
+
+            behaviors: [
+                appLazyloading
+            ],
+
+            properties: {
+                /**
+                 * Selected site
+                 */
+                site: {
+                    type: Object,
+                    notify: true,
+                    value: null
+                },
+                /**
+                 * Selected EP
+                 */
+                emissionPoint: {
+                    type: Object,
+                    notify: true,
+                    value: null
+                }
+            },
+
+            attached: function () {
+                // render deferred elements
+                this.async(this.renderDeferredElements, 1000);
+            },
+
+            /**
+             * Renders elements that are not immediately needed
+             */
+            renderDeferredElements: function () {
+                var self = this;
+                this.lazyload([
+                    "../ev-site/ev-site.html",
+                    "../ev-emission-point/ev-emission-point.html"
+                ]).then(function () {
+                    self.set('deferredElementsLoaded', true);
+                });
+            },
+
+            getCardTitle: function (site, emissionPoint) {
+                if (site) {
+                    return site.label
+                } else if (emissionPoint) {
+                    return emissionPoint.label
+                } else {
+                    return '';
+                }
+            },
+
+            getCardClass: function (site, emissionPoint) {
+                return (site || emissionPoint)
+                        ? 'active'
+                        : 'hidden';
+            }
+        });
+    </script>
+
+</dom-module>
