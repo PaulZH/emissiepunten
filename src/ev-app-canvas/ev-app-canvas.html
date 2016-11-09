@@ -1,6 +1,9 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
 
 <dom-module id="ev-app-canvas">
 
@@ -19,17 +22,38 @@
 
         </style>
 
-        <section>
-            <content></content>
-        </section>
+        <section></section>
 
     </template>
 
     <script>
         Polymer({
 
-            is: 'ev-app-canvas'
+            is: 'ev-app-canvas',
 
+            behaviors: [
+                appLazyloading
+            ],
+
+            properties: {
+                app: String
+            },
+
+            attached: function () {
+                // render app
+                this.renderAppElement();
+            },
+
+            /**
+             * Renders the app element defined per `app` property
+             */
+            renderAppElement: function () {
+                var self = this;
+                this.lazyload([this.app]).then(function () {
+                    var appElementName = self.app.replace(/^.*\/([^\/]+)\.html.*/, '$1');
+                    self.$$('section').appendChild(document.createElement(appElementName));
+                });
+            }
         });
     </script>
 
