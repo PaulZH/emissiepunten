@@ -1,21 +1,17 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
-<link rel="import" href="../ev-map/ev-map-core-behavior.html"/>
-<link rel="import" href="../ev-map/ev-map-location-behavior.html"/>
-<link rel="import" href="../ev-map/ev-map-emission-points-behavior.html"/>
-<link rel="import" href="../ev-app/ev-app-rdf-behavior.html"/>
-
-<link rel="import" href="../ev-radius/ev-radius.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../openlayers/openlayers-assets.html"/>
+<!-- styles -->
 <link rel="import" href="../openlayers/openlayers-styles.html"/>
-<link rel="import" href="../app/app-styles.html"/>
+<!--behaviors -->
+<link rel="import" href="../behaviors/app-lazyloading.html"/>
 
 <dom-module id="ev-map">
 
     <template>
 
-        <style include="app-styles openlayers-styles">
-
+        <style include="openlayers-styles">
             :host {
                 --ev-card-content: {
                     height: 410px;
@@ -28,145 +24,179 @@
                 overflow: hidden;
                 box-sizing: border-box;
             }
-
-            #emission-points {
-                background-color: #fff;
-                box-shadow: 4px 4px 20px rgba(0,0,0,0.4);
-                width: 240px;
-                display: none;
-            }
-
-            #emission-points ev-card {
-                --ev-card-content: {
-                    max-height: 300px;
-                };
-                --ev-card-title: {
-                    height: 32px;
-                    line-height: 32px;
-                    border-bottom: 1px solid #fff;
-                };
-            }
-
-            #emission-points:after {
-                left: 100%;
-                top: 0;
-                content: "";
-                height: 0;
-                width: 0;
-                position: absolute;
-                pointer-events: none;
-                border: 16px solid transparent;
-                border-left-color: var(--ev-app-green-2);
-            }
-
-            #emission-points .ep {
-                border-bottom: 1px solid;
-                padding: 8px 16px;
-                border-bottom: 1px solid var(--ev-app-grey-6);
-                color: var(--ev-app-green-1);
-                cursor: pointer;
-                font-size: 0.95em;
-            }
-
-            #emission-points .ep.selected {
-                background-color: var(--ev-app-green-2);
-                color: #fff;
-            }
-
         </style>
 
         <ev-card title="{{title}}">
             <div id="map"></div>
-            <ev-radius radius="{{location.radius}}"></ev-radius>
+            <template is="dom-if" if="[[deferredElementsLoaded]]">
+                <ev-radius radius="{{location.radius}}"></ev-radius>
+                <ev-map-location-layer ol-map="{{olMap}}" location="{{location}}"
+                                       geolocate="{{geolocate}}"></ev-map-location-layer>
+            </template>
         </ev-card>
-
-        <div id="emission-points">
-            <ev-card title="[[selectedSite.label]]">
-                <template is="dom-repeat" items="[[emissionPoints]]" restamp="true">
-                    <div class="ep" on-tap="epOnEmissionPointClicked" ep="[[item]]">[[item.shortLabel]]</div>
-                </template>
-            </ev-card>
-        </div>
-
-        <iron-ajax id="emission-points-api"
-                   url="{{sparqlApi}}"
-                   headers='{"Accept": "application/json"}'
-                   params='{{epApiParams}}'
-                   handle-as="json"
-                   on-response="epOnApiResponse"
-                   on-error="epOnApiError"
-                   debounce-duration="300">
-            <pre>
-            {{sparqlPrologue}}
-
-            SELECT DISTINCT ?ep ?label ?lat ?lon ?site ?siteLabel WHERE {
-                SERVICE geo:search {
-                    ?ep geo:search "inCircle";
-                    geo:searchDatatype geoliteral:lat-lon ;
-                    geo:predicate wgs84:lat_long;
-                    geo:spatialCircleCenter "{{location.lat}}#{{location.lon}}";
-                    geo:spatialCircleRadius "{{location.radius}}" .
-                }
-                ?ep a milieu:Emissiepunt ;
-                    rdfs:label ?label ;
-                    wgs84_pos:lat ?lat ;
-                    wgs84_pos:long ?lon ;
-                    protontop:isOwnedBy ?site .
-                ?site rdfs:label ?siteLabel .
-            }
-            ORDER BY DESC(?lat) DESC(?lon)
-            LIMIT 1000
-            </pre>
-        </iron-ajax>
 
     </template>
 
     <script>
-
         Polymer({
 
             is: 'ev-map',
 
             behaviors: [
-                evMapCore,
-                evMapLocation,
-                evAppRdf,
-                evMapEmissionPoints
+                appLazyloading
             ],
 
             properties: {
                 /**
-                 * map container element
+                 * Map card title
                  */
-                $map: {
-                    type: Object
-                },
                 title: {
                     type: String,
                     computed: 'getTitle(location.*)'
+                },
+                /**
+                 * Initial map center
+                 */
+                initialCenter: {
+                    type: Array,
+                    value: [140860.69299028325, 190532.7165957574]
+                },
+                /**
+                 * Extent of Flanders
+                 */
+                mapExtent: {
+                    type: Array,
+                    value: [9928.000000, 66928.000000, 272072.000000, 329072.000000]
+                },
+                projection: Object,
+                resolutions: Array,
+                matrixIds: Array,
+                olMap: Object,
+                tilesLayer: Object,
+                geolocate: {
+                    type: Boolean,
+                    notify: true
+                },
+                /**
+                 * Currently selected map location
+                 */
+                location: {
+                    type: Object, // lat, lon, radius
+                    notify: true
                 }
-            },
-
-            ready: function () {
-                this.$map = this.$.map;
-                this.importHref(this.resolveUrl("../ev-card/ev-card.html"));
-                this.importHref(this.resolveUrl("../openlayers/openlayers-assets.html"), this.createMap, null, true);
             },
 
             getTitle: function () {
                 if (this.location && this.location.lat) {
-                    var t = 'Emission Sites within {radius}km of {lat},{lon}';
-                    return t
+                    return 'Sites within {radius}km of {lat},{lon}'
                             .replace('{radius}', this.location.radius)
                             .replace('{lat}', this.location.lat.toFixed(5))
                             .replace('{lon}', this.location.lon.toFixed(5));
                 } else {
                     return 'Select a location';
                 }
+            },
+
+            attached: function () {
+                this.initProjection();
+                this.initResolutions();
+                this.initMatrixIds();
+                this.renderMap();
+                this.renderTilesLayer();
+                this.scopeSubtree(this.$.map, true);
+                this.async(this.renderDeferredElements, 500);
+            },
+
+            initProjection: function () {
+                var code = 'EPSG:31370';
+                //noinspection JSCheckFunctionSignatures
+                if (!ol.proj.get(code)) {
+                    var definition = '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1 +units=m +no_defs';
+                    proj4.defs(code, definition);
+                }
+                //noinspection JSCheckFunctionSignatures
+                this.set('projection', ol.proj.get(code));
+            },
+
+            initResolutions: function () {
+                var resolutions = [];
+                //noinspection JSCheckFunctionSignatures
+                var maxResolution = ol.extent.getHeight(this.mapExtent) / 256;
+                for (var i = 0; i < 12; i++) {
+                    resolutions[i] = maxResolution / Math.pow(2, i);
+                }
+                this.set('resolutions', resolutions);
+            },
+
+            initMatrixIds: function () {
+                var ids = [];
+                for (var i = 0; i < 12; i++) {
+                    ids[i] = i.toString();
+                }
+                this.set('matrixIds', ids);
+            },
+
+            /**
+             * Defers expensive and/or less important elements
+             */
+            renderDeferredElements: function () {
+                var self = this;
+                this.lazyload([
+                    "../ev-radius/ev-radius.html",
+                    "../ev-map-location-layer/ev-map-location-layer.html",
+                    "../ev-map-sites-layer/ev-map-sites-layer.html"
+                ]).then(function () {
+                    self.set('deferredElementsLoaded', true);
+                    // trigger resize event to fix map distortion (mac-only?)
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent('resize', true, false);
+                    //noinspection JSUnresolvedFunction
+                    window.dispatchEvent(evt);
+                });
+            },
+
+            renderMap: function () {
+                //noinspection JSCheckFunctionSignatures
+                this.olMap = new ol.Map({
+                    target: this.$.map,
+                    loadTilesWhileAnimating: true,
+                    interactions: ol.interaction.defaults({mouseWheelZoom: false}),
+                    controls: [
+                        new ol.control.ScaleLine(),
+                        new ol.control.Zoom(),
+                        new ol.control.ZoomSlider()
+                    ],
+                    view: new ol.View({
+                        center: this.initialCenter,
+                        extent: this.mapExtent,
+                        projection: this.projection,
+                        resolutions: this.resolutions,
+                        zoom: 2
+                    })
+                });
+            },
+
+            renderTilesLayer: function () {
+                //noinspection JSCheckFunctionSignatures
+                this.tilesLayer = new ol.layer.Tile({
+                    name: 'tiles',
+                    source: new ol.source.WMTS({
+                        url: 'https://tile.informatievlaanderen.be/ws/raadpleegdiensten/wmts',
+                        layer: 'grb_bsk_grijs',
+                        matrixSet: 'BPL72VL',
+                        format: 'image/png',
+                        projection: 'EPSG:31370',
+                        tileGrid: new ol.tilegrid.WMTS({
+                            extent: this.mapExtent,
+                            resolutions: this.resolutions,
+                            matrixIds: this.matrixIds
+                        }),
+                        style: ''
+                    })
+                });
+                this.olMap.addLayer(this.tilesLayer);
             }
         });
-
-
     </script>
 
 </dom-module>
