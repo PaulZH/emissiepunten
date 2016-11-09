@@ -1,0 +1,76 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<!-- styles -->
+<link rel="import" href="../app/app-styles.html"/>
+
+<dom-module id="ev-data-table">
+
+    <template>
+
+        <style include="app-styles">
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th {
+                text-align: left;
+                background-color: var(--ev-app-grey-7);
+                font-family: "Flanders Sans", "Roboto-Light", sans-serif;
+                font-weight: 300;
+                line-height: 40px;
+                padding: 1px 16px 0;
+            }
+
+            td {
+                line-height: 32px;
+                padding: 0 16px;
+                font-size: 0.9em;
+            }
+
+            tr + tr td {
+                border-top: 1px solid var(--ev-app-grey-7);
+            }
+
+            td.label {
+                font-weight: 500;
+                text-align: right;
+            }
+        </style>
+
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">[[title]]</th>
+                </tr>
+            </thead>
+            <tbody>
+            <template is="dom-repeat" items="{{data}}">
+                <tr>
+                    <td class="label">{{item.label}}</td>
+                    <td>{{item.value}}</td>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'ev-data-table',
+
+            attached: function () {
+            },
+
+            properties: {
+                title: String,
+                data: Array
+            }
+        });
+
+    </script>
+
+</dom-module>
