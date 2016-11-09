@@ -1,9 +1,9 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html"/>
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html"/>
 <link rel="import" href="../../bower_components/paper-item/paper-item.html"/>
-
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 
@@ -61,16 +61,6 @@
 
             is: 'ev-radius',
 
-            ready: function () {
-                // select provided radius
-                var items = this.$.list.querySelectorAll('paper-item');
-                for (var i = 0; i < items.length; i++) {
-                    if (parseInt(items[i].textContent) === this.radius) {
-                        this.set('selected', i);
-                    }
-                }
-            },
-
             properties: {
                 selected: {
                     type: Number,
@@ -78,8 +68,21 @@
                 },
                 radius: {
                     type: Number,
-                    notify: true,
-                    reflectToAttribute: true
+                    notify: true
+                }
+            },
+
+            attached: function () {
+                // select provided radius
+                this.preselectRadius();
+            },
+
+            preselectRadius: function () {
+                var items = this.$.list.querySelectorAll('paper-item');
+                for (var i = 0; i < items.length; i++) {
+                    if (parseInt(items[i].textContent) === this.radius) {
+                        this.set('selected', i);
+                    }
                 }
             },
 
