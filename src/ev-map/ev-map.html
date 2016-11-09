@@ -47,23 +47,17 @@
             ],
 
             properties: {
-                /**
-                 * Map card title
-                 */
+                /** Map card title */
                 title: {
                     type: String,
                     computed: 'getTitle(location.*)'
                 },
-                /**
-                 * Initial map center
-                 */
+                /** Initial map center */
                 initialCenter: {
                     type: Array,
                     value: [140860.69299028325, 190532.7165957574]
                 },
-                /**
-                 * Extent of Flanders
-                 */
+                /** Extent of Flanders */
                 mapExtent: {
                     type: Array,
                     value: [9928.000000, 66928.000000, 272072.000000, 329072.000000]
@@ -77,11 +71,14 @@
                     type: Boolean,
                     notify: true
                 },
-                /**
-                 * Currently selected map location
-                 */
+                /** Currently selected map location */
                 location: {
                     type: Object, // lat, lon, radius
+                    notify: true
+                },
+                /** Currently selected site */
+                selectedSite: {
+                    type: Object,
                     notify: true
                 }
             },
