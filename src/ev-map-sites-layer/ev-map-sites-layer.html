@@ -1,0 +1,257 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../openlayers/openlayers-assets.html"/>
+<link rel="import" href="../ev-sparql-query/ev-sparql-query.html"/>
+<!-- behaviors -->
+<link rel="import" href="../../config/app-config.html"/>
+
+<dom-module id="ev-map-sites-layer">
+
+    <template>
+        <ev-sparql-query id="sites" api="imjv" results="{{siteResults}}">
+            SELECT DISTINCT * WHERE {
+                SERVICE geo:search {
+                    ?ep geo:search "inCircle";
+                    geo:searchDatatype geoliteral:lat-lon ;
+                    geo:predicate wgs84:lat_long;
+                    geo:spatialCircleCenter "{{location.lat}}#{{location.lon}}";
+                    geo:spatialCircleRadius "{{location.radius}}" .
+                }
+                ?ep a milieu:Emissiepunt ;
+                    rdfs:label ?epLabel ;
+                    wgs84_pos:lat ?lat ;
+                    wgs84_pos:long ?lon ;
+                    protontop:isOwnedBy ?site .
+                ?site rdfs:label ?siteLabel .
+            }
+            ORDER BY DESC(?lat) DESC(?lon)
+            LIMIT 500
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-map-sites-layer',
+
+            behaviors: [
+                appConfig
+            ],
+
+            properties: {
+                olMap: Object,
+                /** selected map location */
+                location: {
+                    type: Object, // lat, lon, radius
+                    notify: true
+                },
+                /** vector layer for sites */
+                sitesLayer: {
+                    type: Object
+                },
+                /** Sites around the current location */
+                sites: {
+                    type: Array,
+                    notify: true, // used by <ev-site-list>
+                    observer: 'onSitesChanged'
+                },
+                /** selected site */
+                site: {
+                    type: Object,
+                    notify: true,
+                    observer: 'onSiteChanged'
+                },
+                /** selected site feature */
+                siteFeature: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            observers: [
+                'onLocationChanged(location.*)',
+                'onSitesLoaded(siteResults)'
+            ],
+
+            attached: function () {
+                this.renderSitesLayer();
+                this.registerSiteClicks();
+            },
+
+            renderSitesLayer: function () {
+                //noinspection JSCheckFunctionSignatures
+                this.sitesLayer = new ol.layer.Vector({
+                    name: 'sites',
+                    source: new ol.source.Vector({}),
+                    style: new ol.style.Style({
+                        image: new ol.style.Icon({
+                            anchor: [0.5, 1],
+                            size: [34, 36],
+                            opacity: 0.9,
+                            scale: 1,
+                            src: window.app.base + 'src/ev-map-sites-layer/img/site-marker.png'
+                        })
+                    })
+                });
+                this.olMap.addLayer(this.sitesLayer);
+            },
+
+            onLocationChanged: function () {
+                this.debounce('onLocationChanged', function () {
+                    if (!this.location || !this.location.point) {
+                        return;
+                    }
+                    // retrieve sites
+                    this.$.sites.execute();
+                }, 10);
+            },
+
+            onSitesLoaded: function(results) {
+                var sites = [];
+                var sitesByUri = {};
+                results.bindings.forEach(function (binding) {
+                    var siteUri = binding.site.value;
+                    //noinspection JSUnresolvedVariable
+                    var siteLabel = binding.siteLabel.value;
+                    if (!sitesByUri[siteUri]) {
+                        sitesByUri[siteUri] = {
+                            uri: siteUri,
+                            label: siteLabel,
+                            // @todo use site coords, not emission point coords when API is extended
+                            lon: binding.lon.value,
+                            lat: binding.lat.value,
+                            epCount: 0,
+                            eps: []
+                        };
+                        sites.push(sitesByUri[siteUri]);
+                    }
+                    //noinspection JSUnresolvedVariable
+                    var ep = {
+                        uri: binding.ep.value,
+                        label: binding.epLabel.value,
+                        // add shortened EP label (site label prefix removed)
+                        shortLabel: binding.epLabel.value.replace(new RegExp('^' + siteLabel + '\\s*:\\s*'), '')
+                    };
+                    sitesByUri[siteUri].eps.push(ep);
+                    sitesByUri[siteUri].epCount++;
+                });
+                this.set('sites', sites);
+            },
+
+            onSitesChanged: function () {
+                this.renderSiteMarkers();
+            },
+
+            renderSiteMarkers: function () {
+                var features = [];
+                this.sites.forEach(function (site) {
+                    var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+                    //noinspection JSCheckFunctionSignatures
+                    var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
+                    var feature = new ol.Feature({
+                        name: 'site',
+                        geometry: new ol.geom.Point(lambertPoint),
+                        site: site
+                    });
+                    features.push(feature);
+                });
+                this.sitesLayer.getSource().clear();
+                this.sitesLayer.getSource().addFeatures(features);
+            },
+
+            /**
+             * Handles site changes triggered by the result list
+             *
+             * @param {Object} site
+             */
+            onSiteChanged: function (site) {
+                var self = this;
+                // deselect previously selected feature
+                if (site === null && this.siteFeature) {
+                    this.deselectSiteFeature(this.siteFeature)
+                }
+                // select site feature
+                if (site) {
+                    var features = this.sitesLayer.getSource().getFeatures();
+                    features.forEach(function (feature) {
+                        if (feature.get('site').uri === site.uri) {
+                            self.selectSiteFeature(feature);
+                        }
+                    });
+                }
+            },
+
+            registerSiteClicks: function () {
+                var self = this;
+                this.olMap.on('singleclick', function (event) {
+                    var siteFeature = self.getSiteFeatureAtPixel(event.pixel);
+                    if (siteFeature) {
+                        self.toggleSiteFeature(siteFeature);
+                    }
+                });
+            },
+
+            getSiteFeatureAtPixel: function (pixelPoint) {
+                var result = null;
+                this.olMap.forEachFeatureAtPixel(pixelPoint, function (feature) {
+                    if (feature.get('name') === 'site') {
+                        result = feature;
+                        return true;// break after finding first site feature
+                    }
+                });
+                return result;
+            },
+
+            toggleSiteFeature: function (siteFeature) {
+                if (this.siteFeature === siteFeature) {
+                    this.deselectSiteFeature(siteFeature);
+                } else {
+                    this.selectSiteFeature(siteFeature);
+                }
+            },
+
+            selectSiteFeature: function (siteFeature) {
+                // cancel if already selected
+                if (this.siteFeature === siteFeature) {
+                    return;
+                }
+                // deselect existing
+                if (this.siteFeature) {
+                    this.deselectSiteFeature(this.siteFeature);
+                }
+                // select given
+                //noinspection JSCheckFunctionSignatures
+                siteFeature.setStyle(new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, 1],
+                        size: [38, 41],
+                        opacity: 0.9,
+                        scale: 1,
+                        src: window.app.base + 'src/ev-map-sites-layer/img/site-marker-selected.png'
+                    })
+                }));
+                this.set('siteFeature', siteFeature);
+                this.set('site', siteFeature.get('site'));
+            },
+
+            deselectSiteFeature: function (siteFeature) {
+                //noinspection JSCheckFunctionSignatures
+                siteFeature.setStyle(new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, 1],
+                        size: [34, 36],
+                        opacity: 0.9,
+                        scale: 1,
+                        src: window.app.base + 'src/ev-map-sites-layer/img/site-marker.png'
+                    })
+                }));
+                if (this.siteFeature === siteFeature) {
+                    this.set('siteFeature', null);
+                    this.set('site', null);
+                }
+            }
+        });
+    </script>
+
+</dom-module>

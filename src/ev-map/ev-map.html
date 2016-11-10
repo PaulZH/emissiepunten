@@ -12,7 +12,7 @@
     <template>
 
         <style include="openlayers-styles">
-            :host {
+            #map-card {
                 --ev-card-content: {
                     height: 410px;
                 }
@@ -26,12 +26,15 @@
             }
         </style>
 
-        <ev-card title="{{title}}">
+        <ev-card id="map-card" title="{{title}}">
             <div id="map"></div>
             <template is="dom-if" if="[[deferredElementsLoaded]]">
                 <ev-radius radius="{{location.radius}}"></ev-radius>
                 <ev-map-location-layer ol-map="{{olMap}}" location="{{location}}"
                                        geolocate="{{geolocate}}"></ev-map-location-layer>
+                <ev-map-sites-layer ol-map="{{olMap}}" location="{{location}}"
+                                    sites={{sites}} site="{{selectedSite}}"
+                                    site-feature="{{selectedSiteFeature}}"></ev-map-sites-layer>
             </template>
         </ev-card>
 
@@ -75,6 +78,11 @@
                 location: {
                     type: Object, // lat, lon, radius
                     notify: true
+                },
+                /** Sites around the current location */
+                sites: {
+                    type: Array,
+                    notify: true // used by <ev-site-list>
                 },
                 /** Currently selected site */
                 selectedSite: {
