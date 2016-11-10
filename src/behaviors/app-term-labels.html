@@ -1,0 +1,27 @@
+<script>
+    /**
+     * Polymer behavior for RDF term labels
+     */
+    appTermLabels= {
+
+        properties: {
+            /** term labels */
+            termLabels: Object
+        },
+
+        getTermLabel: function (term) {
+            if (typeof this.termLabels[term] === 'undefined') {
+                // use the hash as label, but not if hash is `id`, `this`, or `self`
+                var label;
+                if (term.match(/#(id|this|self)$/)) {
+                    label = term.replace(/^.*[\/]([^#\/]+).*/, '$1');
+                } else {
+                    label = term.replace(/^.*[#\/]([^#\/]+)/, '$1');
+                }
+                label = label.replace(/_/g, ' ');
+                this.termLabels[term] = label;
+            }
+            return this.termLabels[term];
+        }
+    }
+</script>
