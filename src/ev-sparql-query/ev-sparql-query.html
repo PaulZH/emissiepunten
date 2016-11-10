@@ -35,11 +35,6 @@
                 }
             },
 
-            attached: function () {
-                // set api url
-                this.set('apiUrl', this.config('apis')[this.api]);
-            },
-
             getSparqlPrologue: function () {
                 var result = '';
                 var prefixes = this.config('prefixes');
@@ -52,6 +47,9 @@
             },
 
             execute: function () {
+                // set API URL
+                this.set('apiUrl', this.config('apis')[this.api]);
+                // run query
                 var query = this.getSparqlPrologue() + Polymer.dom(this).textContent;
                 this.$.api.set('params', {query: query});
                 this.$.api.generateRequest();
