@@ -36,6 +36,26 @@
                 </template>
             </ev-card>
 
+            <ev-sparql-query id="labels" api="imjv" results="{{labelResults}}">
+                SELECT DISTINCT ?term ?label WHERE {
+                    {
+                        ?ep a milieu:Emissiepunt ;
+                            ?term ?o .
+                    }
+                    UNION {
+                        ?obs milieu:substantie ?term .
+                    }
+                    UNION {
+                        ?obs sdmx:unitMeasure ?term .
+                    }
+                    UNION {
+                        ?ep dct:type ?term .
+                    }
+                    ?term ?labelProp ?label .
+                    FILTER (?labelProp = rdfs:label || ?labelProp = skos:prefLabel)
+                }
+                LIMIT 500
+            </ev-sparql-query>
         </template>
 
     </template>
@@ -69,6 +89,10 @@
                 }
             },
 
+            observers: [
+                'onLabelsLoaded(labelResults)'
+            ],
+
             attached: function () {
                 // render deferred elements
                 this.async(this.renderDeferredElements, 1000);
@@ -82,9 +106,14 @@
                 this.lazyload([
                     "../ev-card/ev-card.html",
                     "../ev-site/ev-site.html",
-                    "../ev-emission-point/ev-emission-point.html"
+                    "../ev-emission-point/ev-emission-point.html",
+                    "../ev-sparql-query/ev-sparql-query.html"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
+                    // fetch term labels
+                    self.async(function () {
+                        self.$$('#labels').execute();
+                    }, 1)
                 });
             },
 
@@ -111,6 +140,16 @@
 
             showEmissionPointPane: function (emissionPoint) {
                 return !!emissionPoint;
+            },
+
+            onLabelsLoaded: function (labelResults) {
+                var termLabels = {};
+                labelResults.bindings.forEach(function (binding) {
+                    //noinspection JSUnresolvedVariable
+                    var term = binding.term.value;
+                    termLabels[term] = binding.label.value;
+                });
+                this.set('termLabels', termLabels);
             }
         });
     </script>
