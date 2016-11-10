@@ -91,7 +91,7 @@
         <ev-card title="{{title}}">
             <template is="dom-if" if="[[deferredElementsLoaded]]">
                 <!-- no sites -->
-                <template is="dom-if" if="[[!sites.length]]">
+                <template is="dom-if" if="{{!sites.length}}">
                     <p class="intro">
                         Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
                     </p>
@@ -106,12 +106,12 @@
                 </template>
 
                 <!-- sites found -->
-                <template is="dom-if" if="[[sites.length]]" restamp="true">
-                    <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
+                <template is="dom-if" if="{{sites.length}}" restamp="true">
+                    <iron-list items="{{sites}}" selection-enabled selected-item="{{selectedItem}}">
                         <template>
                             <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
                                 [[item.label]]
-                                <div class="ep-count">Emission Points: [[item.eps.length]]</div>
+                                <div class="ep-count">Emission Points: [[item.epCount]]</div>
                             </div>
                         </template>
                     </iron-list>
