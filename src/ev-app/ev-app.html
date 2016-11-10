@@ -105,7 +105,8 @@
             observers: [
                 'onRouteChanged(routeData)',
                 'onRouteChanged(tailData)',
-                'onDataPaneActive(selectedSite,selectedEmissionPoint)'
+                'onDataPaneActive(selectedSite,selectedEmissionPoint)',
+                'onSiteSelected(selectedSite)'
             ],
 
             attached: function () {
@@ -184,6 +185,12 @@
                 }
                 // set active view
                 app.activeView = this.view;
+            },
+
+            onSiteSelected: function(site) {
+                if (site) {
+                    this.$$('app-location').set('__query', 'site=' + site.uri);
+                }
             }
         });
     </script>
