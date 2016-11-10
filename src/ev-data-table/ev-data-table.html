@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
+<!-- behaviors -->
+<link rel="import" href="../behaviors/app-term-labels.html"/>
 
 <dom-module id="ev-data-table">
 
@@ -35,6 +37,7 @@
             td.label {
                 font-weight: 500;
                 text-align: right;
+                text-transform: capitalize;
             }
         </style>
 
@@ -45,9 +48,9 @@
                 </tr>
             </thead>
             <tbody>
-            <template is="dom-repeat" items="{{data}}">
+            <template is="dom-repeat" items="{{items}}">
                 <tr>
-                    <td class="label">{{item.label}}</td>
+                    <td class="label">{{item.name}}</td>
                     <td>{{item.value}}</td>
                 </tr>
             </template>
@@ -57,20 +60,57 @@
     </template>
 
     <script>
-
         Polymer({
 
             is: 'ev-data-table',
+
+            behaviors: [
+                appTermLabels
+            ],
 
             attached: function () {
             },
 
             properties: {
+                /** term label mappings */
+                termLabels: {
+                    type: Object
+                },
+                /* table title */
                 title: String,
-                data: Array
+                /* Resource data (raw) */
+                data: {
+                    type: Object,
+                    observer: 'onData'
+                },
+                /* table items (processed table data) */
+                items: {
+                    type: Array,
+                    value: null
+                }
+            },
+
+            onData: function (data) {
+                var self = this;
+                var items = [];
+                data.bindings.forEach(function (binding) {
+                    var pLabel, oLabel;
+                    pLabel = self.getTermLabel(binding.p.value);
+
+                    if (binding.p.value === 'http://purl.org/dc/terms/type') {// special: type has a term as value
+                        oLabel = self.getTermLabel(binding.o.value);
+                    } else if (binding.o.type === 'uri' || binding.o.type === 'bnode') {// skip links
+                        return;
+                    } else if (binding.p.value.match(/[#\/](lambert.*|lat|long|lat_long)$/i)) {// skip geo fields
+                        return;
+                    } else {// keep literal fields
+                        oLabel = binding.o.value;
+                    }
+                    items.push({name: pLabel, value: oLabel })
+                });
+                this.set('items', items);
             }
         });
-
     </script>
 
 </dom-module>
