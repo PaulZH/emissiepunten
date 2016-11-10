@@ -4,6 +4,7 @@
 <link rel="import" href="../openlayers/openlayers-assets.html"/>
 <!-- styles -->
 <link rel="import" href="../openlayers/openlayers-styles.html"/>
+<link rel="import" href="../ev-map-emission-points-overlay/ev-map-emission-points-overlay-styles.html"/>
 <!--behaviors -->
 <link rel="import" href="../behaviors/app-lazyloading.html"/>
 
@@ -11,7 +12,7 @@
 
     <template>
 
-        <style include="openlayers-styles">
+        <style include="openlayers-styles ev-map-emission-points-overlay-styles">
             #map-card {
                 --ev-card-content: {
                     height: 410px;
@@ -35,6 +36,9 @@
                 <ev-map-sites-layer ol-map="{{olMap}}" location="{{location}}"
                                     sites={{sites}} site="{{selectedSite}}"
                                     site-feature="{{selectedSiteFeature}}"></ev-map-sites-layer>
+                <ev-map-emission-points-overlay ol-map="{{olMap}}"
+                                                site-feature="{{selectedSiteFeature}}"
+                                                emission-point="{{selectedEmissionPoint}}"></ev-map-emission-points-overlay>
             </template>
         </ev-card>
 
@@ -86,6 +90,11 @@
                 },
                 /** Currently selected site */
                 selectedSite: {
+                    type: Object,
+                    notify: true
+                },
+                /** Currently selected emission point */
+                selectedEmissionPoint: {
                     type: Object,
                     notify: true
                 }
@@ -149,7 +158,8 @@
                 this.lazyload([
                     "../ev-radius/ev-radius.html",
                     "../ev-map-location-layer/ev-map-location-layer.html",
-                    "../ev-map-sites-layer/ev-map-sites-layer.html"
+                    "../ev-map-sites-layer/ev-map-sites-layer.html",
+                    "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                     // trigger resize event to fix map distortion (mac-only?)

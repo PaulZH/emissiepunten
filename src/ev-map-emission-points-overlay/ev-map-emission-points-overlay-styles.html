@@ -1,0 +1,63 @@
+<!-- styles -->
+<link rel="import" href="../app/app-styles.html"/>
+
+<dom-module id="ev-map-emission-points-overlay-styles">
+    <template>
+        <style include="app-styles">
+            #overlay {
+                background-color: #fff;
+                box-shadow: 4px 4px 20px rgba(0,0,0,0.4);
+                width: 240px;
+            }
+
+            #overlay > ev-card {
+                --ev-card-content: {
+                    max-height: 300px;
+                };
+                --ev-card-title: {
+                    height: 32px;
+                    line-height: 32px;
+                    border-bottom: 1px solid #fff;
+                };
+            }
+
+            /* polyfilled firefox */
+            #overlay > ev-card > .title {
+                height: 32px;
+                line-height: 32px;
+                border-bottom: 1px solid #fff;
+            }
+
+            #overlay > ev-card > .content {
+                max-height: 300px;
+            }
+
+            #overlay:after {
+                left: 100%;
+                top: 0;
+                content: "";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+                border: 16px solid transparent;
+                border-left-color: var(--ev-app-green-2);
+            }
+
+            #overlay .ep {
+                border-bottom: 1px solid;
+                padding: 8px 16px;
+                border-bottom: 1px solid var(--ev-app-grey-6);
+                color: var(--ev-app-green-1);
+                cursor: pointer;
+                font-size: 0.95em;
+            }
+
+            #overlay .ep.selected {
+                background-color: var(--ev-app-green-2);
+                color: #fff;
+                border-bottom: none;
+            }
+        </style>
+    </template>
+</dom-module>

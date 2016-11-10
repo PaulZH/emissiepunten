@@ -1,0 +1,105 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../openlayers/openlayers-assets.html"/>
+<link rel="import" href="../ev-card/ev-card.html"/>
+
+<dom-module id="ev-map-emission-points-overlay">
+
+    <template>
+        <div id="overlay">
+            <ev-card title="{{site.label}}">
+                <template is="dom-repeat" items="{{eps}}" restamp="true">
+                    <div class="ep" on-tap="onEmissionPointClicked" ep="[[item]]">[[item.shortLabel]]</div>
+                </template>
+            </ev-card>
+        </div>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-map-emission-points-overlay',
+
+            properties: {
+                /** openlayers map */
+                olMap: Object,
+                /** selected site feature */
+                siteFeature: {
+                    type: Object,
+                    observer: 'onSiteFeatureChanged'
+                },
+                /* emission points of the selected site */
+                eps: {
+                    type: Array()
+                },
+                /* selected emission point */
+                emissionPoint: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            ready: function () {
+                this.renderOverlay();
+            },
+
+            renderOverlay: function () {
+                this.overlay = new ol.Overlay({
+                    element: this.$.overlay,
+                    positioning: 'top-right',
+                    autoPan: true,
+                    offset: [-40, -42]
+                });
+                this.olMap.addOverlay(this.overlay);
+            },
+
+            onSiteFeatureChanged: function (siteFeature) {
+                var element = this.overlay.getElement();
+                if (!siteFeature) {
+                    element.style.display = 'none';
+                    this.set('emissionPoint', null);
+                    return;
+                }
+                // update template vars
+                var site = siteFeature.get('site');
+                this.set('site', site);
+                this.set('eps', site.eps);
+                // position element
+                var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+                var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
+                element.style.display = 'block';
+                this.async(function () {
+                    this.overlay.setPosition(lambertPoint);
+                    this.$.overlay.querySelectorAll('.selected').forEach(function (item) {
+                        item.classList.remove('selected');
+                    });
+                }, 1);
+            },
+
+            onEmissionPointClicked: function (event) {
+                var $ep = Polymer.dom(event).rootTarget;
+                var ep = $ep.ep;
+                ep.element = $ep;
+                // toggle current
+                if (this.emissionPoint && this.emissionPoint.uri === ep.uri) {
+                    $ep.classList.remove('selected');
+                    this.set('emissionPoint', null);
+                    return;
+                }
+                // deselect any previous
+                if (this.emissionPoint) {
+                    this.$.overlay.querySelectorAll('.selected').forEach(function (item) {
+                        item.classList.remove('selected');
+                    });
+                }
+                // select new
+                $ep.classList.add('selected');
+                this.set('emissionPoint', ep);
+            },
+
+
+        });
+    </script>
+
+</dom-module>
