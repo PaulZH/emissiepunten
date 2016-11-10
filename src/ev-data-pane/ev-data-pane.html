@@ -1,6 +1,5 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-card/ev-card.html"/>
 <!-- behaviors -->
 <link rel="import" href="../behaviors/app-lazyloading.html"/>
 
@@ -12,11 +11,13 @@
 
             :host {
                 display: block;
+                --ev-card-content: {
+                    min-height: 350px;
+                };
             }
 
             ev-card {
                 display: none;
-                min-height: 410px;
             }
 
             /*noinspection CssUnusedSymbol*/
@@ -71,17 +72,13 @@
             ],
 
             properties: {
-                /**
-                 * Selected site
-                 */
+                /** Selected site */
                 site: {
                     type: Object,
                     notify: true,
                     value: null
                 },
-                /**
-                 * Selected EP
-                 */
+                /** Selected EP */
                 emissionPoint: {
                     type: Object,
                     notify: true,
