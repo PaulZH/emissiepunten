@@ -26,14 +26,17 @@
 
         </style>
 
-        <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site,emissionPoint)]]">
-            <template is="dom-if" if="[[site]]" restamp="true">
-                <ev-site site="[[site]]"></ev-site>
-            </template>
-            <template is="dom-if" if="[[emissionPoint]]" restamp="true">
-                <ev-emission-point point="[[emissionPoint]]"></ev-emission-point>
-            </template>
-        </ev-card>
+        <template is="dom-if" if="[[deferredElementsLoaded]]">
+            <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site)]]">
+                <template is="dom-if" if="[[showSitePane(site,emissionPoint)]]" restamp="true">
+                    <ev-site site="[[site]]" term-labels="{{termLabels}}"></ev-site>
+                </template>
+                <template is="dom-if" if="[[showEmissionPointPane(emissionPoint)]]" restamp="true">
+                    <ev-emission-point emission-point="[[emissionPoint]]" term-labels="{{termLabels}}"></ev-emission-point>
+                </template>
+            </ev-card>
+
+        </template>
 
     </template>
 
@@ -77,6 +80,7 @@
             renderDeferredElements: function () {
                 var self = this;
                 this.lazyload([
+                    "../ev-card/ev-card.html",
                     "../ev-site/ev-site.html",
                     "../ev-emission-point/ev-emission-point.html"
                 ]).then(function () {
@@ -85,19 +89,28 @@
             },
 
             getCardTitle: function (site, emissionPoint) {
-                if (site) {
+                if (site && emissionPoint) {
+                    return emissionPoint.label;
+                }
+                else if (site) {
                     return site.label
-                } else if (emissionPoint) {
-                    return emissionPoint.label
                 } else {
                     return '';
                 }
             },
 
-            getCardClass: function (site, emissionPoint) {
-                return (site || emissionPoint)
+            getCardClass: function (site) {
+                return (site)
                         ? 'active'
                         : 'hidden';
+            },
+
+            showSitePane: function (site, emissionPoint) {
+                return !!(site && !emissionPoint);
+            },
+
+            showEmissionPointPane: function (emissionPoint) {
+                return !!emissionPoint;
             }
         });
     </script>
