@@ -1,13 +1,13 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html"/>
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html"/>
 <link rel="import" href="../../bower_components/paper-item/paper-item.html"/>
-
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
 
-<dom-module id="ev-emission-selector">
+<dom-module id="ev-substance-selector">
 
     <template>
 
@@ -25,7 +25,7 @@
                 --list-width: 300px;
             }
 
-            paper-dropdown-menu-light[emission-count="1"]  {
+            paper-dropdown-menu-light[substance-count="1"]  {
                 display: none;
             }
 
@@ -43,9 +43,9 @@
 
         </style>
 
-        <paper-dropdown-menu-light label="Emission" emission-count$="{{emissionCount}}">
+        <paper-dropdown-menu-light label="Substance" substance-count$="{{substanceCount}}">
             <paper-listbox id="list" class="dropdown-content" selected="{{selected}}">
-                <template is="dom-repeat" items="{{emissions}}">
+                <template is="dom-repeat" items="{{substances}}">
                     <paper-item>[[item]]</paper-item>
                 </template>
             </paper-listbox>
@@ -57,17 +57,17 @@
 
         Polymer({
 
-            is: 'ev-emission-selector',
+            is: 'ev-substance-selector',
 
             properties: {
-                emissions: {
+                substances: {
                     type: Array,
-                    observer: 'onEmissionsChanged'
+                    observer: 'onSubstancesChanged'
                 },
                 emissionCount: {
                     type: Number
                 },
-                emission: {
+                substance: {
                     type: String,
                     notify: true,
                     reflectToAttribute: true
@@ -78,20 +78,19 @@
                 }
             },
 
-            onEmissionsChanged: function (emissions) {
+            onSubstancesChanged: function (substances) {
                 this.set('selected', null);
-                this.set('emission', null);
-                this.set('emissionCount', emissions ? emissions.length : 0);
-                var self = this;
-                setTimeout(function () {
-                    self.set('selected', 0);
+                this.set('substance', null);
+                this.set('substanceCount', substances ? substances.length : 0);
+                this.async(function () {
+                    this.set('selected', 0);
                 }, 250);
             },
 
             onSelectionChanged: function (selectedIndex) {
                 var selectedItem = Polymer.dom(this.root).querySelector('paper-item:nth-child(' + (selectedIndex + 1) + ')');
                 if (selectedItem && selectedItem.textContent.trim()) {
-                    this.set('emission', selectedItem.textContent.trim());
+                    this.set('substance', selectedItem.textContent.trim());
                 }
             }
 
