@@ -31,7 +31,7 @@
                 },
                 /* emission points of the selected site */
                 eps: {
-                    type: Array()
+                    type: Array
                 },
                 /* selected emission point */
                 emissionPoint: {
@@ -67,14 +67,14 @@
                 this.set('eps', site.eps);
                 // position element
                 var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+                //noinspection JSCheckFunctionSignatures
                 var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
                 element.style.display = 'block';
                 this.async(function () {
                     this.overlay.setPosition(lambertPoint);
-                    this.$.overlay.querySelectorAll('.selected').forEach(function (item) {
-                        item.classList.remove('selected');
-                    });
                 }, 1);
+                // deselect any emission points
+                this.resetSelection(this.$.overlay);
             },
 
             onEmissionPointClicked: function (event) {
@@ -87,18 +87,24 @@
                     this.set('emissionPoint', null);
                     return;
                 }
-                // deselect any previous
-                if (this.emissionPoint) {
-                    this.$.overlay.querySelectorAll('.selected').forEach(function (item) {
-                        item.classList.remove('selected');
-                    });
-                }
+                // deselect any emission points
+                this.resetSelection(this.$.overlay);
                 // select new
                 $ep.classList.add('selected');
                 this.set('emissionPoint', ep);
             },
 
-
+            /**
+             * Removes all `selected` classes from nodes in the given container
+             *
+             * @param $list
+             */
+            resetSelection: function ($list) {
+                var items = $list.querySelectorAll('.selected');
+                for (var i = 0; i < items.length; i++) {
+                    items[i].classList.remove('selected');
+                }
+            }
         });
     </script>
 
