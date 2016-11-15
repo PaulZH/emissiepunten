@@ -10,6 +10,9 @@
         },
 
         getTermLabel: function (term) {
+            if (!this.termLabels) {
+                this.termLabels = {};
+            }
             if (typeof this.termLabels[term] === 'undefined') {
                 // use the hash as label, but not if hash is `id`, `this`, or `self`
                 var label;
