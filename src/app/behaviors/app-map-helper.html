@@ -1,0 +1,128 @@
+<script>
+    /**
+     * Polymer behavior for working with openlayers maps
+     */
+    appMapHelper = {
+
+        properties: {
+            wgs84Sphere: {
+                type: Object
+            }
+        },
+
+        ready: function () {
+            this.wgs84Sphere = new ol.Sphere(6378137);
+        },
+
+        isWithinRadius: function (point) {
+            var distFromCenter = this.getPointDistance(this.location.point, point);
+            return (distFromCenter / 1000 <= this.location.radius);
+        },
+
+        /**
+         * Calculates the distance between 2 points
+         * @param point1 Lambert72 point
+         * @param point2 Lambert72 point
+         * @return {Number} Distance in meters
+         */
+        getPointDistance: function (point1, point2) {
+            //noinspection JSCheckFunctionSignatures
+            var wgs84Point1 = ol.proj.transform(point1, 'EPSG:31370', 'EPSG:4326');
+            //noinspection JSCheckFunctionSignatures
+            var wgs84Point2 = ol.proj.transform(point2, 'EPSG:31370', 'EPSG:4326');
+            return this.wgs84Sphere.haversineDistance(wgs84Point1, wgs84Point2);
+        },
+
+        /**
+         * Sorts features by x/y position, so that they can appear properly stacked on the map
+         *
+         * @param {Array} features
+         */
+        sortFeaturesByPosition: function (features) {
+            var self = this;
+            return features.sort(function (a, b) {
+                var aPoint = self.getFeaturePoint(a);
+                var bPoint = self.getFeaturePoint(b);
+                if (aPoint[1] < bPoint[1]) {
+                    return 1;
+                }
+                if (aPoint[1] > bPoint[1]) {
+                    return -1;
+                }
+                if (aPoint[0] < bPoint[0]) {
+                    return 1;
+                }
+                if (aPoint[0] > bPoint[0]) {
+                    return -1;
+                }
+                return 0;
+            });
+        },
+
+        /**
+         * Returns a point for the given feature that can be used to calculate the stacking order
+         */
+        getFeaturePoint: function (feature) {
+            switch (feature.get('name')) {
+                case 'site':
+                    return [feature.get('site').x, feature.get('site').y];
+                case 'ep':
+                    return [feature.get('ep').x, feature.get('ep').y];
+                case 'line':// +0.1 to make sure that lines are always below the site marker
+                    return [feature.get('lineStart').x + 0.1, feature.get('lineStart').y + 0.1];
+                default:
+                    return [0, 0];
+            }
+        },
+
+        findFeatures: function (layer, types) {
+            var features = layer.getSource().getFeatures();
+            if (!types) {// all of them
+                return features;
+            }
+            // filter features
+            if (typeof types === 'string') {
+                types = [types];// make sure `types` is an array
+            }
+            return features.filter(function (feature) {
+                return (types.indexOf(feature.get('name')) !== -1);
+            });
+        },
+
+        findFeatureByUri: function (layer, type, uri) {
+            var result = null;
+            layer.getSource().getFeatures().forEach(function (feature) {
+                if (result) {
+                    return;
+                }
+                if (feature.get('name') !== type) {
+                    return;
+                }
+                if (feature.get(type).uri === uri) {
+                    result = feature;
+                }
+            });
+            return result;
+        },
+
+        getFeatureAtPixel: function (pixelPoint, type) {
+            var result = null;
+            this.olMap.forEachFeatureAtPixel(pixelPoint, function (feature) {
+                if (feature.get('name') === type) {
+                    result = feature;
+                    return true;// break after finding first feature
+                }
+            });
+            return result;
+        },
+
+        setFeatureStyle: function (feature, styleName) {
+            var zIndex = feature.getStyle().getZIndex();
+            var style = feature.get(styleName);
+            style.setZIndex(zIndex);
+            feature.setStyle(style);
+            feature.set('currentStyle', styleName);
+        }
+
+    }
+</script>
