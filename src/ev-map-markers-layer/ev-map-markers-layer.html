@@ -1,0 +1,401 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../openlayers/openlayers-assets.html"/>
+<!-- queries -->
+<link rel="import" href="../app/queries/sites-emission-points-query.html"/>
+<link rel="import" href="../app/queries/site-coordinates-query.html"/>
+<!-- behaviors -->
+<link rel="import" href="../../config/app-config.html"/>
+<link rel="import" href="../app/behaviors/app-map-helper.html"/>
+
+<dom-module id="ev-map-markers-layer">
+
+    <template>
+        <sites-emission-points-query location="{{location}}" response="{{sitesEpsResponse}}"></sites-emission-points-query>
+        <site-coordinates-query sites="{{basicSites}}" response="{{siteCoordsResponse}}"></site-coordinates-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-map-markers-layer',
+
+            behaviors: [
+                appConfig,
+                appMapHelper
+            ],
+
+            properties: {
+                olMap: Object,
+                /** selected map location */
+                location: {
+                    type: Object, // lat, lon, radius, point
+                    notify: true
+                },
+                /** vector layer for sites and emission points */
+                markerLayer: {
+                    type: Object
+                },
+                /** Sites without coordinates */
+                basicSites: {
+                    type: Array
+                },
+                /** Sites around the current location */
+                sites: {
+                    type: Array,
+                    notify: true, // used by <ev-site-list>
+                    observer: 'onSitesChanged'
+                },
+                /** selected site */
+                site: {
+                    type: Object,
+                    notify: true,
+                    observer: 'onSiteChanged'
+                },
+                /* selected emission point */
+                emissionPoint: {
+                    type: Object,
+                    notify: true,
+                    observer: 'onEmissionPointChanged'
+                }
+            },
+
+            observers: [
+                'onLocationChanged(location.*)',
+                'onSitesAndEmissionPointsLoaded(sitesEpsResponse)',
+                'onSiteCoordinatesLoaded(siteCoordsResponse)'
+            ],
+
+            attached: function () {
+                this.renderMarkerLayer();
+                this.registerMapClicks();
+            },
+
+            renderMarkerLayer: function () {
+                //noinspection JSCheckFunctionSignatures
+                this.markerLayer = new ol.layer.Vector({
+                    name: 'sites-eps',
+                    source: new ol.source.Vector({})
+                });
+                this.olMap.addLayer(this.markerLayer);
+            },
+
+            registerMapClicks: function () {
+                var self = this;
+                this.olMap.on('singleclick', function (event) {
+                    // click on site feature
+                    var siteFeature = self.getFeatureAtPixel(event.pixel, 'site');
+                    // click on emission point feature
+                    var epFeature = self.getFeatureAtPixel(event.pixel, 'ep');
+                    // both clicked
+                    if (siteFeature && epFeature) {
+                        var siteZIndex = siteFeature.getStyle().getZIndex();
+                        var epZIndex = epFeature.getStyle().getZIndex();
+                        if (siteZIndex > epZIndex) {
+                            self.handleSiteFeatureClick(siteFeature);
+                        } else {
+                            self.handleEmissionPointFeatureClick(epFeature);
+                        }
+                    } else if (siteFeature) {
+                        self.handleSiteFeatureClick(siteFeature);
+                    } else  if (epFeature) {
+                        self.handleEmissionPointFeatureClick(epFeature);
+                    }
+                });
+            },
+
+            onLocationChanged: function () {
+                this.debounce('onLocationChanged', function () {
+                    // fetch sites and emission points
+                    if (this.location && this.location.point) {
+                        this.$$('sites-emission-points-query').execute();
+                    }
+                }, 10);
+            },
+
+            /**
+             * Builds a site array with emission points for each entry
+             *
+             * @param {Object} response
+             * @param {Array} response.bindings
+             * @param {Object} response.bindings[].site
+             * @param {Object} response.bindings[].siteLabel
+             * @param {Object} response.bindings[].ep
+             * @param {Object} response.bindings[].epLabel
+             * @param {Object} response.bindings[].epLat
+             * @param {Object} response.bindings[].epLon
+             */
+            onSitesAndEmissionPointsLoaded: function (response) {
+                if (!response.bindings.length) {
+                    return this.set('sites', []);
+                }
+                // create sites and emission points
+                var sites = [];
+                var sitesByUri = {};
+                var addedEps = {};
+                response.bindings.forEach(function (binding) {
+                    // index site
+                    var site;
+                    if (!sitesByUri[binding.site.value]) {
+                        site = {
+                            uri: binding.site.value,
+                            label: binding.siteLabel.value,
+                            epCount: 0,
+                            eps: []
+                        };
+                        sitesByUri[site.uri] = site;
+                        sites.push(site);
+                    } else {
+                        site = sitesByUri[binding.site.value];
+                    }
+                    // index emission point
+                    if (addedEps[binding.ep.value]) {
+                        return;
+                    }
+                    var ep = {
+                        uri: binding.ep.value,
+                        label: binding.epLabel.value,
+                        lon: parseFloat(binding.epLon.value),
+                        lat: parseFloat(binding.epLat.value)
+                    };
+                    // add shortened EP label (site label prefix removed)
+                    ep.shortLabel = ep.label.replace(new RegExp('^' + site.label + '\\s*:\\s*'), '');
+                    // add x/y info
+                    //noinspection JSCheckFunctionSignatures
+                    var epLambertPoint = ol.proj.transform([ep.lon, ep.lat], 'EPSG:4326', 'EPSG:31370');
+                    ep.x = epLambertPoint[0];
+                    ep.y = epLambertPoint[1];
+                    site.eps.push(ep);
+                    site.epCount++;
+                    addedEps[ep.uri] = true;
+                });
+                // load site coordinates
+                this.set('basicSites', sites);
+                this.async(function () {
+                    // load site coordinates
+                    this.$$('site-coordinates-query').execute();
+                }, 1);
+            },
+
+            onSiteCoordinatesLoaded: function (response) {
+                var self = this;
+                // index coords
+                var bindingBySite = {};
+                response.bindings.forEach(function (binding) {
+                    bindingBySite[binding.site.value] = binding;
+                });
+                var sites = [];
+                this.basicSites.forEach(function (site) {
+                    if (!bindingBySite[site.uri]) {
+                        return;
+                    }
+                    // set coords
+                    site.x = parseFloat(bindingBySite[site.uri].x.value);
+                    site.y = parseFloat(bindingBySite[site.uri].y.value);
+                    // keep only sites within radius
+                    if (self.isWithinRadius([site.x, site.y])) {
+                        sites.push(site);
+                    }
+                });
+                this.set('sites', sites);
+            },
+
+            onSitesChanged: function (sites) {
+                // remove site markers
+                if (this.markerLayer) {
+                    this.markerLayer.getSource().clear();
+                }
+                if (sites) {
+                    this.renderMarkers(sites);
+                }
+            },
+
+            renderMarkers: function (sites) {
+                // create features
+                var features = this.createMarkerFeatures(sites);
+                // sort features
+                this.sortFeaturesByPosition(features);
+                // stack features
+                features.forEach(function (feature, index) {
+                    feature.getStyle().setZIndex(index + 1);// enforce stacking order
+                });
+                // render features
+                this.markerLayer.getSource().addFeatures(features);
+            },
+
+            createMarkerFeatures: function (sites) {
+                var self = this;
+                var features = [];
+                sites.forEach(function (site) {
+                    // add site marker
+                    features.push(self.createSiteFeature(site));
+                    // add emission point markers
+                    site.eps.forEach(function (ep) {
+                        // add line from site to ep
+                        features.push(self.createConnectorFeature(site, ep));
+                        // add ep marker
+                        features.push(self.createEmissionPointFeature(site, ep));
+                    });
+                });
+                return features;
+            },
+
+            createSiteFeature: function (site) {
+                //noinspection JSCheckFunctionSignatures
+                var feature = new ol.Feature({
+                    name: 'site',
+                    site: site,
+                    geometry: new ol.geom.Point([site.x, site.y]),
+                    defaultStyle: new ol.style.Style({
+                        image: new ol.style.Icon(this.markerStyles.site)
+                    }),
+                    selectedStyle: new ol.style.Style({
+                        image: new ol.style.Icon(this.markerStyles.selectedSite)
+                    }),
+                    currentStyle: 'defaultStyle'
+                });
+                feature.setStyle(feature.get('defaultStyle'));
+                return feature;
+            },
+
+            createConnectorFeature: function (site, ep) {
+                var sitePoint = [site.x, site.y];
+                var epPoint = [ep.x, ep.y];
+                //noinspection JSCheckFunctionSignatures
+                var feature = new ol.Feature({
+                    name: 'line',
+                    lineStart: site,
+                    siteUri: site.uri,
+                    geometry: new ol.geom.LineString([sitePoint, epPoint]),
+                    defaultStyle: new ol.style.Style({
+                        image: ''
+                    }),
+                    visibleStyle: new ol.style.Style({
+                        stroke: new ol.style.Stroke(this.markerStyles.connector),
+                    }),
+                    currentStyle: 'defaultStyle'
+                });
+                feature.setStyle(feature.get('defaultStyle'));
+                return feature;
+            },
+
+            createEmissionPointFeature: function (site, ep) {
+                //noinspection JSCheckFunctionSignatures
+                var feature = new ol.Feature({
+                    name: 'ep',
+                    ep: ep,
+                    siteUri: site.uri,
+                    geometry: new ol.geom.Point([ep.x, ep.y]),
+                    defaultStyle: new ol.style.Style({
+                        image: ''
+                    }),
+                    visibleStyle: new ol.style.Style({
+                        image: new ol.style.Icon(this.markerStyles.emissionPoint)
+                    }),
+                    selectedStyle: new ol.style.Style({
+                        image: new ol.style.Icon(this.markerStyles.selectedEmissionPoint)
+                    }),
+                    currentStyle: 'defaultStyle'
+                });
+                feature.setStyle(feature.get('defaultStyle'));
+                return feature;
+            },
+
+            /**
+             * Handles site changes triggered by the result list or map clicks
+             *
+             * @param {Object} site
+             */
+            onSiteChanged: function (site) {
+                if (!this.markerLayer) {
+                    return;
+                }
+                // deselect previously selected feature
+                this.deselectSiteFeatures();
+                // hide all site emission points and markers
+                this.resetEmissionPointFeatures();
+                // select site feature
+                if (site) {
+                    var siteFeature = this.findFeatureByUri(this.markerLayer, 'site', site.uri);
+                    if (siteFeature) {
+                        this.selectSiteFeature(siteFeature);
+                        this.showEmissionPointFeatures(site);
+                    }
+                }
+                // clear selected emission point
+                this.set('emissionPoint', null);
+            },
+
+            deselectSiteFeatures: function () {
+                this.findFeatures(this.markerLayer, 'site').forEach(function (feature) {
+                    if (feature.get('currentStyle') !== 'defaultStyle') {
+                        this.setFeatureStyle(feature, 'defaultStyle');
+                    }
+                }, this);
+            },
+
+            selectSiteFeature: function (siteFeature) {
+                this.setFeatureStyle(siteFeature, 'selectedStyle');
+            },
+
+            handleSiteFeatureClick: function (siteFeature) {
+                if (siteFeature.get('currentStyle') === 'selectedStyle') {// selected
+                    this.set('site', null);
+                } else {
+                    this.set('site', siteFeature.get('site'));
+                }
+            },
+
+            resetEmissionPointFeatures: function () {
+                this.findFeatures(this.markerLayer, ['ep', 'line']).forEach(function (feature) {
+                    this.setFeatureStyle(feature, 'defaultStyle');
+                }, this);
+            },
+
+            showEmissionPointFeatures: function (site) {
+                this.findFeatures(this.markerLayer, ['ep', 'line']).forEach(function (feature) {
+                    if (feature.get('siteUri') === site.uri) {
+                        this.setFeatureStyle(feature, 'visibleStyle');
+                    }
+                }, this);
+            },
+
+            handleEmissionPointFeatureClick: function (epFeature) {
+                if (epFeature.get('currentStyle') === 'selectedStyle') {// selected
+                    this.set('emissionPoint', null);
+                } else {
+                    this.set('emissionPoint', epFeature.get('ep'));
+                }
+            },
+
+            onEmissionPointChanged: function (ep) {
+                if (!this.markerLayer) {
+                    return;
+                }
+                // deselect previously selected ep markers
+                this.deselectEmissionPointFeatures();
+                // select ep feature
+                if (ep) {
+                    var epFeature = this.findFeatureByUri(this.markerLayer, 'ep', ep.uri);
+                    if (epFeature) {
+                        this.selectEmissionPointFeature(epFeature);
+                    }
+                }
+            },
+
+            deselectEmissionPointFeatures: function () {
+                this.findFeatures(this.markerLayer, 'ep').forEach(function (feature) {
+                    if (feature.get('currentStyle') === 'selectedStyle') {
+                        this.setFeatureStyle(feature, 'visibleStyle');
+                    }
+                }, this);
+            },
+
+            selectEmissionPointFeature: function (epFeature) {
+                this.setFeatureStyle(epFeature, 'selectedStyle');
+            }
+        });
+    </script>
+
+</dom-module>

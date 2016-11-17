@@ -72,7 +72,7 @@
             isMapClick: function (event) {
                 var result = true;
                 this.olMap.forEachFeatureAtPixel(event.pixel, function(feature) {
-                    if (feature.get('name').match(/^(site)$/)) {
+                    if (feature.get('name').match(/^(site|ep)$/)) {
                         result = false;
                         return true;
                     }
