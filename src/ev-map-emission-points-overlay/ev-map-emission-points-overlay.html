@@ -63,9 +63,13 @@
                 if (!this.overlay) {
                     return;
                 }
+                clearTimeout(this.zoomOutTO);
                 if (!site) {
                     this.overlay.getElement().style.display = 'none';
                     this.set('eps', null);
+                    this.zoomOutTO = setTimeout(function () {
+                        self.zoomOut();
+                    }, 100);
                     return;
                 }
                 // update template vars
@@ -76,14 +80,36 @@
                 this.positionOverlay();
             },
 
+            zoomOut: function () {
+                var view = this.olMap.getView();
+                // pan
                 //noinspection JSCheckFunctionSignatures
-                var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
-                element.style.display = 'block';
+                var pan = ol.animation.pan({
+                    source: view.getCenter(),
+                    duration: 500
+                });
+                // zoom
+                var currentResolution = view.getResolution();
+                var targetResolution = this.location.radius * 10;
+                //noinspection JSCheckFunctionSignatures
+                var zoom = ol.animation.zoom({
+                    resolution: currentResolution,
+                    duration: 500
+                });
+                // run animation
+                this.olMap.beforeRender(pan, zoom);
+                view.setCenter(this.location.point);
+                view.setResolution(targetResolution);
+            },
+
             onEmissionPointChanged: function (ep) {
                 // deselect any emission points
                 this.resetSelection();
                 if (ep) {
                     this.selectEmissionPoint(ep);
+                    this.async(function () {
+                        this.transitionToEmissionPoint();
+                    }, 1);
                 }
             },
 
@@ -94,6 +120,33 @@
                     //noinspection JSCheckFunctionSignatures
                     this.overlay.setPosition(lambertPoint);
                 }, delay || 1);
+            },
+
+            transitionToEmissionPoint: function () {
+                var view = this.olMap.getView();
+                // pan
+                //noinspection JSCheckFunctionSignatures
+                var pan = ol.animation.pan({
+                    source: view.getCenter(),
+                    duration: 500
+                });
+                // zoom
+                var currentResolution = view.getResolution();
+                var targetResolution = 16;
+                //noinspection JSCheckFunctionSignatures
+                var zoom = ol.animation.zoom({
+                    resolution: currentResolution,
+                    duration: 500
+                });
+                // run animation
+                if (currentResolution > targetResolution) {//only zoom in, never out
+                    this.olMap.beforeRender(pan, zoom);
+                    //noinspection JSCheckFunctionSignatures
+                    view.setCenter([this.site.x, this.site.y]);
+                    view.setResolution(targetResolution);
+                }
+                // position overlay
+                this.positionOverlay(1000);
             },
 
             onEmissionPointClicked: function (event) {
