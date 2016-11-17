@@ -28,6 +28,43 @@
                     cube: 'http://purl.org/linked-data/cube#',
                     sdmx: 'http://purl.org/linked-data/sdmx/2009/attribute#'
                 }
+            },
+            markerStyles: {
+                type: Object,
+                value: {
+                    'site': {
+                        anchor: [0.5, 0.9],
+                        size: [80, 90],
+                        opacity: 1,
+                        scale: 0.5,
+                        src: window.app.base + 'src/ev-map-markers-layer/img/site-marker.png'
+                    },
+                    'selectedSite': {
+                        anchor: [0.5, 0.9],
+                        size: [80, 90],
+                        opacity: 1,
+                        scale: 0.5,
+                        src: window.app.base + 'src/ev-map-markers-layer/img/site-marker-selected.png'
+                    },
+                    'emissionPoint': {
+                        anchor: [0.5, 0.9],
+                        size: [48, 54],
+                        opacity: 1,
+                        scale: 0.5,
+                        src: window.app.base + 'src/ev-map-markers-layer/img/ep-marker.png'
+                    },
+                    'selectedEmissionPoint': {
+                        anchor: [0.5, 0.9],
+                        size: [48, 54],
+                        opacity: 1,
+                        scale: 0.5,
+                        src: window.app.base + 'src/ev-map-markers-layer/img/ep-marker-selected.png'
+                    },
+                    'connector': {
+                        color: [255, 255, 255, 0.5],
+                        width: 3
+                    }
+                }
             }
         },
 
