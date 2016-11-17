@@ -18,17 +18,24 @@
                     height: 32px;
                     line-height: 32px;
                     border-bottom: 1px solid #fff;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    box-sizing: border-box;
                 };
             }
 
-            /* polyfilled firefox */
-            #overlay > ev-card > .title {
+            #overlay > ev-card > .title {/* needed for polyfilled firefox */
                 height: 32px;
                 line-height: 32px;
                 border-bottom: 1px solid #fff;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                box-sizing: border-box;
             }
 
-            #overlay > ev-card > .content {
+            #overlay > ev-card > .content {/* needed for polyfilled firefox */
                 max-height: 300px;
             }
 
