@@ -7,7 +7,7 @@
 <dom-module id="ev-sparql-query">
 
     <template>
-        <iron-ajax id="api" url="{{apiUrl}}" params='{{params}}' headers='{"Accept": "application/json"}'
+        <iron-ajax id="api" url="{{apiUrl}}" method="POST" body='{{body}}' headers='{"Accept": "application/json"}'
                    handle-as="json" on-response="onResponse" on-error="onError" debounce-duration="300">
             <content></content>
         </iron-ajax>
@@ -51,7 +51,7 @@
                 this.set('apiUrl', this.config('apis')[this.api]);
                 // run query
                 var query = this.getSparqlPrologue() + Polymer.dom(this).textContent;
-                this.$.api.set('params', {query: query});
+                this.$.api.set('body', 'query=' + encodeURIComponent(query));
                 this.$.api.generateRequest();
             },
 
