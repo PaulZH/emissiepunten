@@ -8,8 +8,10 @@
     <template>
         <div id="overlay">
             <ev-card title="{{site.label}}">
-                <template is="dom-repeat" items="{{eps}}" restamp="true">
-                    <div class="ep" on-tap="onEmissionPointClicked" ep="[[item]]">[[item.shortLabel]]</div>
+                <template is="dom-repeat" items="{{eps}}">
+                    <div class="ep" on-tap="onEmissionPointClicked" ep="{{item}}" data-uri$="{{item.uri}}">
+                        [[item.shortLabel]]
+                    </div>
                 </template>
             </ev-card>
         </div>
@@ -24,10 +26,10 @@
             properties: {
                 /** openlayers map */
                 olMap: Object,
-                /** selected site feature */
-                siteFeature: {
+                /** selected site */
+                site: {
                     type: Object,
-                    observer: 'onSiteFeatureChanged'
+                    observer: 'onSiteChanged'
                 },
                 /* emission points of the selected site */
                 eps: {
@@ -36,7 +38,8 @@
                 /* selected emission point */
                 emissionPoint: {
                     type: Object,
-                    notify: true
+                    notify: true,
+                    observer: 'onEmissionPointChanged'
                 }
             },
 
@@ -54,44 +57,52 @@
                 this.olMap.addOverlay(this.overlay);
             },
 
-            onSiteFeatureChanged: function (siteFeature) {
-                var element = this.overlay.getElement();
-                if (!siteFeature) {
-                    element.style.display = 'none';
-                    this.set('emissionPoint', null);
+            onSiteChanged: function (site) {
+                var self = this;
+                if (!this.overlay) {
+                    return;
+                }
+                if (!site) {
+                    this.overlay.getElement().style.display = 'none';
+                    this.set('eps', null);
                     return;
                 }
                 // update template vars
-                var site = siteFeature.get('site');
                 this.set('site', site);
                 this.set('eps', site.eps);
-                // position element
-                var wgs84Point = [parseFloat(site.lon), parseFloat(site.lat)];
+                // deselect any emission points
+                this.resetSelection();
+                this.positionOverlay();
+            },
+
                 //noinspection JSCheckFunctionSignatures
                 var lambertPoint = ol.proj.transform(wgs84Point, 'EPSG:4326', 'EPSG:31370');
                 element.style.display = 'block';
-                this.async(function () {
-                    this.overlay.setPosition(lambertPoint);
-                }, 1);
+            onEmissionPointChanged: function (ep) {
                 // deselect any emission points
-                this.resetSelection(this.$.overlay);
+                this.resetSelection();
+                if (ep) {
+                    this.selectEmissionPoint(ep);
+                }
+            },
+
+            positionOverlay: function (delay) {
+                this.overlay.getElement().style.display = 'block';
+                this.async(function () {
+                    var lambertPoint = [this.site.x, this.site.y];
+                    //noinspection JSCheckFunctionSignatures
+                    this.overlay.setPosition(lambertPoint);
+                }, delay || 1);
             },
 
             onEmissionPointClicked: function (event) {
                 var $ep = Polymer.dom(event).rootTarget;
                 var ep = $ep.ep;
-                ep.element = $ep;
-                // toggle current
-                if (this.emissionPoint && this.emissionPoint.uri === ep.uri) {
-                    $ep.classList.remove('selected');
-                    this.set('emissionPoint', null);
-                    return;
+                if (this.emissionPoint && this.emissionPoint.uri === ep.uri) {// toggle current
+                    return this.set('emissionPoint', null);
+                } else {// select clicked
+                    this.set('emissionPoint', ep);
                 }
-                // deselect any emission points
-                this.resetSelection(this.$.overlay);
-                // select new
-                $ep.classList.add('selected');
-                this.set('emissionPoint', ep);
             },
 
             /**
@@ -99,10 +110,21 @@
              *
              * @param $list
              */
-            resetSelection: function ($list) {
-                var items = $list.querySelectorAll('.selected');
+            resetSelection: function () {
+                var items = this.$.overlay.querySelectorAll('.selected');
                 for (var i = 0; i < items.length; i++) {
                     items[i].classList.remove('selected');
+                }
+            },
+
+            selectEmissionPoint: function (ep) {
+                var items = this.$.overlay.querySelectorAll('.ep');
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].ep.uri === ep.uri) {
+                        items[i].classList.add('selected');
+                    } else {
+                        items[i].classList.remove('selected');
+                    }
                 }
             }
         });
