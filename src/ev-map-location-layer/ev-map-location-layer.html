@@ -97,8 +97,8 @@
                     this.getMarkerFeature().getGeometry().setCoordinates(this.location.point);
                     // re-position radius disc
                     this.getRadiusFeature().getGeometry().setCenterAndRadius(this.location.point, this.location.radius * 1000);
-                    // pan to new location
-                    this.async(this.panToLocation, 100);
+                    // pan/zoom to new location
+                    this.async(this.transitionToLocation, 100);
                 }, 10);
             },
 
@@ -139,15 +139,31 @@
                 return this.radiusFeature;
             },
 
-            panToLocation: function () {
+            transitionToLocation: function () {
                 var view = this.olMap.getView();
+                // pan
                 //noinspection JSCheckFunctionSignatures
                 var pan = ol.animation.pan({
                     source: view.getCenter(),
                     duration: 500
                 });
-                this.olMap.beforeRender(pan);
-                view.setCenter(this.location.point);
+                // zoom
+                var currentResolution = view.getResolution();
+                var targetResolution = this.location.radius * 10;
+                //noinspection JSCheckFunctionSignatures
+                var zoom = ol.animation.zoom({
+                    resolution: currentResolution,
+                    duration: 500
+                });
+                // run animation
+                if (currentResolution > targetResolution) {//should zoom in
+                    this.olMap.beforeRender(pan, zoom);
+                    view.setCenter(this.location.point);
+                    view.setResolution(targetResolution);
+                } else {// never zoom out
+                    this.olMap.beforeRender(pan);
+                    view.setCenter(this.location.point);
+                }
             },
 
             onGeolocate: function () {
