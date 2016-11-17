@@ -174,7 +174,7 @@
                 //noinspection JSCheckFunctionSignatures
                 this.olMap = new ol.Map({
                     target: this.$.map,
-                    loadTilesWhileAnimating: true,
+                    loadTilesWhileAnimating: false,
                     interactions: ol.interaction.defaults({mouseWheelZoom: false}),
                     controls: [
                         new ol.control.ScaleLine(),
