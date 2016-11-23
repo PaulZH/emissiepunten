@@ -1,0 +1,53 @@
+<!-- elements -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html"/>
+
+<dom-module id="labels-query">
+
+    <template>
+        <ev-sparql-query id="query" api="imjv" results="{{response}}">
+            SELECT DISTINCT ?term ?label WHERE {
+                # emission point labels
+                {
+                    ?ep a milieu:Emissiepunt ;
+                    ?term ?o .
+                }
+                # substantie labels
+                UNION {
+                    ?obs milieu:substantie ?term .
+                }
+                # unit labels
+                UNION {
+                    ?obs sdmx:unitMeasure ?term .
+                }
+                # type labels
+                UNION {
+                    ?ep dct:type ?term .
+                }
+                ?term ?labelProp ?label .
+                FILTER (?labelProp = rdfs:label || ?labelProp = skos:prefLabel)
+            }
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'labels-query',
+
+            properties: {
+                /** response */
+                response: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            execute: function () {
+                this.$.query.execute();
+            }
+        });
+    </script>
+
+</dom-module>

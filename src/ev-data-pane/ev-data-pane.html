@@ -28,6 +28,8 @@
         </style>
 
         <template is="dom-if" if="[[deferredElementsLoaded]]">
+            <labels-query response="{{labelResponse}}"></labels-query>
+
             <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site)]]">
                 <template is="dom-if" if="[[showSitePane(site,emissionPoint)]]" restamp="true">
                     <ev-site site="[[site]]" term-labels="{{termLabels}}"></ev-site>
@@ -36,27 +38,6 @@
                     <ev-emission-point emission-point="[[emissionPoint]]" term-labels="{{termLabels}}"></ev-emission-point>
                 </template>
             </ev-card>
-
-            <ev-sparql-query id="labels" api="imjv" results="{{labelResults}}">
-                SELECT DISTINCT ?term ?label WHERE {
-                    {
-                        ?ep a milieu:Emissiepunt ;
-                            ?term ?o .
-                    }
-                    UNION {
-                        ?obs milieu:substantie ?term .
-                    }
-                    UNION {
-                        ?obs sdmx:unitMeasure ?term .
-                    }
-                    UNION {
-                        ?ep dct:type ?term .
-                    }
-                    ?term ?labelProp ?label .
-                    FILTER (?labelProp = rdfs:label || ?labelProp = skos:prefLabel)
-                }
-                LIMIT 500
-            </ev-sparql-query>
         </template>
 
     </template>
@@ -86,7 +67,7 @@
             },
 
             observers: [
-                'onLabelsLoaded(labelResults)'
+                'onLabelsLoaded(labelResponse)'
             ],
 
             attached: function () {
@@ -103,12 +84,12 @@
                     "../ev-card/ev-card.html",
                     "../ev-site/ev-site.html",
                     "../ev-emission-point/ev-emission-point.html",
-                    "../ev-sparql-query/ev-sparql-query.html"
+                    "../app/queries/labels-query.html"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                     // fetch term labels
                     self.async(function () {
-                        self.$$('#labels').execute();
+                        self.$$('labels-query').execute();
                     }, 1)
                 });
             },
@@ -138,9 +119,9 @@
                 return !!emissionPoint;
             },
 
-            onLabelsLoaded: function (labelResults) {
+            onLabelsLoaded: function (labelResponse) {
                 var termLabels = {};
-                labelResults.bindings.forEach(function (binding) {
+                labelResponse.bindings.forEach(function (binding) {
                     //noinspection JSUnresolvedVariable
                     var term = binding.term.value;
                     termLabels[term] = binding.label.value;
