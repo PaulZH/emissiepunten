@@ -68,8 +68,8 @@
                     return [feature.get('site').x, feature.get('site').y];
                 case 'ep':
                     return [feature.get('ep').x, feature.get('ep').y];
-                case 'line':// +0.1 to make sure that lines are always below the site marker
-                    return [feature.get('lineStart').x + 0.1, feature.get('lineStart').y + 0.1];
+                case 'line':
+                    return [feature.get('lineStart').x, feature.get('lineStart').y];
                 default:
                     return [0, 0];
             }

@@ -218,7 +218,10 @@
                 this.sortFeaturesByPosition(features);
                 // stack features
                 features.forEach(function (feature, index) {
-                    feature.getStyle().setZIndex(index + 1);// enforce stacking order
+                    var zIndex = feature.get('name') === 'line'
+                            ? 0 // keep lines below markers
+                            : index + 1;
+                    feature.getStyle().setZIndex(zIndex);// enforce stacking order
                 });
                 // render features
                 this.markerLayer.getSource().addFeatures(features);
