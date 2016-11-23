@@ -104,7 +104,7 @@
 
         </style>
 
-        <iron-ajax id="bower" auto url="../../bower.json" handle-as="json" on-response="onBowerJsonLoaded"></iron-ajax>
+        <iron-ajax id="version" auto url="../../config/manifest.json" handle-as="json" on-response="onManifestJsonLoaded"></iron-ajax>
 
         <ev-responsive>
             <footer>
@@ -147,8 +147,8 @@
                 }
             },
 
-            onBowerJsonLoaded: function () {
-                this.set('version', this.$.bower['lastResponse'].version || null);
+            onManifestJsonLoaded: function () {
+                this.set('version', this.$.version['lastResponse'].version || null);
             }
         });
     </script>
