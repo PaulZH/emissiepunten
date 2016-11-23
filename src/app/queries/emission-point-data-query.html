@@ -1,0 +1,40 @@
+<!-- elements -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html"/>
+
+<dom-module id="emission-point-data-query">
+
+    <template>
+        <ev-sparql-query id="query" api="imjv" results="{{response}}">
+            SELECT ?p ?o WHERE {
+                <{{emissionPoint.uri}}> ?p ?o .
+            }
+            ORDER BY ?p
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'emission-point-data-query',
+
+            properties: {
+                /** response */
+                response: {
+                    type: Object,
+                    notify: true
+                },
+                /** selected emission point */
+                emissionPoint: {
+                    type: Object
+                }
+            },
+
+            execute: function () {
+                this.$.query.execute();
+            }
+        });
+    </script>
+
+</dom-module>

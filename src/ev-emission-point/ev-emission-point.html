@@ -6,6 +6,8 @@
 <link rel="import" href="../ev-sparql-query/ev-sparql-query.html"/>
 <link rel="import" href="../ev-substance-selector/ev-substance-selector.html"/>
 <link rel="import" href="../ev-emission-vega-chart/ev-emission-vega-chart.html"/>
+<!-- queries -->
+<link rel="import" href="../app/queries/emission-point-data-query.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <!-- behaviors -->
@@ -48,11 +50,13 @@
             }
         </style>
 
+        <emission-point-data-query emission-point="{{emissionPoint}}" response="{{epDataResponse}}"></emission-point-data-query>
+
         <ev-responsive>
             <div class="columns">
                 <div id="data">
-                    <template is="dom-if" if="{{epData}}">
-                        <ev-data-table title="Emission Point Data" data="{{epData}}" term-labels="{{termLabels}}"></ev-data-table>
+                    <template is="dom-if" if="{{epDataResponse}}">
+                        <ev-data-table title="Emission Point Data" data="{{epDataResponse}}" term-labels="{{termLabels}}"></ev-data-table>
                     </template>
                 </div>
                 <div id="charts">
@@ -76,14 +80,6 @@
                 </div>
             </div>
         </ev-responsive>
-
-        <ev-sparql-query id="data" api="imjv" results="{{epData}}">
-            SELECT ?p ?o WHERE {
-                <{{emissionPoint.uri}}> ?p ?o .
-            }
-            ORDER BY ?p
-            LIMIT 100
-        </ev-sparql-query>
 
         <ev-sparql-query id="emissions" api="imjv" results="{{emissionData}}">
             SELECT ?year ?substance ?amount ?unit WHERE {
