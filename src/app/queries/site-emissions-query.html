@@ -1,0 +1,52 @@
+<!-- elements -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html"/>
+<!-- behaviors -->
+<link rel="import" href="../../../config/app-config.html"/>
+
+<dom-module id="site-emissions-query">
+
+    <template>
+        <ev-sparql-query id="query" api="imjv" results="{{response}}">
+            SELECT ?year ?substance ?amount ?unit WHERE {
+                ?obs a cube:Observation ;
+                     milieu:referentiegebied ?ep ;
+                     milieu:tijdsperiode ?year ;
+                     milieu:substantie ?substance ;
+                     milieu:hoeveelheid ?amount ;
+                     sdmx:unitMeasure ?unit .
+                ?ep protontop:isOwnedBy <{{site.uri}}> .
+            }
+            ORDER BY ?year ?substance
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'site-emissions-query',
+
+            behaviors: [
+                appConfig
+            ],
+
+            properties: {
+                /** response */
+                response: {
+                    type: Object,
+                    notify: true
+                },
+                /** selected site */
+                site: {
+                    type: Object
+                }
+            },
+
+            execute: function () {
+                this.$.query.execute();
+            }
+        });
+    </script>
+
+</dom-module>

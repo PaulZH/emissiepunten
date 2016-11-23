@@ -7,11 +7,12 @@
 <link rel="import" href="../ev-emission-vega-chart/ev-emission-vega-chart.html"/>
 <!-- queries -->
 <link rel="import" href="../app/queries/site-data-query.html"/>
+<link rel="import" href="../app/queries/site-emissions-query.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <!-- behaviors -->
 <link rel="import" href="../app/behaviors/app-term-labels.html"/>
-<link rel="import" href="../../../config/app-config.html"/>
+<link rel="import" href="../../config/app-config.html"/>
 
 <dom-module id="ev-site">
 
@@ -52,6 +53,7 @@
         </style>
 
         <site-data-query site="{{site}}" response="{{siteDataResponse}}"></site-data-query>
+        <site-emissions-query site="{{site}}" response="{{emissionsResponse}}"></site-emissions-query>
 
         <ev-responsive>
             <div class="columns">
@@ -81,25 +83,11 @@
                 </div>
             </div>
         </ev-responsive>
-
-        <ev-sparql-query id="emissions" api="imjv" results="{{emissionData}}">
-            SELECT ?year ?substance ?amount ?unit WHERE {
-                ?obs a cube:Observation ;
-                     milieu:referentiegebied ?ep ;
-                     milieu:tijdsperiode ?year ;
-                     milieu:substantie ?substance ;
-                     milieu:hoeveelheid ?amount ;
-                     sdmx:unitMeasure ?unit .
-                ?ep protontop:isOwnedBy <{{site.uri}}> .
-            }
-            ORDER BY ?year ?substance
-            LIMIT 500
-        </ev-sparql-query>
-
     </template>
 
     <script>
 
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-site',
@@ -116,28 +104,29 @@
                     observer: "onSiteChanged"
                 },
                 /** emission data */
-                emissionData: {
-                    type: Object,
-                    value: null,
-                    observer: 'onEmissionData'
+                emissions: {
+                    type: Object
                 }
             },
+
+            observers: [
+                'onEmissionsLoaded(emissionsResponse)'
+            ],
 
             onSiteChanged: function (site) {
                 if (site) {
                     this.async(function () {
                         this.$$('site-data-query').execute();
-                        this.$.emissions.execute();
-                    }, 1)
-                    //noinspection JSUnresolvedVariable
+                        this.$$('site-emissions-query').execute();
+                    }, 1);
                 }
             },
 
-            onEmissionData: function (emissionData) {
+            onEmissionsLoaded: function (emissionsResponse) {
                 var self = this;
                 this.set('emissions', null);
-                var bindings = emissionData
-                        ? emissionData.bindings
+                var bindings = emissionsResponse
+                        ? emissionsResponse.bindings
                         : [];
                 var emissions = { substances: []};
                 bindings.forEach(function (binding) {
