@@ -2,11 +2,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../ev-sparql-query/ev-sparql-query.html"/>
 
-<dom-module id="sites-emission-points-query">
+<dom-module id="sites-query">
 
     <template>
         <ev-sparql-query id="query" api="imjv" results="{{response}}">
-            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon  WHERE {
+            SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?epCount) WHERE {
                 SERVICE geo:search {
                     ?ep geo:search "inCircle";
                     geo:searchDatatype geoliteral:lat-lon ;
@@ -15,14 +15,10 @@
                     geo:spatialCircleRadius "{{getQueryRadius(location.radius)}}" .
                 }
                 ?ep a milieu:Emissiepunt ;
-                    rdfs:label ?epLabel ;
-                    wgs84_pos:lat ?epLat ;
-                    wgs84_pos:long ?epLon ;
                     protontop:isOwnedBy ?site .
                 ?site rdfs:label ?siteLabel .
             }
-            ORDER BY DESC(?epLat) DESC(?epLon)
-            LIMIT 500
+            GROUP BY ?site ?siteLabel
         </ev-sparql-query>
     </template>
 
@@ -30,7 +26,7 @@
         //noinspection JSUnusedGlobalSymbols
         Polymer({
 
-            is: 'sites-emission-points-query',
+            is: 'sites-query',
 
             properties: {
                 /** response */

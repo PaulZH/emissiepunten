@@ -8,7 +8,7 @@
     <template>
         <div id="overlay">
             <ev-card title="{{site.label}}">
-                <template is="dom-repeat" items="{{eps}}">
+                <template is="dom-repeat" items="{{site.eps}}">
                     <div class="ep" on-tap="onEmissionPointClicked" ep="{{item}}" data-uri$="{{item.uri}}">
                         [[item.shortLabel]]
                     </div>
@@ -31,10 +31,6 @@
                     type: Object,
                     observer: 'onSiteChanged'
                 },
-                /* emission points of the selected site */
-                eps: {
-                    type: Array
-                },
                 /* selected emission point */
                 emissionPoint: {
                     type: Object,
@@ -42,6 +38,10 @@
                     observer: 'onEmissionPointChanged'
                 }
             },
+
+            observers: [
+                'onEpsChanged(site.eps)'
+            ],
 
             ready: function () {
                 this.renderOverlay();
@@ -52,7 +52,7 @@
                     element: this.$.overlay,
                     positioning: 'top-right',
                     autoPan: true,
-                    offset: [-40, -42],
+                    offset: [-48, -52],
                     insertFirst: false // show above controls
                 });
                 this.olMap.addOverlay(this.overlay);
@@ -74,8 +74,15 @@
                 }
                 // update template vars
                 this.set('site', site);
-                this.set('eps', site.eps);
                 // deselect any emission points
+                this.resetSelection();
+                this.positionOverlay();
+            },
+
+            onEpsChanged: function(eps) {
+                if (!this.site || !eps) {
+                    return;
+                }
                 this.resetSelection();
                 this.positionOverlay();
             },
@@ -115,7 +122,10 @@
 
             positionOverlay: function (delay) {
                 this.overlay.getElement().style.display = 'block';
-                this.async(function () {
+                this.debounce('positionOverlay', function () {
+                    if (!this.site) {
+                        return;
+                    }
                     var lambertPoint = [this.site.x, this.site.y];
                     //noinspection JSCheckFunctionSignatures
                     this.overlay.setPosition(lambertPoint);
@@ -162,7 +172,6 @@
             /**
              * Removes all `selected` classes from nodes in the given container
              *
-             * @param $list
              */
             resetSelection: function () {
                 var items = this.$.overlay.querySelectorAll('.selected');
