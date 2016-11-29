@@ -126,6 +126,8 @@
                 this.set('site', site);
                 // deselect any emission points
                 this.resetSelection();
+                // pan/zoom to site
+                this.async(this.transitionToSite, 1);
             },
 
             onEpsChanged: function(eps) {
@@ -136,6 +138,9 @@
             },
 
             zoomOut: function () {
+                if (!this.location.point) {
+                    return;
+                }
                 var view = this.olMap.getView();
                 // pan
                 //noinspection JSCheckFunctionSignatures
@@ -157,14 +162,29 @@
                 view.setResolution(targetResolution);
             },
 
+            transitionToSite: function () {
+                if (!this.site) {
+                    return;
+                }
+                var view = this.olMap.getView();
+                // pan
+                //noinspection JSCheckFunctionSignatures
+                var pan = ol.animation.pan({
+                    source: view.getCenter(),
+                    duration: 500
+                });
+                // run animation
+                this.olMap.beforeRender(pan);
+                //noinspection JSCheckFunctionSignatures
+                view.setCenter([this.site.x, this.site.y]);
+            },
+
             onEmissionPointChanged: function (ep) {
                 // deselect any emission points
                 this.resetSelection();
                 if (ep) {
                     this.selectEmissionPoint(ep);
-                    this.async(function () {
-                        this.transitionToEmissionPoint();
-                    }, 1);
+                    this.async(this.transitionToEmissionPoint, 1);
                 }
             },
 
@@ -178,7 +198,7 @@
                 });
                 // zoom
                 var currentResolution = view.getResolution();
-                var targetResolution = 16;
+                var targetResolution = 12;
                 //noinspection JSCheckFunctionSignatures
                 var zoom = ol.animation.zoom({
                     resolution: currentResolution,

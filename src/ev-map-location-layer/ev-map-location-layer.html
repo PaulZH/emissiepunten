@@ -4,6 +4,7 @@
 <dom-module id="ev-map-location-layer">
 
     <script>
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-map-location-layer',
@@ -35,6 +36,7 @@
 
             observers: [
                 'onLocationChanged(location.*)',
+                'onRadiusChanged(location.radius)',
                 'onGeolocate(geolocate)'
             ],
 
@@ -102,6 +104,16 @@
                 }, 10);
             },
 
+            onRadiusChanged: function (radius) {
+                if (!radius || !this.location.point) {
+                    return;
+                }
+                this.async(function () {
+                    var forceZoom = true;
+                    this.transitionToLocation(forceZoom);
+                }, 100);
+            },
+
             getMarkerFeature: function () {
                 if (this.markerFeature) {
                     return this.markerFeature;
@@ -139,7 +151,7 @@
                 return this.radiusFeature;
             },
 
-            transitionToLocation: function () {
+            transitionToLocation: function (forceZoom) {
                 var view = this.olMap.getView();
                 // pan
                 //noinspection JSCheckFunctionSignatures
@@ -156,7 +168,7 @@
                     duration: 500
                 });
                 // run animation
-                if (currentResolution > targetResolution) {//should zoom in
+                if (currentResolution > targetResolution || forceZoom) {//should zoom
                     this.olMap.beforeRender(pan, zoom);
                     view.setCenter(this.location.point);
                     view.setResolution(targetResolution);
