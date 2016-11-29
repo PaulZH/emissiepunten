@@ -127,7 +127,7 @@
                 // deselect any emission points
                 this.resetSelection();
                 // pan/zoom to site
-                this.async(this.transitionToSite, 1);
+                this.debounce('transitionToSite', this.transitionToSite, 100);
             },
 
             onEpsChanged: function(eps) {
