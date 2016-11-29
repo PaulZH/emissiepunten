@@ -2,12 +2,77 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../openlayers/openlayers-assets.html"/>
 <link rel="import" href="../ev-card/ev-card.html"/>
+<!-- styles -->
+<link rel="import" href="../app/app-styles.html"/>
 
 <dom-module id="ev-map-emission-points-overlay">
 
+    <style include="app-styles">
+        :host {
+            display: block;
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: 8px;
+            width: 200px;
+            opacity: 0.95;
+        }
+
+        #overlay {
+        }
+
+        #overlay > ev-card {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+            --ev-card-title: {
+                height: 32px;
+                line-height: 32px;
+                border-bottom: 1px solid #fff;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                box-sizing: border-box;
+            };
+            --ev-card-content: {
+                max-height: 362px;
+            };
+        }
+
+        /*noinspection CssUnusedSymbol*/
+        #overlay > ev-card > .title {/* needed for polyfilled firefox */
+            height: 32px;
+            line-height: 32px;
+            border-bottom: 1px solid #fff;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            box-sizing: border-box;
+        }
+
+        /*noinspection CssUnusedSymbol*/
+        #overlay > ev-card > .content {/* needed for polyfilled firefox */
+            max-height: 362px;
+        }
+
+        #overlay .ep {
+            border-bottom: 1px solid;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--ev-app-grey-6);
+            color: var(--ev-app-green-1);
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        /*noinspection CssUnusedSymbol*/
+        #overlay .ep.selected {
+            background-color: var(--ev-app-green-2);
+            color: #fff;
+            border-bottom: none;
+        }
+    </style>
+
     <template>
-        <div id="overlay">
-            <ev-card title="{{site.label}}">
+        <div id="overlay" hidden$="{{!site.eps}}">
+            <ev-card title="Emission Points: {{site.eps.length}}">
                 <template is="dom-repeat" items="{{site.eps}}">
                     <div class="ep" on-tap="onEmissionPointClicked" ep="{{item}}" data-uri$="{{item.uri}}">
                         [[item.shortLabel]]
@@ -43,29 +108,10 @@
                 'onEpsChanged(site.eps)'
             ],
 
-            ready: function () {
-                this.renderOverlay();
-            },
-
-            renderOverlay: function () {
-                this.overlay = new ol.Overlay({
-                    element: this.$.overlay,
-                    positioning: 'top-right',
-                    autoPan: true,
-                    offset: [-48, -52],
-                    insertFirst: false // show above controls
-                });
-                this.olMap.addOverlay(this.overlay);
-            },
-
             onSiteChanged: function (site) {
                 var self = this;
-                if (!this.overlay) {
-                    return;
-                }
                 clearTimeout(this.zoomOutTO);
                 if (!site) {
-                    this.overlay.getElement().style.display = 'none';
                     this.set('eps', null);
                     this.zoomOutTO = setTimeout(function () {
                         self.zoomOut();
@@ -76,7 +122,6 @@
                 this.set('site', site);
                 // deselect any emission points
                 this.resetSelection();
-                this.positionOverlay();
             },
 
             onEpsChanged: function(eps) {
@@ -84,7 +129,6 @@
                     return;
                 }
                 this.resetSelection();
-                this.positionOverlay();
             },
 
             zoomOut: function () {
@@ -120,18 +164,6 @@
                 }
             },
 
-            positionOverlay: function (delay) {
-                this.overlay.getElement().style.display = 'block';
-                this.debounce('positionOverlay', function () {
-                    if (!this.site) {
-                        return;
-                    }
-                    var lambertPoint = [this.site.x, this.site.y];
-                    //noinspection JSCheckFunctionSignatures
-                    this.overlay.setPosition(lambertPoint);
-                }, delay || 1);
-            },
-
             transitionToEmissionPoint: function () {
                 var view = this.olMap.getView();
                 // pan
@@ -155,8 +187,6 @@
                     view.setCenter([this.site.x, this.site.y]);
                     view.setResolution(targetResolution);
                 }
-                // position overlay
-                this.positionOverlay(1000);
             },
 
             onEmissionPointClicked: function (event) {
