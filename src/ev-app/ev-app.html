@@ -160,14 +160,13 @@
 
             /**
              * Scroll the viewport so that the data pane becomes visible
-             *
              */
             scrollIn: function () {
                 var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
-                var appTop = this.offsetTop - 4;
+                var mapTop = this.$$('ev-map'). offsetTop - 4;
                 var targetScrollTop = scrollTop;
-                if (scrollTop < appTop) {
-                    targetScrollTop = appTop;
+                if (scrollTop < mapTop) {
+                    targetScrollTop = mapTop;
                 }
                 anime({
                     targets: [document.body, document.documentElement],
