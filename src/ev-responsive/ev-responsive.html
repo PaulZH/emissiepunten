@@ -13,6 +13,8 @@
         <iron-media-query query="(min-width: 720px)" query-matches="{{w7a}}"></iron-media-query>
         <iron-media-query query="(min-width: 800px)" query-matches="{{w8a}}"></iron-media-query>
         <iron-media-query query="(min-width: 820px)" query-matches="{{w8b}}"></iron-media-query>
+        <iron-media-query query="(min-width: 900px)" query-matches="{{w9a}}"></iron-media-query>
+        <iron-media-query query="(min-width: 1024px)" query-matches="{{w10a}}"></iron-media-query>
 
         <content></content>
     </template>
@@ -53,6 +55,14 @@
                     reflectToAttribute: true
                 },
                 w8b: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w9a: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                w10a: {
                     type: Boolean,
                     reflectToAttribute: true
                 }
