@@ -18,25 +18,38 @@
                 display: block;
             }
 
-            /* list and map */
+            /* stacked when width < w7a */
 
-            #list-and-map {
+            ev-site-list {
+                margin-bottom: 16px;
+            }
+
+            /*noinspection CssUnusedSymbol*/
+            [w7a] #list-and-map {
                 @apply(--layout-horizontal);
             }
 
-            ev-site-list {
-                display: none;
+            [w7a] ev-site-list {
+                max-width: 40%;
+                margin-right: 16px;
+                margin-bottom: 0;
             }
 
-            [w8a] ev-site-list {
-                display: block;
+            [w7a] ev-site-list {
                 @apply(--layout-flex);
-                margin-right: 16px;
             }
 
             ev-map {
-                @apply(--layout-flex-4);
+                @apply(--layout-flex-2);
                 max-width: 100%;
+            }
+
+            [w9a] ev-map {
+                @apply(--layout-flex-3);
+            }
+
+            [w10a] ev-map {
+                @apply(--layout-flex-4);
             }
 
             /* data-pane */

@@ -1,6 +1,7 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../ev-card/ev-card.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
@@ -14,21 +15,37 @@
         <style include="app-styles app-fonts">
 
             :host {
+                display: block;
+            }
+
+            ev-card {
+                --ev-card-title: {
+                    border-bottom: 1px solid #fff;
+                };
+                --ev-card-content: {
+                    max-height: 360px;
+                };
+            }
+
+            /* shown next to map when width >= w7a */
+
+            [w7a] ev-card {
                 --ev-card-content: {
                     height: 410px;
                 };
-                --ev-card-title: {
-                    border-bottom: 1px solid #fff;
-                }
+            }
+
+            [w7a] p {
+                padding: 20px;
             }
 
             p {
-                padding: 20px 20px;
+                padding: 8px 20px;
                 text-align: center;
                 line-height: 1.5;
             }
 
-            p.intro {
+            [w7a] p.intro {
                 margin-top: 20px;
             }
 
@@ -93,36 +110,38 @@
 
         </style>
 
-        <ev-card title="{{title}}">
-            <template is="dom-if" if="[[deferredElementsLoaded]]">
-                <!-- no sites -->
-                <template is="dom-if" if="{{!sites.length}}">
-                    <p class="intro">
-                        Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
-                    </p>
-                    <p class="get-started">
-                        <span class="heading">Get started:</span>
-                        <paper-button raised on-tap="onGeolocate">
-                            <iron-icon icon="maps:my-location"></iron-icon>
-                            Use my location
-                        </paper-button>
-                        <span class="sub-info">or just click on the map</span>
-                    </p>
-                </template>
+        <ev-responsive>
+            <ev-card title="{{title}}">
+                <template is="dom-if" if="[[deferredElementsLoaded]]">
+                    <!-- no sites -->
+                    <template is="dom-if" if="{{!sites.length}}">
+                        <p class="intro">
+                            Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
+                        </p>
+                        <p class="get-started">
+                            <span class="heading">Get started:</span>
+                            <paper-button raised on-tap="onGeolocate">
+                                <iron-icon icon="maps:my-location"></iron-icon>
+                                Use my location
+                            </paper-button>
+                            <span class="sub-info">or just click on the map</span>
+                        </p>
+                    </template>
 
-                <!-- sites found -->
-                <template is="dom-if" if="{{sites.length}}" restamp="true">
-                    <iron-list items="{{sites}}" selection-enabled selected-item="{{selectedItem}}">
-                        <template>
-                            <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
-                                [[item.label]]
-                                <div class="ep-count">Emission Points: [[item.epCount]]</div>
-                            </div>
-                        </template>
-                    </iron-list>
+                    <!-- sites found -->
+                    <template is="dom-if" if="{{sites.length}}" restamp="true">
+                        <iron-list items="{{sites}}" selection-enabled selected-item="{{selectedItem}}">
+                            <template>
+                                <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
+                                    [[item.label]]
+                                    <div class="ep-count">Emission Points: [[item.epCount]]</div>
+                                </div>
+                            </template>
+                        </iron-list>
+                    </template>
                 </template>
-            </template>
-        </ev-card>
+            </ev-card>
+        </ev-responsive>
 
     </template>
 
