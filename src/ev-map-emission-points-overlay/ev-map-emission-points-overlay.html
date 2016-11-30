@@ -64,6 +64,8 @@
         #overlay .ep {
             border-bottom: 1px solid;
             padding: 8px 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             border-bottom: 1px solid var(--ev-app-grey-6);
             color: var(--ev-app-green-1);
             cursor: pointer;
@@ -87,7 +89,7 @@
             <ev-card toggle="true" title="Emission Points: {{site.eps.length}}">
                 <div class="eps">
                     <template is="dom-repeat" items="{{site.eps}}">
-                        <div class="ep" ep="{{item}}" data-uri$="{{item.uri}}"
+                        <div class="ep" ep="{{item}}" data-uri$="{{item.uri}}" title$="[[item.shortLabel]]"
                              on-tap="onEmissionPointClicked">
                             [[item.shortLabel]]
                         </div>
