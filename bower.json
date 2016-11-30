@@ -42,7 +42,8 @@
     "vega": "https://vega.github.io/vega-editor/vendor/vega.min.js",
     "vega-lite": "https://vega.github.io/vega-editor/vendor/vega-lite.min.js",
     "vega-lite-sourcemap": "https://vega.github.io/vega-editor/vendor/vega-lite.min.js.map",
-    "vega-embed": "https://vega.github.io/vega-editor/vendor/vega-embed.min.js"
+    "vega-embed": "https://vega.github.io/vega-editor/vendor/vega-embed.min.js",
+    "animejs": "^1.1.2"
   },
   "devDependencies": {
     "living-cukes": "bnowack/living-cukes"
