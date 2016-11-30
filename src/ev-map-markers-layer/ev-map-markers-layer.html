@@ -247,10 +247,29 @@
                         } else {
                             this.loadEmissionPoints();
                         }
+                        // pan/zoom to site feature
+                        this.debounce('transitionToSiteFeature', this.transitionToSiteFeature, 100);
                     }
                 }
                 // clear selected emission point
                 this.set('emissionPoint', null);
+            },
+
+            transitionToSiteFeature: function () {
+                if (!this.site) {
+                    return;
+                }
+                var view = this.olMap.getView();
+                // pan
+                //noinspection JSCheckFunctionSignatures
+                var pan = ol.animation.pan({
+                    source: view.getCenter(),
+                    duration: 500
+                });
+                // run animation
+                this.olMap.beforeRender(pan);
+                //noinspection JSCheckFunctionSignatures
+                view.setCenter([this.site.x, this.site.y]);
             },
 
             deselectSiteFeatures: function () {

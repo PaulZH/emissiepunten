@@ -139,8 +139,6 @@
                 this.set('site', site);
                 // deselect any emission points
                 this.resetSelection();
-                // pan/zoom to site
-                this.debounce('transitionToSite', this.transitionToSite, 100);
             },
 
             onEpsChanged: function(eps) {
@@ -173,23 +171,6 @@
                 this.olMap.beforeRender(pan, zoom);
                 view.setCenter(this.location.point);
                 view.setResolution(targetResolution);
-            },
-
-            transitionToSite: function () {
-                if (!this.site) {
-                    return;
-                }
-                var view = this.olMap.getView();
-                // pan
-                //noinspection JSCheckFunctionSignatures
-                var pan = ol.animation.pan({
-                    source: view.getCenter(),
-                    duration: 500
-                });
-                // run animation
-                this.olMap.beforeRender(pan);
-                //noinspection JSCheckFunctionSignatures
-                view.setCenter([this.site.x, this.site.y]);
             },
 
             onEmissionPointChanged: function (ep) {
