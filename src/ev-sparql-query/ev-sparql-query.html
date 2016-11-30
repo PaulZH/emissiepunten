@@ -61,7 +61,9 @@
             },
 
             onResponse: function () {
-                this.set('results', this.$.api.lastResponse.results);
+                if (this.$.api.lastResponse && this.$.api.lastResponse.results) {
+                    this.set('results', this.$.api.lastResponse.results);
+                }
             }
         });
     </script>
