@@ -25,17 +25,22 @@
                 height: 100%;
             }
 
-            #chart-title {
+            .chart-title {
                 text-align: center;
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: 500;
                 clear: both;
-                padding-top: 8px;
+                padding-top: 16px;
+            }
+
+            .chart-title a {
+                color: var(--ev-app-green-1);
             }
 
         </style>
 
-        <div id="chart-title">{{ substance }}</div>
+        <div class="chart-title" hidden$="{{!substanceLink}}"><a href="{{substanceLink}}" target="ev-ext">{{ substance }}</a></div>
+        <div class="chart-title" hidden$="{{substanceLink}}">{{ substance }}</div>
         <div id="chart"></div>
 
     </template>
@@ -55,6 +60,10 @@
                     type: String,
                     value: "Substance",
                     observer: 'onSubstanceChanged'
+                },
+                substanceLink: {
+                	type: String,
+                    value: null
                 }
             },
 
@@ -71,6 +80,7 @@
                     return;
                 }
                 var chartData = this.getChartData();
+                this.set('substanceLink', chartData.link);
                 var spec = {
                     data: chartData,
                     mark: chartData.mark,
@@ -110,6 +120,7 @@
                 var years = this.data[this.substance];
                 var unit;
                 var allZero = true;
+                var link;
                 for (var year in years) {
                     if (!years.hasOwnProperty(year)) {
                         continue;
@@ -119,6 +130,7 @@
                         year: year
                     });
                     unit = years[year].unit;
+                    link = years[year].link;
                     if (years[year].amount !== 0) {
                         allZero = false;
                     }
@@ -130,7 +142,7 @@
                 if (allZero) {
                     mark = 'point';
                 }
-                return { values: values, unit: unit, mark: mark };
+                return { values: values, unit: unit, mark: mark, link: link };
             }
 
         });

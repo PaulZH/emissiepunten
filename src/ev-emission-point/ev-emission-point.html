@@ -132,12 +132,16 @@
                     var substance = self.getTermLabel(binding.substance.value);
                     var amount = parseFloat(binding.amount.value);
                     var unit = self.getTermLabel(binding.unit.value);
+					//noinspection JSUnresolvedVariable
+					var substanceLink = binding.seeAlso
+                        ? binding.seeAlso.value
+                        : null;
                     if (!emissions[substance]) {
                         emissions[substance] = {};
                         emissions.substances.push(substance);
                     }
                     if (!emissions[substance][year]) {
-                        emissions[substance][year] = { unit: unit, amount: 0};
+						emissions[substance][year] = { unit: unit, amount: 0, link: substanceLink };
                     }
                     emissions[substance][year].amount += amount;
                 });

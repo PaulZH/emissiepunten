@@ -6,13 +6,16 @@
 
     <template>
         <ev-sparql-query id="query" api="imjv" results="{{response}}">
-            SELECT ?year ?substance ?amount ?unit WHERE {
+            SELECT ?year ?substance ?amount ?unit ?seeAlso WHERE {
                 ?obs a cube:Observation ;
                 milieu:referentiegebied <{{emissionPoint.uri}}> ;
                 milieu:tijdsperiode ?year ;
                 milieu:substantie ?substance ;
                 milieu:hoeveelheid ?amount ;
                 sdmx:unitMeasure ?unit .
+                OPTIONAL {
+                    ?substance rdfs:seeAlso ?seeAlso .
+                }
             }
             ORDER BY ?year ?substance
         </ev-sparql-query>
