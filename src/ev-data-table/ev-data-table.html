@@ -30,7 +30,12 @@
                 font-size: 0.9em;
             }
 
-            tr + tr td {
+            tbody tr:first-child td {
+                padding-top: 1em;
+            }
+
+            tr + tr td,
+            tr + template + tr td {
                 border-top: 1px solid var(--ev-app-grey-7);
             }
 
@@ -38,6 +43,7 @@
                 font-weight: 500;
                 text-align: right;
                 text-transform: capitalize;
+                width: 40%;
             }
         </style>
 
