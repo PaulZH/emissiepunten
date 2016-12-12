@@ -11,17 +11,13 @@ Flanders Emission Explorer
 
 * [Preview](https://bnowackbiz.github.io/emissies-vlaanderen/) (LNE VPN required for SPARQL queries)
 
-## Installation
-
-* `npm install`
-* `bower install`
-* `cp bower_components/vega-lite-sourcemap/index.map bower_components/vega-lite/vega-lite.min.js.map` (optional)
-* `npm run polymer-serve` => `http://localhost:8080/` (or any alternative web server setup)
-
 ## Repository Layout
 
 * `/bower_components`               - Client-side dependencies
 * `/node_modules`                   - NodeJS development dependencies
+* `/config`                         - Configuration files
+    * `app-config.html`             - Configuration options for APIs, SPARQL prefixes, LD base URLs, map markers
+    * `manisfest.json`              - Manifest file for "add to homescreen"-apps
 * `/dev`                            - Development files
     * `/e2e`                        - Files for End-to-End tests
         * `/config`                 - Configuration files
@@ -48,3 +44,24 @@ Flanders Emission Explorer
 * `index.html`                      - application index file
 * `manual.html`                     - User manual
 * `documentation.html`              - Stakeholder and developer documentation
+
+## Installation
+
+* `npm install`
+* `bower install`
+* `cp bower_components/vega-lite-sourcemap/index.map bower_components/vega-lite/vega-lite.min.js.map` (optional)
+* `npm run polymer-serve` => `http://localhost:8080/` (or any alternative web server setup)
+
+## SPARQL Endpoint Configuration
+  
+* Endpoints can be configured in the `apis` section in `/config/app-config.html`.
+
+## Linked Data HREF Configuration
+
+* To replace selected LD URLs in link hrefs, e.g. "id.milieuinfo.be" with "id-ontwikkel.milieuinfo.be,
+  adjust the `linkedDataServers` section in `/config/app-config.html`.
+
+## Site and Emission Point Table Configuration
+
+* Data Tables (labels and skippable predicates) can be configured in the `dataTableProperties` section in `/config/app-config.html`.
+
