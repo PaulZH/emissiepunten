@@ -1,0 +1,27 @@
+<script>
+    /**
+     * Polymer behavior for overriding Linked Data URLs (mainly during development)
+     */
+    appLinkedDataHrefs = {
+
+        properties: {
+            /** replacement hosts */
+			linkedDataServers: Object
+        },
+
+        setLinkedDataServers: function (servers) {
+        	this.linkedDataServers = servers;
+        },
+
+        ldHref: function (url) {
+        	for (var fromHost in this.linkedDataServers) {
+        		if (!this.linkedDataServers.hasOwnProperty(fromHost)) {
+        			continue;
+                }
+                var toHost = this.linkedDataServers[fromHost];
+                url = url.replace(fromHost, toHost);
+            }
+            return url;
+        }
+    }
+</script>
