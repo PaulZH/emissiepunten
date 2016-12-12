@@ -67,6 +67,23 @@
                     }
                 }
             },
+            dataTableProperties: {
+				type: Object,
+				value : {
+                    labels: [
+                    	'http://www.w3.org/2000/01/rdf-schema#label',
+                        'http://purl.org/dc/terms/title'
+                    ],
+					skip: [
+						'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+						'http://id.milieuinfo.be/def#lambert72_x',
+						'http://id.milieuinfo.be/def#lambert72_y',
+                        'http://www.proxml.be/blazegeo/wgs84_pos#lat_long',
+                        'http://www.w3.org/2003/01/geo/wgs84_pos#lat',
+                        'http://www.w3.org/2003/01/geo/wgs84_pos#long'
+                    ]
+                }
+            },
             linkedDataServers: {
             	type: Object,
                 value : {
