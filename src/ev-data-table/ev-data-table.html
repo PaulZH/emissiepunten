@@ -1,9 +1,13 @@
+<!--suppress HtmlUnknownTarget -->
+
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <!-- behaviors -->
+<link rel="import" href="../../config/app-config.html"/>
 <link rel="import" href="../app/behaviors/app-term-labels.html"/>
+<link rel="import" href="../app/behaviors/app-linked-data-hrefs.html"/>
 
 <dom-module id="ev-data-table">
 
@@ -45,6 +49,12 @@
                 text-transform: capitalize;
                 width: 40%;
             }
+
+            a {
+                color: var(--ev-app-green-1);
+                text-transform: capitalize;
+            }
+
         </style>
 
         <table>
@@ -54,10 +64,22 @@
                 </tr>
             </thead>
             <tbody>
-            <template is="dom-repeat" items="{{items}}">
+            <template is="dom-repeat" items="{{labelItems}}">
                 <tr>
-                    <td class="label">{{item.name}}</td>
+                    <td class="label" title="{{item.labelUri}}">{{item.label}}</td>
                     <td>{{item.value}}</td>
+                </tr>
+            </template>
+            <template is="dom-repeat" items="{{textItems}}">
+                <tr>
+                    <td class="label" title="{{item.labelUri}}">{{item.label}}</td>
+                    <td>{{item.value}}</td>
+                </tr>
+            </template>
+            <template is="dom-repeat" items="{{linkItems}}">
+                <tr>
+                    <td class="label" title="{{item.labelUri}}">{{item.label}}</td>
+                    <td><a href="{{ldHref(item.valueUri)}}" target="ev-ext">{{item.value}}</a></td>
                 </tr>
             </template>
             </tbody>
@@ -71,10 +93,13 @@
             is: 'ev-data-table',
 
             behaviors: [
-                appTermLabels
+				appConfig,
+                appTermLabels,
+                appLinkedDataHrefs
             ],
 
-            attached: function () {
+            ready: function () {
+            	this.setLinkedDataServers(this.config('linkedDataServers'));
             },
 
             properties: {
@@ -89,8 +114,13 @@
                     type: Object,
                     observer: 'onData'
                 },
-                /* table items (processed table data) */
-                items: {
+                /* text items (processed table data) */
+                textItems: {
+                    type: Array,
+                    value: null
+                },
+                /* link items (processed table data) */
+                linkItems: {
                     type: Array,
                     value: null
                 }
@@ -98,23 +128,54 @@
 
             onData: function (data) {
                 var self = this;
-                var items = [];
+                var labelItems = [];
+                var textItems = [];
+                var linkItems = [];
+                var prevPLabel;
+                var labelProps = this.config('dataTableProperties').labels;
+                var skipProps = this.config('dataTableProperties').skip;
                 data.bindings.forEach(function (binding) {
-                    var pLabel, oLabel;
+                    var pLabel, oLabel, isLink, isLabel;
                     pLabel = self.getTermLabel(binding.p.value);
-
-                    if (binding.p.value === 'http://purl.org/dc/terms/type') {// special: type has a term as value
+                    if (skipProps.indexOf(binding.p.value) !== -1) {
+                    	return;
+                    } else if (binding.o.type === 'bnode') {// skip blank nodes
+						return;
+					} else if (binding.p.value === 'http://purl.org/dc/terms/type') {// special: dct:type has a term as value
                         oLabel = self.getTermLabel(binding.o.value);
-                    } else if (binding.o.type === 'uri' || binding.o.type === 'bnode') {// skip links
-                        return;
-                    } else if (binding.p.value.match(/[#\/](lambert.*|lat|long|lat_long)$/i)) {// skip geo fields
-                        return;
+                    } else if (binding.o.type === 'uri') {
+                    	isLink = true;
+						oLabel = binding.oLabel
+                            ? binding.oLabel.value
+                            : self.getTermLabel(binding.o.value);
                     } else {// keep literal fields
                         oLabel = binding.o.value;
                     }
-                    items.push({name: pLabel, value: oLabel })
+					isLabel = (labelProps.indexOf(binding.p.value) !== -1);
+
+					// clear repeated p labels
+					if (pLabel === prevPLabel) {
+						pLabel = '';
+					}
+
+					// skip repeated labels
+                    if (isLabel && labelItems.length) {
+						return;
+                    }
+
+                    if (isLabel) {
+						labelItems.push({label: pLabel, value: oLabel, labelUri: binding.p.value});
+					} else if (isLink) {
+                        linkItems.push({label: pLabel, value: oLabel, labelUri: binding.p.value, valueUri: binding.o.value });
+                    } else {
+						textItems.push({label: pLabel, value: oLabel, labelUri: binding.p.value });
+                    }
+
+					prevPLabel = pLabel || prevPLabel;
                 });
-                this.set('items', items);
+                this.set('labelItems', labelItems);
+                this.set('textItems', textItems);
+                this.set('linkItems', linkItems);
             }
         });
     </script>
