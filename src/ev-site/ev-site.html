@@ -11,8 +11,9 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <!-- behaviors -->
-<link rel="import" href="../app/behaviors/app-term-labels.html"/>
 <link rel="import" href="../../config/app-config.html"/>
+<link rel="import" href="../app/behaviors/app-term-labels.html"/>
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-site">
 
@@ -59,7 +60,7 @@
             <div class="columns">
                 <div id="data">
                     <template is="dom-if" if="{{siteDataResponse}}" restamp="true">
-                        <ev-data-table table-title="Site data" data="{{siteDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{site.uri}}"></ev-data-table>
+                        <ev-data-table table-title="{{localize('site_data')}}" data="{{siteDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{site.uri}}"></ev-data-table>
                     </template>
                 </div>
                 <div id="charts">
@@ -67,7 +68,7 @@
                         <template is="dom-if" if="{{emissions}}">
                             <div class="controls">
                                 <ev-substance-selector substances="{{emissions.substances}}" substance="{{selectedSubstance}}"></ev-substance-selector>
-                                <span class="heading">Site Emissions</span>
+                                <span class="heading">{{localize('site_emissions')}}</span>
                             </div>
                             <div class="chart">
                                 <ev-emission-vega-chart data="{{emissions}}" substance="{{selectedSubstance}}"></ev-emission-vega-chart>
@@ -76,7 +77,7 @@
 
                         <template is="dom-if" if="{{!emissions}}">
                             <div class="no-emissions">
-                                No emission data available
+                                {{localize('no_emission_data')}}
                             </div>
                         </template>
                     </div>
@@ -94,7 +95,8 @@
 
             behaviors: [
                 appConfig,
-                appTermLabels
+                appTermLabels,
+                appLocalization
             ],
 
             properties: {

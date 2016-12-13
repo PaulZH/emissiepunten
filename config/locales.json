@@ -15,9 +15,12 @@
     "no_emission_data": "Geen emissie gegevens beschikbaar",
 
     "map_title": "Selecteer een locatie",
-    "sites_within": "Sites binnen {radius}km van {lat},{lon}",
+    "sites_within": "Exploitaties binnen {radius}km van {lat},{lon}",
 
-    "radius": "Radius"
+    "radius": "Radius",
+
+    "site_data": "Exploitatie Gegevens",
+    "site_emissions": "Exploitatie Emissies"
   },
   "en": {
     "restart": "Restart",
@@ -37,6 +40,9 @@
     "map_title": "Select a location",
     "sites_within": "Sites within {radius}km of {lat},{lon}",
 
-    "radius": "Radius"
+    "radius": "Radius",
+
+    "site_data": "Site Data",
+    "site_emissions": "Site Emissions"
   }
 }
