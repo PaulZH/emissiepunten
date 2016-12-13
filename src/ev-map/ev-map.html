@@ -6,6 +6,7 @@
 <link rel="import" href="../openlayers/openlayers-styles.html"/>
 <!--behaviors -->
 <link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-map">
 
@@ -30,7 +31,7 @@
             }
         </style>
 
-        <ev-card id="map-card" title="{{title}}">
+        <ev-card id="map-card" title="{{localize('map_title')}}">
             <div id="map"></div>
             <template is="dom-if" if="[[deferredElementsLoaded]]">
                 <ev-radius radius="{{location.radius}}"></ev-radius>
@@ -60,14 +61,14 @@
             is: 'ev-map',
 
             behaviors: [
-                appLazyloading
+                appLazyloading,
+				appLocalization
             ],
 
             properties: {
                 /** Map card title */
                 title: {
-                    type: String,
-                    computed: 'getTitle(location.*)'
+                    type: String
                 },
                 /** Initial map center */
                 initialCenter: {
@@ -110,16 +111,25 @@
                 }
             },
 
-            getTitle: function () {
-                if (this.location && this.location.lat) {
-                    return 'Sites within {radius}km of {lat},{lon}'
-                            .replace('{radius}', this.location.radius)
-                            .replace('{lat}', this.location.lat.toFixed(5))
-                            .replace('{lon}', this.location.lon.toFixed(5));
-                } else {
-                    return 'Select a location';
-                }
-            },
+			observers: [
+				'onLocationChanged(location.*)'
+			],
+
+			onLocationChanged: function () {
+				if (!this.localize) {
+					return;
+				}
+				var $card = this.$$('ev-card');
+				var title = this.localize('maptitle');
+				if (this.location && this.location.lat) {
+					title = this.localize('sites_within',
+                        'radius', this.location.radius,
+                        'lat', this.location.lat.toFixed(5),
+                        'lon', this.location.lon.toFixed(5)
+                    );
+				}
+				$card.set('title', title);
+			},
 
             attached: function () {
                 this.initProjection();
