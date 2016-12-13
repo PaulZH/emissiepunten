@@ -26,6 +26,7 @@
                 font-weight: 300;
                 line-height: 40px;
                 padding: 1px 16px 0;
+                position: relative;
             }
 
             td {
@@ -55,12 +56,25 @@
                 text-transform: capitalize;
             }
 
+            .ld-link {
+                display: block;
+                position: absolute;
+                right: 8px;
+                top: 8px;
+                width: 24px;
+                height: 24px;
+                background: transparent url('img/sw-cube.png') center no-repeat;
+            }
+
         </style>
 
         <table>
             <thead>
                 <tr>
-                    <th colspan="2">[[tableTitle]]</th>
+                    <th colspan="2">
+                        [[tableTitle]]
+                        <a class="ld-link" href="[[ldHref(ldUri)]]" target="ev-ext" hidden$="[[!ldUri]]"></a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -114,6 +128,11 @@
                     type: Object,
                     observer: 'onData'
                 },
+                /* table resource URI */
+                ldUri: {
+                	type: String,
+                    value: ''
+				},
                 /* text items (processed table data) */
                 textItems: {
                     type: Array,

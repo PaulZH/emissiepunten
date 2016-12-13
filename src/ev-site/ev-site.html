@@ -59,7 +59,7 @@
             <div class="columns">
                 <div id="data">
                     <template is="dom-if" if="{{siteDataResponse}}" restamp="true">
-                        <ev-data-table table-title="Site data" data="{{siteDataResponse}}" term-labels="{{termLabels}}"></ev-data-table>
+                        <ev-data-table table-title="Site data" data="{{siteDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{site.uri}}"></ev-data-table>
                     </template>
                 </div>
                 <div id="charts">
@@ -133,7 +133,8 @@
                     //noinspection JSUnresolvedVariable
                     var year = binding.year.value;
                     var substance = self.getTermLabel(binding.substance.value);
-                    var amount = parseFloat(binding.amount.value);
+                    //noinspection JSUnresolvedVariable
+					var amount = parseFloat(binding.amount.value);
                     var unit = self.getTermLabel(binding.unit.value);
                     //noinspection JSUnresolvedVariable
 					var substanceLink = binding.seeAlso
