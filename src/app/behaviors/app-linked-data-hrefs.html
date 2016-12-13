@@ -19,7 +19,7 @@
         			continue;
                 }
                 var toHost = this.linkedDataServers[fromHost];
-                url = url.replace(fromHost, toHost);
+                url = (url || '').replace(fromHost, toHost);
             }
             return url;
         }
