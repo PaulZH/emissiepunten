@@ -5,6 +5,8 @@
 <link rel="import" href="../ev-card/ev-card.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
+<!-- behaviors -->
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-map-emission-points-overlay">
 
@@ -84,7 +86,7 @@
 
     <template>
         <div id="overlay" hidden$="{{!site.eps}}">
-            <ev-card toggle="true" title="Emission Points: {{site.eps.length}}">
+            <ev-card toggle="true" title="{{localize('emission_points')}}: {{site.eps.length}}">
                 <div class="eps">
                     <template is="dom-repeat" items="{{site.eps}}">
                         <div class="ep" ep="{{item}}" data-uri$="{{item.uri}}" title$="[[item.shortLabel]]"
@@ -103,7 +105,11 @@
 
             is: 'ev-map-emission-points-overlay',
 
-            properties: {
+			behaviors: [
+				appLocalization
+			],
+
+			properties: {
                 /** openlayers map */
                 olMap: Object,
                 /** selected site */
