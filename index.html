@@ -32,7 +32,8 @@
 
             window.app = {
                 base: location.pathname,
-                activeView: location.pathname
+                activeView: location.pathname,
+                language: 'nl'
             };
 
             // set up Polymer options
@@ -55,10 +56,12 @@
         </script>
 
         <link rel="import" href="bower_components/polymer/polymer.html"/>
+        <link rel="import" href="bower_components/polymer-cookie/polymer-cookie.html"/>
         <link rel="import" href="src/ev-layout/ev-layout.html"/>
 
     </head>
     <body class="initializing">
+        <polymer-cookie id="language" name="language" time="30"></polymer-cookie>
         <ev-layout app="../ev-app/ev-app.html"></ev-layout>
     </body>
 </html>

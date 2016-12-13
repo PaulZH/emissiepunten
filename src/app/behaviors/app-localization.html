@@ -1,0 +1,42 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<script>
+    /**
+     * Polymer behavior for localized strings
+     */
+    appLocalization = [{
+
+        properties: {
+			language: {
+				type: String,
+                observer: 'onLanguageChanged'
+			}
+        },
+
+        attached: function() {
+			this.loadResources(window.app.base + 'config/locales.json');
+			this.readLanguage();
+		},
+
+        onLanguageChanged: function (language) {
+			window.app.language = language;
+        	this.writeLanguage(language);
+        },
+
+		readLanguage: function () {
+			var $cookie = document.querySelector('#language');
+			this.set('language', $cookie.readCookie() || window.app.language);
+		},
+
+		writeLanguage: function (language) {
+			var $cookie = document.querySelector('#language');
+			this.async(function () {
+                $cookie.eraseCookie();
+                $cookie.value = language;
+                $cookie.createCookie();
+            }, 1);
+		}
+
+	}, Polymer.AppLocalizeBehavior];
+</script>
