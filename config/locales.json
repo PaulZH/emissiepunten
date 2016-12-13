@@ -20,7 +20,9 @@
     "radius": "Radius",
 
     "site_data": "Exploitatie Gegevens",
-    "site_emissions": "Exploitatie Emissies"
+    "site_emissions": "Exploitatie Emissies",
+
+    "substance": "Substantie"
   },
   "en": {
     "restart": "Restart",
@@ -43,6 +45,8 @@
     "radius": "Radius",
 
     "site_data": "Site Data",
-    "site_emissions": "Site Emissions"
+    "site_emissions": "Site Emissions",
+
+    "substance": "Substance"
   }
 }

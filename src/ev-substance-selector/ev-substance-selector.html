@@ -6,6 +6,8 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
+<!-- behaviors -->
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-substance-selector">
 
@@ -43,7 +45,7 @@
 
         </style>
 
-        <paper-dropdown-menu-light label="Substance" substance-count$="{{substanceCount}}">
+        <paper-dropdown-menu-light label="{{localize('substance')}}" substance-count$="{{substanceCount}}">
             <paper-listbox id="list" class="dropdown-content" selected="{{selected}}">
                 <template is="dom-repeat" items="{{substances}}">
                     <paper-item>[[item]]</paper-item>
@@ -59,7 +61,11 @@
 
             is: 'ev-substance-selector',
 
-            properties: {
+			behaviors: [
+				appLocalization
+			],
+
+			properties: {
                 substances: {
                     type: Array,
                     observer: 'onSubstancesChanged'
