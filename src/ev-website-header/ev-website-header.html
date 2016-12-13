@@ -7,6 +7,8 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
+<!-- behaviors -->
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-website-header">
 
@@ -151,7 +153,7 @@
                     </a>
                 </div>
                 <nav class="service-nav">
-                    <a class="home" href$="[[appPath]]" on-tap="restartApp">Restart</a>
+                    <a class="home" href$="[[appPath]]" on-tap="restartApp">{{localize('restart')}}</a>
                     <a class="language" on-tap="toggleLanguagePopup">
                         {{language}}
                         <iron-icon icon="arrow-drop-down"></iron-icon>
@@ -170,6 +172,10 @@
         Polymer({
 
             is: 'ev-website-header',
+
+			behaviors: [
+				appLocalization
+			],
 
 			properties: {
 				appPath: {
