@@ -7,6 +7,7 @@
 <link rel="import" href="../app/app-fonts.html"/>
 <!-- behaviors -->
 <link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-site-list">
 
@@ -67,7 +68,7 @@
                 font-size: 15px;
                 font-weight: 500;
                 font-family: "Flanders Sans", sans-serif;
-                padding-right: 20px;
+                padding-right: 16px;
             }
 
             iron-icon {
@@ -111,20 +112,18 @@
         </style>
 
         <ev-responsive>
-            <ev-card title="{{title}}">
+            <ev-card title="{{localize('intro_title')}}">
                 <template is="dom-if" if="[[deferredElementsLoaded]]">
                     <!-- no sites -->
                     <template is="dom-if" if="{{!sites.length}}">
-                        <p class="intro">
-                            Find emission points across Flanders. Explore locations, organisations and detailed pollution data.
-                        </p>
+                        <p class="intro">{{localize('intro')}}</p>
                         <p class="get-started">
-                            <span class="heading">Get started:</span>
+                            <span class="heading">{{localize('get_started')}}:</span>
                             <paper-button raised on-tap="onGeolocate">
                                 <iron-icon icon="maps:my-location"></iron-icon>
-                                Use my location
+                                {{localize('use_my_location')}}
                             </paper-button>
-                            <span class="sub-info">or just click on the map</span>
+                            <span class="sub-info">{{localize('or_click_map')}}</span>
                         </p>
                     </template>
 
@@ -134,7 +133,7 @@
                             <template>
                                 <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
                                     [[item.label]]
-                                    <div class="ep-count">Emission Points: [[item.epCount]]</div>
+                                    <div class="ep-count">{{localize('emission_points')}}: [[item.epCount]]</div>
                                 </div>
                             </template>
                         </iron-list>
@@ -153,7 +152,8 @@
             is: 'ev-site-list',
 
             behaviors: [
-                appLazyloading
+                appLazyloading,
+				appLocalization
             ],
 
             properties: {
@@ -162,8 +162,7 @@
                     value: false
                 },
                 title: {
-                    type: String,
-                    computed: 'getTitle(location.*,sites)'
+                    type: String
                 },
                 location: {
                     type: Object
@@ -187,6 +186,10 @@
                 }
             },
 
+            observers: [
+				'onSearch(location.*,sites)'
+            ],
+
             attached: function () {
                 // render deferred elements
                 this.async(this.renderDeferredElements, 100);
@@ -207,15 +210,16 @@
                 });
             },
 
-            getTitle: function () {
-                if (this.location && this.location.point) {
-                    var hits = (this.sites.length || 0);
-                    return (hits === 1)
-                        ? '1 site found'
-                        : hits + ' sites found';
-                } else {
-                    return 'Emission Sites in Flanders';
+            onSearch: function () {
+            	if (!this.localize) {
+            		return;
                 }
+                var $card = this.$$('ev-card');
+            	var title = this.localize('intro_title');
+            	if (this.location.point) {
+            		 title = this.localize('sites_found', 'count', this.sites.length);
+                }
+                $card.set('title', title);
             },
 
             onSiteSelected: function (site) {

@@ -1,8 +1,24 @@
 {
   "nl": {
-    "restart": "Herstaten"
+    "restart": "Herstaten",
+
+    "intro_title": "Exploitaties in Vlaanderen",
+    "intro": "Vind emissie punten in Vlaanderen. Verken locaties, organisaties en gedetailleerde verontreiniging gegevens.",
+    "get_started": "Aan de slag",
+    "use_my_location": "Mijn locatie",
+    "or_click_map": "of klik gewoon op de kaart",
+    "sites_found": "{count, number} {count, plural, one {exploitatie} other {exploitaties}} gevonden",
+    "emission_points": "Emissie Punten"
   },
   "en": {
-    "restart": "Restart"
+    "restart": "Restart",
+
+    "intro_title": "Emission Sites in Flanders",
+    "intro": "Find emission points across Flanders. Explore locations, organisations and detailed pollution data.",
+    "get_started": "Get started",
+    "use_my_location": "Use my location",
+    "or_click_map": "or just click on the map",
+    "sites_found": "{count, number} {count, plural, one {site} other {sites}} found",
+    "emission_points": "Emission Points"
   }
 }
