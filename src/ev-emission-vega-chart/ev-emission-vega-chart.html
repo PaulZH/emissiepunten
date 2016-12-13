@@ -1,10 +1,11 @@
-
+<!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../vega/vega-assets.html"/>
-
-
+<!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
+<!-- behaviors -->
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-emission-vega-chart">
 
@@ -51,7 +52,11 @@
 
             is: 'ev-emission-vega-chart',
 
-            properties: {
+			behaviors: [
+				appLocalization
+			],
+
+			properties: {
                 data: {
                     type: Object,
                     observer: 'onDataChanged'
@@ -76,11 +81,12 @@
             },
 
             updateChart: function () {
-                if (!this.data || !this.substance) {
+                if (!this.data || !this.substance || !this.localize) {
                     return;
                 }
                 var chartData = this.getChartData();
                 this.set('substanceLink', chartData.link);
+                var localize = this.localize;
                 var spec = {
                     data: chartData,
                     mark: chartData.mark,
@@ -90,7 +96,7 @@
                             field: "year",
                             type: "ordinal",
                             axis: {
-                                title: "Year", labelAngle: 0
+                                title: localize("year"), labelAngle: 0
                             }
                         },
                         y: {

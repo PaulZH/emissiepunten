@@ -22,7 +22,9 @@
     "site_data": "Exploitatie Gegevens",
     "site_emissions": "Exploitatie Emissies",
 
-    "substance": "Substantie"
+    "substance": "Substantie",
+
+    "year": "Jaar"
   },
   "en": {
     "restart": "Restart",
@@ -47,6 +49,8 @@
     "site_data": "Site Data",
     "site_emissions": "Site Emissions",
 
-    "substance": "Substance"
+    "substance": "Substance",
+
+    "year": "Year"
   }
 }
