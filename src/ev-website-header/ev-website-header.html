@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html"/>
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html"/>
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html"/>
 <link rel="import" href="../app/app-fonts.html"/>
@@ -24,12 +26,13 @@
                 @apply(--ev-app-container);
                 @apply(--layout-horizontal);
                 @apply(--layout-wrap);
+                position: relative;
             }
 
             /* department styles */
 
             .department {
-                @apply(--layout-flex-9);
+                @apply(--layout-flex);
                 @apply(--layout-self-center);
             }
 
@@ -60,9 +63,80 @@
             /* service nav styles */
 
             .service-nav {
-                @apply(--layout-flex-3);
+                position: absolute;
+                top: 8px;
+                right: 16px;
+                background-color: var(--ev-app-grey-7);
+                font-size: 14px;
+                height: 40px;
+                padding-left: 4px;
+                z-index: 1;
             }
 
+            .service-nav > * {
+                text-align: left;
+            }
+
+            .service-nav a {
+                line-height: 40px;
+                color: var(--ev-service-nav-link-color);
+                text-decoration: none;
+                padding: 0 8px;
+                cursor: pointer;
+            }
+
+            .service-nav > a + a {
+                border-left: 1px solid var(--ev-service-nav-border-color);
+            }
+
+            .service-nav a.language {
+                text-transform: uppercase;
+            }
+
+            .language-popup {
+                position: absolute;
+                top: 0;
+                right: 28px;
+                width: 32px;
+                font-family: "Flanders Sans", sans-serif;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+                background-color: #fff;
+                opacity: 0;
+                transition: all 0.2s ease-in-out;
+                height: 0;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .language-popup.active {
+                opacity: 1;
+                min-height: 80px;
+            }
+
+            .language-popup a {
+                display: block;
+                text-align: center;
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Chrome/Safari/Opera */
+                -khtml-user-select: none; /* Konqueror */
+                -moz-user-select: none; /* Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently not supported by any browser */
+            }
+
+            .language-popup a:hover {
+                text-decoration: underline;
+            }
+
+            .language-popup a + a {
+                border-top: 1px solid var(--ev-service-nav-border-color);
+            }
+
+            .language-popup a[data-lang="nl"][data-selected="nl"],
+            .language-popup a[data-lang="en"][data-selected="en"] {
+                background-color: var(--ev-language-popup-active-bg-color);
+                font-weight: bold;
+            }
 
         </style>
 
@@ -76,7 +150,17 @@
                         <span>Energie</span>
                     </a>
                 </div>
-                <nav class="service-nav"></nav>
+                <nav class="service-nav">
+                    <a class="home" href$="[[appPath]]" on-tap="restartApp">Restart</a>
+                    <a class="language" on-tap="toggleLanguagePopup">
+                        {{language}}
+                        <iron-icon icon="arrow-drop-down"></iron-icon>
+                    </a>
+                    <div class="language-popup">
+                        <a data-lang="nl" data-selected$="{{language}}" on-tap="selectLanguage">NL</a>
+                        <a data-lang="en" data-selected$="{{language}}" on-tap="selectLanguage">EN</a>
+                    </div>
+                </nav>
             </header>
         </ev-responsive>
 
@@ -85,9 +169,33 @@
     <script>
         Polymer({
 
-            is: 'ev-website-header'
+            is: 'ev-website-header',
 
-        });
+			properties: {
+				appPath: {
+					type: String,
+					value: app.base || location.pathname
+				}
+			},
+
+			restartApp: function () {
+				location.href = this.appPath;
+			},
+
+			toggleLanguagePopup: function (event) {
+				event.preventDefault();
+            	var $popup = this.$$('.language-popup');
+            	$popup.classList.toggle('active');
+			},
+
+			selectLanguage: function (event) {
+            	this.set('language', event.target.getAttribute('data-lang'));
+            	this.toggleLanguagePopup(event);
+            	this.async(function () {
+            		this.restartApp();
+                }, 100);
+            }
+		});
     </script>
 
 </dom-module>
