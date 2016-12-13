@@ -103,7 +103,8 @@
                             field: "amount",
                             type: "quantitative",
                             axis: {
-                                title: chartData.unit
+                                title: chartData.unit,
+                                format: '.2r'// rounded to 2 significant digits, see https://github.com/d3/d3-format/blob/master/README.md
                             }
                         }
                     },
