@@ -13,6 +13,7 @@
 <link rel="import" href="../app/app-styles.html"/>
 <!-- behaviors -->
 <link rel="import" href="../app/behaviors/app-term-labels.html"/>
+<link rel="import" href="../app/behaviors/app-localization.html"/>
 
 <dom-module id="ev-emission-point">
 
@@ -58,7 +59,7 @@
             <div class="columns">
                 <div id="data">
                     <template is="dom-if" if="{{epDataResponse}}">
-                        <ev-data-table table-title="Emission Point Data" data="{{epDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{emissionPoint.uri}}"></ev-data-table>
+                        <ev-data-table table-title="{{localize('emission_point_data')}}" data="{{epDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{emissionPoint.uri}}"></ev-data-table>
                     </template>
                 </div>
                 <div id="charts">
@@ -66,7 +67,7 @@
                         <template is="dom-if" if="{{emissions}}">
                             <div class="controls">
                                 <ev-substance-selector substances="{{emissions.substances}}" substance="{{selectedSubstance}}"></ev-substance-selector>
-                                <span class="heading">Emissions</span>
+                                <span class="heading">{{localize('emissions')}}</span>
                             </div>
                             <div class="chart">
                                 <ev-emission-vega-chart data="{{emissions}}" substance="{{selectedSubstance}}"></ev-emission-vega-chart>
@@ -75,7 +76,7 @@
 
                         <template is="dom-if" if="{{!emissions}}">
                             <div class="no-emissions">
-                                No emission data available
+                                {{localize('no_emission_data')}}
                             </div>
                         </template>
                     </div>
@@ -92,7 +93,8 @@
             is: 'ev-emission-point',
 
             behaviors: [
-                appTermLabels
+                appTermLabels,
+				appLocalization
             ],
 
             properties: {

@@ -8,7 +8,11 @@
     "use_my_location": "Mijn locatie",
     "or_click_map": "of klik gewoon op de kaart",
     "sites_found": "{count, number} {count, plural, one {exploitatie} other {exploitaties}} gevonden",
-    "emission_points": "Emissie Punten"
+    "emission_points": "Emissie Punten",
+
+    "emission_point_data": "Emissie Punt Gegevens",
+    "emissions": "Emissies",
+    "no_emission_data": "Geen emissie gegevens beschikbaar"
   },
   "en": {
     "restart": "Restart",
@@ -19,6 +23,10 @@
     "use_my_location": "Use my location",
     "or_click_map": "or just click on the map",
     "sites_found": "{count, number} {count, plural, one {site} other {sites}} found",
-    "emission_points": "Emission Points"
+    "emission_points": "Emission Points",
+
+    "emission_point_data": "Emission Point Data",
+    "emissions": "Emissions",
+    "no_emission_data": "No emission data available"
   }
 }
