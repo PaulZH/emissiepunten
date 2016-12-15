@@ -1,34 +1,26 @@
 {
   "nl": {
-    "restart": "Herstaten",
-
-    "intro_title": "Exploitaties in Vlaanderen",
-    "intro": "Vind emissie punten in Vlaanderen. Verken locaties, organisaties en gedetailleerde verontreiniging gegevens.",
+    "restart": "Herstarten",
+    "intro_title": "Emissiepunten en sites in Vlaanderen",
+    "intro": "Vind emissiepunten in Vlaanderen. Verken locaties, organisaties en gedetailleerde emissiegegevens.",
     "get_started": "Aan de slag",
-    "use_my_location": "Mijn locatie",
+    "use_my_location": "Gebruik mijn locatie",
     "or_click_map": "of klik gewoon op de kaart",
     "sites_found": "{count, number} {count, plural, one {exploitatie} other {exploitaties}} gevonden",
-    "emission_points": "Emissie Punten",
-
-    "emission_point_data": "Emissie Punt Gegevens",
+    "emission_points": "Emissiepunten",
+    "emission_point_data": "Emissiepuntgegevens",
     "emissions": "Emissies",
-    "no_emission_data": "Geen emissie gegevens beschikbaar",
-
+    "no_emission_data": "Geen emissiegegevens beschikbaar",
     "map_title": "Selecteer een locatie",
     "sites_within": "Exploitaties binnen {radius}km van {lat},{lon}",
-
     "radius": "Radius",
-
-    "site_data": "Exploitatie Gegevens",
-    "site_emissions": "Exploitatie Emissies",
-
-    "substance": "Substantie",
-
+    "site_data": "Exploitatiegegevens",
+    "site_emissions": "Emissies van de site",
+    "substance": "Stof",
     "year": "Jaar"
   },
   "en": {
     "restart": "Restart",
-
     "intro_title": "Emission Sites in Flanders",
     "intro": "Find emission points across Flanders. Explore locations, organisations and detailed pollution data.",
     "get_started": "Get started",
@@ -36,21 +28,15 @@
     "or_click_map": "or just click on the map",
     "sites_found": "{count, number} {count, plural, one {site} other {sites}} found",
     "emission_points": "Emission Points",
-
     "emission_point_data": "Emission Point Data",
     "emissions": "Emissions",
     "no_emission_data": "No emission data available",
-
     "map_title": "Select a location",
     "sites_within": "Sites within {radius}km of {lat},{lon}",
-
     "radius": "Radius",
-
     "site_data": "Site Data",
     "site_emissions": "Site Emissions",
-
     "substance": "Substance",
-
     "year": "Year"
   }
 }
