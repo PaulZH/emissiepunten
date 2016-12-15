@@ -129,6 +129,7 @@
                     );
 				}
 				$card.set('title', title);
+				this.triggerResize();
 			},
 
             attached: function () {
@@ -182,11 +183,7 @@
                     "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
-                    // trigger resize event to fix map distortion (mac-only?)
-                    var evt = document.createEvent("HTMLEvents");
-                    evt.initEvent('resize', true, false);
-                    //noinspection JSUnresolvedFunction
-                    window.dispatchEvent(evt);
+                    self.triggerResize();
                 });
             },
 
@@ -230,6 +227,16 @@
                     })
                 });
                 this.olMap.addLayer(this.tilesLayer);
+            },
+
+			/**
+             * Triggers a (fake) resize event to fix any map distortions caused by flex-box (mac-only issue?)
+			 */
+            triggerResize: function () {
+				var evt = document.createEvent("HTMLEvents");
+				evt.initEvent('resize', true, false);
+				//noinspection JSUnresolvedFunction
+				window.dispatchEvent(evt);
             }
         });
     </script>
