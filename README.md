@@ -45,7 +45,7 @@ Flanders Emission Explorer
 * `manual.html`                     - User manual
 * `documentation.html`              - Stakeholder and developer documentation
 
-## Installation
+## Local Installation
 
 * `npm install`
 * `bower install`
@@ -65,3 +65,18 @@ Flanders Emission Explorer
 
 * Data Tables (labels and skippable predicates) can be configured in the `dataTableProperties` section in `/config/app-config.html`.
 
+## Deployment
+
+* Switch to the `master` branch
+* Update the dependencies
+    * `bower install` or `bower update`
+    * `cp bower_components/vega-lite-sourcemap/index.map bower_components/vega-lite/vega-lite.min.js.map`
+* Now copy the following directories and files to the target web server
+    * `/bower_components`
+    * `/config`
+    * `/src`
+    * `index.html`
+    * `favicon.ico`
+
+Alternatively, copy the directories and files listed above from the `gh-pages` branch to the target web server.
+The `gh-pages` branch contains the latest release including all required bower dependencies.
