@@ -11,8 +11,8 @@
                     rdfs:label ?epLabel ;
                     wgs84_pos:lat ?epLat ;
                     wgs84_pos:long ?epLon ;
-                    protontop:isOwnedBy <{{site.uri}}> ;
-                    protontop:isOwnedBy ?site .
+                    milieu:exploitant <{{site.uri}}> ;
+                    milieu:exploitant ?site .
                 ?site rdfs:label ?siteLabel .
             }
             ORDER BY DESC(?epLat) DESC(?epLon)

@@ -15,7 +15,7 @@
                     geo:spatialCircleRadius "{{getQueryRadius(location.radius)}}" .
                 }
                 ?ep a milieu:Emissiepunt ;
-                    protontop:isOwnedBy ?site .
+                    milieu:exploitant ?site .
                 ?site rdfs:label ?siteLabel .
             }
             GROUP BY ?site ?siteLabel
