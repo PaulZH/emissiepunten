@@ -11,8 +11,8 @@
                     rdfs:label ?epLabel ;
                     wgs84_pos:lat ?epLat ;
                     wgs84_pos:long ?epLon ;
-                    milieu:exploitant <{{site.uri}}> ;
-                    milieu:exploitant ?site .
+                    milieu:exploitatie <{{site.uri}}> ;
+                    milieu:exploitatie ?site .
                 ?site rdfs:label ?siteLabel .
             }
             ORDER BY DESC(?epLat) DESC(?epLon)
