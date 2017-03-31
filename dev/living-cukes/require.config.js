@@ -2,7 +2,7 @@
  * RequireJS config for LivingCukes
  */
 require.config({
-    urlArgs: 'appVersion=' + (location.host.match(/^(local|192.168|bnowackbiz.github.io|$)/) ? Math.random() : '0.0.1'),
+    urlArgs: 'appVersion=' + (location.host.match(/^(local|192.168|projects.bnowack.de|$)/) ? Math.random() : '0.0.1'),
     paths: {
         jquery: 'bower_components/jquery/dist/jquery.min',
         text: 'bower_components/requirejs-plugins/lib/text',

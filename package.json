@@ -1,7 +1,7 @@
 {
   "name": "emissies-vlaanderen",
   "version": "0.0.1",
-  "description": "Emission Explorer for Flanders",
+  "description": "Emission Explorer for Flanders (dev tools)",
   "scripts": {
     "npm-fresh": "rm -rf ./node_modules && npm install",
     "bower-fresh": "rm -rf ./bower_components && bower install",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bnowackbiz/emissies-vlaanderen.git"
+    "url": "git+https://gitlab.com/bnowack/emissies-vlaanderen.git"
   },
   "keywords": [
     "vlaanderen",
@@ -22,9 +22,9 @@
   "license": "UNLICENSED",
   "private": true,
   "bugs": {
-    "url": "https://github.com/bnowackbiz/emissies-vlaanderen/issues"
+    "url": "https://gitlab.com/bnowack/emissies-vlaanderen/issues"
   },
-  "homepage": "https://github.com/bnowackbiz/emissies-vlaanderen#readme",
+  "homepage": "https://gitlab.com/bnowack/emissies-vlaanderen",
   "dependencies": {},
   "devDependencies": {
     "bower": "^1.7.9",

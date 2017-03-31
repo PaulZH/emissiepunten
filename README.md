@@ -4,12 +4,11 @@ Flanders Emission Explorer
 
 ## Documentation
 
-* [User Manual](http://bnowackbiz.github.io/emissies-vlaanderen/manual.html)
-* ["Living" documentation for project stakeholders and developers](http://bnowackbiz.github.io/emissies-vlaanderen/documentation.html)
+* ["Living" documentation for project stakeholders and developers](http://projects.bnowack.de/2016/06-emissies-vlaanderen/documentation.html)
 
 ## Preview
 
-* [Preview](https://bnowackbiz.github.io/emissies-vlaanderen/) (LNE VPN required for SPARQL queries)
+* [Preview](http://projects.bnowack.de/2016/06-emissies-vlaanderen/)
 
 ## Repository Layout
 

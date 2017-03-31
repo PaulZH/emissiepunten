@@ -11,7 +11,7 @@
     "vlaanderen",
     "emissies"
   ],
-  "homepage": "https://github.com/bnowackbiz/emissies-vlaanderen",
+  "homepage": "https://gitlab.com/bnowack/emissies-vlaanderen",
   "private": true,
   "ignore": [
     "**/.*",
