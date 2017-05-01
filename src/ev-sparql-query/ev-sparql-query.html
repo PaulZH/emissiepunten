@@ -32,6 +32,10 @@
                 results: {
                     type: Object,
                     notify: true
+                },
+                queryRunning: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -49,6 +53,8 @@
             execute: function () {
                 // set API URL
                 this.set('apiUrl', this.config('apis')[this.api]);
+                // increase query counter
+                this.onQueryStarted();
                 // run query
                 var query = this.getSparqlPrologue() + Polymer.dom(this).textContent;
                 this.$.api.set('body', 'query=' + encodeURIComponent(query));
@@ -56,13 +62,37 @@
             },
 
             onError: function () {
+                // decrease query counter
+                this.onQueryEnded();
                 //noinspection JSUnresolvedVariable
                 console.log('SPARQL Error', arguments[1].error.message, this.apiUrl, this.$.api.params.query);
             },
 
             onResponse: function () {
+                // decrease query counter
+                this.onQueryEnded(false);
                 if (this.$.api.lastResponse && this.$.api.lastResponse.results) {
                     this.set('results', this.$.api.lastResponse.results);
+                }
+            },
+
+            onQueryStarted: function () {
+                if (this.queryRunning) {
+                    return;
+                }
+                this.queryRunning = true;
+                if (window.evMap) {
+                    window.evMap.onQueryStarted();
+                }
+            },
+
+            onQueryEnded: function () {
+                if (!this.queryRunning) {
+                    return;
+                }
+                this.queryRunning = false;
+                if (window.evMap) {
+                    window.evMap.onQueryEnded();
                 }
             }
         });

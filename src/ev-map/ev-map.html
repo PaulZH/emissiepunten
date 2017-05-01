@@ -12,9 +12,10 @@
 
     <template>
 
-        <style include="openlayers-styles">
+        <style include="openlayers-styles app-styles">
             :host {
                 display: block;
+                position: relative;
             }
 
             #map-card {
@@ -29,10 +30,42 @@
                 overflow: hidden;
                 box-sizing: border-box;
             }
+
+            #loading {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background-color: var(--ev-app-green-1);
+                display: none;
+            }
+
+            /*noinspection CssUnusedSymbol*/
+            #loading.active {
+                display: block;
+                animation: loader 3s infinite ease;
+            }
+
+            @keyframes loader {
+                0% {
+                    width: 0;
+                    left: 0;
+                }
+                50% {
+                    width: 101%;
+                    left: 0;
+                }
+                100% {
+                    width: 0;
+                    left: 100%;
+                }
+            }
         </style>
 
         <ev-card id="map-card" title="{{localize('map_title')}}">
             <div id="map"></div>
+            <div id="loading"></div>
             <template is="dom-if" if="[[deferredElementsLoaded]]">
                 <ev-radius radius="{{location.radius}}"></ev-radius>
                 <ev-map-location-layer
@@ -56,6 +89,7 @@
     </template>
 
     <script>
+        //noinspection JSUnusedGlobalSymbols
         Polymer({
 
             is: 'ev-map',
@@ -108,6 +142,10 @@
                 selectedEmissionPoint: {
                     type: Object,
                     notify: true
+                },
+                runningQueries: {
+                    type: Number,
+                    value: 0
                 }
             },
 
@@ -238,6 +276,29 @@
 				evt.initEvent('resize', true, false);
 				//noinspection JSUnresolvedFunction
 				window.dispatchEvent(evt);
+            },
+
+            /**
+             * Activates loading indicator (triggered by ev-sparql-query)
+             */
+            onQueryStarted: function () {
+                var self = this;
+                this.runningQueries++;
+                setTimeout(function () {
+                    if (self.runningQueries) {
+                        self.$.loading.classList.add('active');
+                    }
+                }, 500)
+            },
+
+            /**
+             * Deactivates loading indicator (triggered by ev-sparql-query)
+             */
+            onQueryEnded: function () {
+                this.runningQueries--;
+                if (this.runningQueries <= 0) {
+                    this.$.loading.classList.remove('active');
+                }
             }
         });
     </script>
