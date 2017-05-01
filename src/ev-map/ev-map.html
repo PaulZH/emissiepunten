@@ -140,6 +140,7 @@
                 this.renderTilesLayer();
                 this.scopeSubtree(this.$.map, true);
                 this.async(this.renderDeferredElements, 500);
+                window.evMap = this;
             },
 
             initProjection: function () {
