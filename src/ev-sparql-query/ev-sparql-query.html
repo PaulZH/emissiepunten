@@ -65,7 +65,12 @@
                 // decrease query counter
                 this.onQueryEnded();
                 //noinspection JSUnresolvedVariable
-                console.log('SPARQL Error', arguments[1].error.message, this.apiUrl, this.$.api.params.query);
+                var errorMessage = 'Query error: ' + (arguments[1].error.message || arguments[1].error.type);
+                var query =  Polymer.dom(this).textContent;
+                if (window.evMap) {
+                    window.evMap.set('queryError', errorMessage);
+                }
+                console.log(errorMessage, this.apiUrl, query);
             },
 
             onResponse: function () {

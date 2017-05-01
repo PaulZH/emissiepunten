@@ -61,11 +61,31 @@
                     left: 100%;
                 }
             }
+
+            #error {
+                position: absolute;
+                left: 8px;
+                bottom: -50px;
+                background-color: #c00;
+                color: #fff;
+                line-height: 32px;
+                padding: 0 16px;
+                max-width: 50%;
+                transition: bottom 1s ease, opacity 1s ease;
+                opacity: 0;
+            }
+
+            /*noinspection CssUnusedSymbol*/
+            #error.active {
+                bottom: 8px;
+                opacity: 1;
+            }
         </style>
 
         <ev-card id="map-card" title="{{localize('map_title')}}">
             <div id="map"></div>
             <div id="loading"></div>
+            <div id="error">{{queryError}}</div>
             <template is="dom-if" if="[[deferredElementsLoaded]]">
                 <ev-radius radius="{{location.radius}}"></ev-radius>
                 <ev-map-location-layer
@@ -146,11 +166,13 @@
                 runningQueries: {
                     type: Number,
                     value: 0
-                }
+                },
+                queryError: String
             },
 
 			observers: [
-				'onLocationChanged(location.*)'
+				'onLocationChanged(location.*)',
+				'onQueryError(queryError)'
 			],
 
 			onLocationChanged: function () {
@@ -299,6 +321,25 @@
                 if (this.runningQueries <= 0) {
                     this.$.loading.classList.remove('active');
                 }
+            },
+
+            /**
+             * Shows error toast (triggered by ev-sparql-query)
+             */
+            onQueryError: function (error) {
+                if (!error) {
+                    return;
+                }
+                var self = this;
+                this.$.error.classList.add('active');
+                setTimeout(function () {
+                    if (self.queryError === error) {
+                        self.$.error.classList.remove('active');
+                        setTimeout(function () {
+                            self.queryError = null;
+                        }, 1000);
+                    }
+                }, 5000);
             }
         });
     </script>
