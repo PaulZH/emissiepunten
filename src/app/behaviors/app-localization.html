@@ -26,16 +26,22 @@
 
 		readLanguage: function () {
 			var $cookie = document.querySelector('#language');
-			this.set('language', $cookie.readCookie() || window.app.language);
+			var language = $cookie && $cookie.readCookie
+                ? $cookie.readCookie() || window.app.language
+                : window.app.language;
+            this.set('language', language);
 		},
 
 		writeLanguage: function (language) {
 			var $cookie = document.querySelector('#language');
 			this.async(function () {
+                if (!$cookie.eraseCookie || !$cookie.createCookie) {
+                    return;
+                }
                 $cookie.eraseCookie();
                 $cookie.value = language;
                 $cookie.createCookie();
-            }, 1);
+            }, 100);
 		}
 
 	}, Polymer.AppLocalizeBehavior];
