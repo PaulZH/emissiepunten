@@ -8,7 +8,7 @@
 
     <template>
         <iron-ajax id="api" url="{{apiUrl}}" method="POST" body='{{body}}' headers='{"Accept": "application/json"}'
-                   handle-as="json" on-response="onResponse" on-error="onError" debounce-duration="300">
+                   handle-as="json" on-response="onResponse" on-error="onError" debounce-duration="300" timeout="{{apis.timeout}}">
             <content></content>
         </iron-ajax>
     </template>
