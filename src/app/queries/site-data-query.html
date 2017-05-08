@@ -7,7 +7,7 @@
 <dom-module id="site-data-query">
 
     <template>
-        <ev-sparql-query id="query" api="imjv" results="{{response}}">
+        <ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
             SELECT DISTINCT ?p ?o WHERE {
                 SERVICE &lt;{{apis.cbb}}&gt; {
                     &lt;{{site.uri}}&gt; ?p ?o .

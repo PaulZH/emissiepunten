@@ -38,6 +38,10 @@
                 queryRunning: {
                     type: Boolean,
                     value: false
+                },
+                notifyMap: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -88,7 +92,7 @@
                     return;
                 }
                 this.queryRunning = true;
-                if (window.evMap) {
+                if (this.notifyMap && window.evMap) {
                     window.evMap.onQueryStarted();
                 }
             },
@@ -98,7 +102,7 @@
                     return;
                 }
                 this.queryRunning = false;
-                if (window.evMap) {
+                if (this.notifyMap && window.evMap) {
                     window.evMap.onQueryEnded();
                 }
             }
