@@ -69,13 +69,6 @@ Flanders Emission Explorer
 * Switch to the `master` branch
 * Update the dependencies
     * `bower install` or `bower update`
-    * `cp bower_components/vega-lite-sourcemap/index.map bower_components/vega-lite/vega-lite.min.js.map`
-* Now copy the following directories and files to the target web server
-    * `/bower_components`
-    * `/config`
-    * `/src`
-    * `index.html`
-    * `favicon.ico`
-
-Alternatively, copy the directories and files listed above from the `gh-pages` branch to the target web server.
-The `gh-pages` branch contains the latest release including all required bower dependencies.
+* Run the build script
+    * `npm run build`
+* Copy the contents of the `dist` directory to the target web server
