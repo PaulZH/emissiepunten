@@ -9,18 +9,18 @@
     <template>
         <ev-sparql-query id="query" api="imjv" results="{{response}}">
             SELECT DISTINCT ?site ?x ?y WHERE {
-                SERVICE &lt;{{apis.cbb}}> {
+                SERVICE &lt;{{apis.cbb}}&gt; {
                     # duplicate first site so that we can have a leading UNION in the dom-repeat
                     {
                         ?site milieu:lambert72_x ?x ;
                               milieu:lambert72_y ?y .
-                        FILTER(?site  = &lt;{{sites.0.uri}}>)
+                        FILTER(?site  = &lt;{{sites.0.uri}}&gt;)
                     }
                     <template is="dom-repeat" items="{{sites}}">
                         UNION {
                             ?site milieu:lambert72_x ?x ;
                                   milieu:lambert72_y ?y .
-                            FILTER(?site = &lt;{{item.uri}}>)
+                            FILTER(?site = &lt;{{item.uri}}&gt;)
                         }
                     </template>
                 }

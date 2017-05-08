@@ -9,8 +9,8 @@
     <template>
         <ev-sparql-query id="query" api="imjv" results="{{response}}">
             SELECT DISTINCT ?p ?o WHERE {
-                SERVICE <{{apis.cbb}}> {
-                    <{{site.uri}}> ?p ?o .
+                SERVICE &lt;{{apis.cbb}}&gt; {
+                    &lt;{{site.uri}}&gt; ?p ?o .
                 }
             }
             ORDER BY ?p

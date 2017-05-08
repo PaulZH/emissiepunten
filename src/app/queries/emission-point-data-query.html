@@ -7,7 +7,7 @@
     <template>
         <ev-sparql-query id="query" api="imjv" results="{{response}}">
             SELECT DISTINCT ?p ?o ?oLabel WHERE {
-                <{{emissionPoint.uri}}> ?p ?o .
+                &lt;{{emissionPoint.uri}}&gt; ?p ?o .
                 OPTIONAL { ?o rdfs:label ?oLabel . }
             }
             ORDER BY ?p
