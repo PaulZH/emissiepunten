@@ -50,7 +50,7 @@
                 var prefixes = this.config('prefixes');
                 for (var prefix in prefixes) {
                     if (prefixes.hasOwnProperty(prefix)) {
-                        result += 'PREFIX ' + prefix + ': <' + prefixes[prefix] + '>' + "\n";
+                        result += 'PREFIX ' + prefix + ': <' + prefixes[prefix] + '> ' + "\n";
                     }
                 }
                 return result;
