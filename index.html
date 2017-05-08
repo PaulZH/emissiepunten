@@ -5,9 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta name="mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <link rel="shortcut icon" href="favicon.ico" data-size="32x32"/>
-        <link rel="apple-touch-icon" href="src/app/img/app-icon.png" data-size="152x152"/>
-        <link rel="manifest" href="config/manifest.json?1.0.6"/>
+        <link rel="shortcut icon" href="favicon.ico?##appVersion##" data-size="32x32"/>
+        <link rel="apple-touch-icon" href="src/app/img/app-icon.png?##appVersion##" data-size="152x152"/>
+        <link rel="manifest" href="config/manifest.json?##appVersion##"/>
 
         <title data-suffix=" - Emissies Vlaanderen">Welcome - Emissies Vlaanderen</title>
 
@@ -19,7 +19,7 @@
             }
 
             body.initializing  {
-                background: #fff url("src/ev-website-header/img/logo-lne.png") center no-repeat;
+                background: #fff url("src/ev-website-header/img/logo-lne.png?##appVersion##") center no-repeat;
             }
 
             body.initializing > * {
@@ -56,11 +56,11 @@
 
         <link rel="import" href="bower_components/polymer/polymer.html"/>
         <link rel="import" href="bower_components/polymer-cookie/polymer-cookie.html"/>
-        <link rel="import" href="src/ev-layout/ev-layout.html"/>
+        <link rel="import" href="src/ev-layout/ev-layout.html?##appVersion##"/>
 
     </head>
     <body class="initializing">
         <polymer-cookie id="language" name="language" time="30"></polymer-cookie>
-        <ev-layout app="../ev-app/ev-app.html"></ev-layout>
+        <ev-layout app="../ev-app/ev-app.html?##appVersion##"></ev-layout>
     </body>
 </html>

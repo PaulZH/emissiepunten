@@ -1,12 +1,12 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?##appVersion##"/>
 <!-- styles -->
-<link rel="import" href="../app/app-styles.html"/>
-<link rel="import" href="../app/app-fonts.html"/>
+<link rel="import" href="../app/app-styles.html?##appVersion##"/>
+<link rel="import" href="../app/app-fonts.html?##appVersion##"/>
 <!-- behaviors -->
-<link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 
 <dom-module id="ev-global-header">
 
@@ -107,7 +107,7 @@
              */
             renderDeferredElements: function () {
                 var self = this;
-                this.lazyload(["../ev-contact-link/ev-contact-link.html"]).then(function () {
+                this.lazyload(["../ev-contact-link/ev-contact-link.html?##appVersion##"]).then(function () {
                     self.$$('.sys-nav').appendChild(document.createElement('ev-contact-link'));
                 });
             },

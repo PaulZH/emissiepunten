@@ -1,6 +1,6 @@
 {
   "name": "Emissies Vlaanderen",
-  "version": "1.0.6",
+  "version": "##appVersion##",
   "display": "standalone",
   "icons": [
     {

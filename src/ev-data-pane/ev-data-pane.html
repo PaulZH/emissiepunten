@@ -1,7 +1,7 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <!-- behaviors -->
-<link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 
 <dom-module id="ev-data-pane">
 
@@ -81,10 +81,10 @@
             renderDeferredElements: function () {
                 var self = this;
                 this.lazyload([
-                    "../ev-card/ev-card.html",
-                    "../ev-site/ev-site.html",
-                    "../ev-emission-point/ev-emission-point.html",
-                    "../app/queries/labels-query.html"
+                    "../ev-card/ev-card.html?##appVersion##",
+                    "../ev-site/ev-site.html?##appVersion##",
+                    "../ev-emission-point/ev-emission-point.html?##appVersion##",
+                    "../app/queries/labels-query.html?##appVersion##"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                     // fetch term labels

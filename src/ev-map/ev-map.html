@@ -1,12 +1,12 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-card/ev-card.html"/>
-<link rel="import" href="../openlayers/openlayers-assets.html"/>
+<link rel="import" href="../ev-card/ev-card.html?##appVersion##"/>
+<link rel="import" href="../openlayers/openlayers-assets.html?##appVersion##"/>
 <!-- styles -->
-<link rel="import" href="../openlayers/openlayers-styles.html"/>
+<link rel="import" href="../openlayers/openlayers-styles.html?##appVersion##"/>
 <!--behaviors -->
-<link rel="import" href="../app/behaviors/app-lazyloading.html"/>
-<link rel="import" href="../app/behaviors/app-localization.html"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
+<link rel="import" href="../app/behaviors/app-localization.html?##appVersion##"/>
 
 <dom-module id="ev-map">
 
@@ -238,10 +238,10 @@
             renderDeferredElements: function () {
                 var self = this;
                 this.lazyload([
-                    "../ev-radius/ev-radius.html",
-                    "../ev-map-location-layer/ev-map-location-layer.html",
-                    "../ev-map-markers-layer/ev-map-markers-layer.html",
-                    "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html"
+                    "../ev-radius/ev-radius.html?##appVersion##",
+                    "../ev-map-location-layer/ev-map-location-layer.html?##appVersion##",
+                    "../ev-map-markers-layer/ev-map-markers-layer.html?##appVersion##",
+                    "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html?##appVersion##"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                     self.triggerResize();

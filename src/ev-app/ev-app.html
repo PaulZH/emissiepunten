@@ -1,14 +1,14 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
-<link rel="import" href="../ev-site-list/ev-site-list.html"/>
-<link rel="import" href="../ev-map/ev-map.html"/>
-<link rel="import" href="../anime/anime-assets.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?##appVersion##"/>
+<link rel="import" href="../ev-site-list/ev-site-list.html?##appVersion##"/>
+<link rel="import" href="../ev-map/ev-map.html?##appVersion##"/>
+<link rel="import" href="../anime/anime-assets.html?##appVersion##"/>
 <!-- styles -->
-<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <!-- behaviors -->
-<link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 
 <dom-module id="ev-app">
     <template>
@@ -134,9 +134,9 @@
             renderDeferredElements: function () {
                 var self = this;
                 this.lazyload([
-                    "../ev-data-pane/ev-data-pane.html",
-                    "../../bower_components/app-route/app-location.html",
-                    "../../bower_components/app-route/app-route.html"
+                    "../ev-data-pane/ev-data-pane.html?##appVersion##",
+                    "../../bower_components/app-route/app-location.html?##appVersion##",
+                    "../../bower_components/app-route/app-route.html?##appVersion##"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                 });

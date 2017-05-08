@@ -1,5 +1,5 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html?##appVersion##">
 
 <script>
     /**
@@ -15,7 +15,7 @@
         },
 
         attached: function() {
-			this.loadResources(window.app.base + 'config/locales.json');
+			this.loadResources(window.app.base + 'config/locales.json?##appVersion##');
 			this.readLanguage();
 		},
 

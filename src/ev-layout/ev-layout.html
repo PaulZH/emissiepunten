@@ -1,12 +1,12 @@
 <!-- elements -->
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-global-header/ev-global-header.html"/>
-<link rel="import" href="../ev-website-header/ev-website-header.html"/>
-<link rel="import" href="../ev-app-canvas/ev-app-canvas.html"/>
+<link rel="import" href="../ev-global-header/ev-global-header.html?##appVersion##"/>
+<link rel="import" href="../ev-website-header/ev-website-header.html?##appVersion##"/>
+<link rel="import" href="../ev-app-canvas/ev-app-canvas.html?##appVersion##"/>
 <!-- styles -->
-<link rel="import" href="../app/app-styles.html"/>
+<link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <!-- behaviors -->
-<link rel="import" href="../app/behaviors/app-lazyloading.html"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 
 <dom-module id="ev-layout">
 
@@ -59,7 +59,7 @@
              */
             renderDeferredElements: function () {
                 var self = this;
-                this.lazyload(["../ev-website-footer/ev-website-footer.html"]).then(function () {
+                this.lazyload(["../ev-website-footer/ev-website-footer.html?##appVersion##"]).then(function () {
                     Polymer.dom(self.root).appendChild(document.createElement('ev-website-footer'));
                 });
             }

@@ -2,10 +2,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?##appVersion##"/>
 <!-- styles -->
-<link rel="import" href="../app/app-styles.html"/>
-<link rel="import" href="../app/app-fonts.html"/>
+<link rel="import" href="../app/app-styles.html?##appVersion##"/>
+<link rel="import" href="../app/app-fonts.html?##appVersion##"/>
 
 <dom-module id="ev-website-footer">
 
@@ -104,7 +104,7 @@
 
         </style>
 
-        <iron-ajax id="version" auto url="../../config/manifest.json" handle-as="json" on-response="onManifestJsonLoaded"></iron-ajax>
+        <iron-ajax id="version" auto url="../../config/manifest.json?##appVersion##" handle-as="json" on-response="onManifestJsonLoaded"></iron-ajax>
 
         <ev-responsive>
             <footer>
