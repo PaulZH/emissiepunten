@@ -1,0 +1,10 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../app/app-styles.html?1.0.7"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.0.7"/>
+<dom-module id="ev-app-canvas">
+<template>
+<style include="app-styles">:host{display:block;background:var(--ev-app-background-color) url(img/background-pattern.png)}:host>section{@apply(--ev-app-container)}</style>
+<section></section>
+</template>
+<script>Polymer({is:"ev-app-canvas",behaviors:[appLazyloading],properties:{app:String},attached:function(){this.renderAppElement()},renderAppElement:function(){var e=this;this.lazyload([this.app]).then(function(){var a=e.app.replace(/^.*\/([^\/]+)\.html.*/,"$1");e.$$("section").appendChild(document.createElement(a))})}})</script>
+</dom-module>

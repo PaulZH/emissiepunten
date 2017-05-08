@@ -1,0 +1,23 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../openlayers/openlayers-assets.html?1.0.7"/>
+<link rel="import" href="../anime/anime-assets.html?1.0.7"/>
+<link rel="import" href="../ev-card/ev-card.html?1.0.7"/>
+<link rel="import" href="../app/app-styles.html?1.0.7"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.0.7"/>
+<dom-module id="ev-map-emission-points-overlay">
+<style include="app-styles">#overlay{display:block;position:absolute;left:8px;top:8px;width:200px;max-height:394px;opacity:.95}#overlay>ev-card{box-shadow:0 1px 2px rgba(0,0,0,.15);--ev-card-title:{height:32px;line-height:32px;border-bottom:1px solid #fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box};--ev-card-content:{max-height:362px;overflow:hidden};}#overlay>ev-card>.title{height:32px;line-height:32px;border-bottom:1px solid #fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box}#overlay>ev-card>.content{max-height:362px;overflow:hidden}.eps{overflow:scroll;max-height:362px}#overlay .ep{border-bottom:1px solid;padding:8px 16px;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--ev-app-grey-6);color:var(--ev-app-green-1);cursor:pointer;font-size:.95em}#overlay .ep:hover{background-color:var(--ev-app-green-3)}#overlay .ep.selected{background-color:var(--ev-app-green-2);color:#fff;border-bottom:none}</style>
+<template>
+<div id="overlay" hidden$="{{!site.eps}}">
+<ev-card toggle="true" title="{{localize('emission_points')}}: {{site.eps.length}}">
+<div class="eps">
+<template is="dom-repeat" items="{{site.eps}}">
+<div class="ep" ep="{{item}}" data-uri$="{{item.uri}}" title$="[[item.shortLabel]]" on-tap="onEmissionPointClicked">
+[[item.shortLabel]]
+</div>
+</template>
+</div>
+</ev-card>
+</div>
+</template>
+<script>Polymer({is:"ev-map-emission-points-overlay",behaviors:[appLocalization],properties:{olMap:Object,site:{type:Object,observer:"onSiteChanged"},emissionPoint:{type:Object,notify:!0,observer:"onEmissionPointChanged"}},observers:["onEpsChanged(site.eps)"],onSiteChanged:function(i){var t=this;return clearTimeout(this.zoomOutTO),i?(this.set("site",i),void this.resetSelection()):(this.set("eps",null),void(this.zoomOutTO=setTimeout(function(){t.zoomOut()},100)))},onEpsChanged:function(i){this.site&&i&&this.resetSelection()},zoomOut:function(){if(this.location.point){var i=this.olMap.getView(),t=ol.animation.pan({source:i.getCenter(),duration:500}),e=i.getResolution(),o=10*this.location.radius,s=ol.animation.zoom({resolution:e,duration:500});this.olMap.beforeRender(t,s),i.setCenter(this.location.point),i.setResolution(o)}},onEmissionPointChanged:function(i){this.resetSelection(),i&&(this.selectEmissionPoint(i),this.async(this.transitionToEmissionPoint,1),this.async(this.scrollToEmissionPoint,1))},onEmissionPointClicked:function(i){var t=Polymer.dom(i).rootTarget,e=t.ep;return this.emissionPoint&&this.emissionPoint.uri===e.uri?this.set("emissionPoint",null):void this.set("emissionPoint",e)},selectEmissionPoint:function(i){for(var t=this.$.overlay.querySelectorAll(".ep"),e=0;e<t.length;e++)t[e].ep.uri===i.uri?t[e].classList.add("selected"):t[e].classList.remove("selected")},transitionToEmissionPoint:function(){var i=this.olMap.getView(),t=ol.animation.pan({source:i.getCenter(),duration:500}),e=i.getResolution(),o=12,s=ol.animation.zoom({resolution:e,duration:500});e>o&&(this.olMap.beforeRender(t,s),i.setCenter([this.site.x,this.site.y]),i.setResolution(o))},scrollToEmissionPoint:function(){var i=this.$$(".eps"),t=this.$$(".ep.selected"),e=t.offsetTop,o=i.scrollTop,s=i.clientHeight,n=t.offsetHeight,r=e+n-s,l=e,a=o;o<r?a=r:o>l&&(a=l),anime({targets:i,scrollTop:a,easing:"easeOutCubic"})},resetSelection:function(){for(var i=this.$.overlay.querySelectorAll(".selected"),t=0;t<i.length;t++)i[t].classList.remove("selected")}})</script>
+</dom-module>

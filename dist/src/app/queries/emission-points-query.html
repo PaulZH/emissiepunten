@@ -1,0 +1,19 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.0.7"/>
+<dom-module id="emission-points-query">
+<template>
+<ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon  WHERE {
+                ?ep a milieu:Emissiepunt ;
+                    rdfs:label ?epLabel ;
+                    wgs84_pos:lat ?epLat ;
+                    wgs84_pos:long ?epLon ;
+                    milieu:exploitatie &lt;{{site.uri}}&gt; ;
+                    milieu:exploitatie ?site .
+                ?site rdfs:label ?siteLabel .
+            }
+            ORDER BY DESC(?epLat) DESC(?epLon)
+        </ev-sparql-query>
+</template>
+<script>Polymer({is:"emission-points-query",properties:{response:{type:Object,notify:!0},site:{type:Object}},execute:function(){this.$.query.execute()}})</script>
+</dom-module>

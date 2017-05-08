@@ -1,0 +1,17 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.0.7"/>
+<link rel="import" href="../../../config/app-config.html?1.0.7"/>
+<dom-module id="site-data-query">
+<template>
+<ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?p ?o WHERE {
+                SERVICE &lt;{{apis.cbb}}&gt; {
+                    &lt;{{site.uri}}&gt; ?p ?o .
+                }
+            }
+            ORDER BY ?p
+            LIMIT 100
+        </ev-sparql-query>
+</template>
+<script>Polymer({is:"site-data-query",behaviors:[appConfig],properties:{response:{type:Object,notify:!0},site:{type:Object}},execute:function(){this.site&&this.site.uri&&this.$.query.execute()}})</script>
+</dom-module>

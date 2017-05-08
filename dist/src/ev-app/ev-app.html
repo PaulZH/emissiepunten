@@ -1,0 +1,25 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.7"/>
+<link rel="import" href="../ev-site-list/ev-site-list.html?1.0.7"/>
+<link rel="import" href="../ev-map/ev-map.html?1.0.7"/>
+<link rel="import" href="../anime/anime-assets.html?1.0.7"/>
+<link rel="import" href="../app/app-styles.html?1.0.7"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.0.7"/>
+<dom-module id="ev-app">
+<template>
+<style include="app-styles">:host{display:block}ev-site-list{margin-bottom:16px}[w7a] #list-and-map{@apply(--layout-horizontal)}[w7a] ev-site-list{max-width:40%;margin-right:16px;margin-bottom:0}[w7a] ev-site-list{@apply(--layout-flex)}ev-map{@apply(--layout-flex-2);max-width:100%}[w9a] ev-map{@apply(--layout-flex-3)}[w10a] ev-map{@apply(--layout-flex-4)}ev-data-pane{margin-top:16px}</style>
+<ev-responsive>
+<section id="list-and-map">
+<ev-site-list geolocate="{{geolocate}}" location="{{location}}" sites="{{sites}}" selected-site="{{selectedSite}}"></ev-site-list>
+<ev-map location="{{location}}" geolocate="{{geolocate}}" sites="{{sites}}" selected-site="{{selectedSite}}" selected-emission-point="{{selectedEmissionPoint}}"></ev-map>
+</section>
+<template is="dom-if" if="[[deferredElementsLoaded]]">
+<ev-data-pane site="{{selectedSite}}" emission-point="{{selectedEmissionPoint}}"></ev-data-pane>
+<app-location route="{{route}}"></app-location>
+<app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{tailData}}"></app-route>
+</template>
+</ev-responsive>
+</template>
+<script>Polymer({is:"ev-app",behaviors:[appLazyloading],properties:{view:{type:String,reflectToAttribute:!0,value:app.activeView,observer:"onViewChanged"},query:{type:Object},location:{type:Object,value:{lat:null,lon:null,radius:10,point:null}},selectedSite:{type:Object,value:null},selectedEmissionPoint:{type:Object,value:null}},observers:["onRouteChanged(routeData)","onRouteChanged(tailData)","onDataPaneActive(selectedSite,selectedEmissionPoint)","onSiteSelected(selectedSite)"],attached:function(){this.async(this.renderDeferredElements,100)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-data-pane/ev-data-pane.html?1.0.7","../../bower_components/app-route/app-location.html?1.0.7","../../bower_components/app-route/app-route.html?1.0.7"]).then(function(){e.set("deferredElementsLoaded",!0)})},onDataPaneActive:function(e,t){(e||t)&&(this.expandCanvas(),this.debounce("adjustCanvas",function(){this.scrollIn()},750))},expandCanvas:function(){this.style.minHeight=this.offsetHeight+"px"},scrollIn:function(){var e=document.body.scrollTop||document.documentElement.scrollTop,t=this.$$("ev-map").offsetTop-4,a=e;e<t&&(a=t),anime({targets:[document.body,document.documentElement],scrollTop:a,easing:"easeOutCubic"})},onRouteChanged:function(){this.tailData&&null!==this.tailData.prefix&&(this.view=(this.tailData.prefix||"")+(this.tailData.path||""),this.query=this.tailData.__queryParams)},onViewChanged:function(){this.view!==app.activeView&&(app.activeView=this.view)},onSiteSelected:function(e){e&&this.$$("app-location").set("__query","site="+e.uri)}})</script>
+</dom-module>

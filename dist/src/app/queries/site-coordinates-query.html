@@ -1,0 +1,27 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.0.7"/>
+<link rel="import" href="../../../config/app-config.html?1.0.7"/>
+<dom-module id="site-coordinates-query">
+<template>
+<ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?site ?x ?y WHERE {
+                SERVICE &lt;{{apis.cbb}}&gt; {
+                    # duplicate first site so that we can have a leading UNION in the dom-repeat
+                    {
+                        ?site milieu:lambert72_x ?x ;
+                              milieu:lambert72_y ?y .
+                        FILTER(?site  = &lt;{{sites.0.uri}}&gt;)
+                    }
+                    <template is="dom-repeat" items="{{sites}}">
+                        UNION {
+                            ?site milieu:lambert72_x ?x ;
+                                  milieu:lambert72_y ?y .
+                            FILTER(?site = &lt;{{item.uri}}&gt;)
+                        }
+                    </template>
+                }
+            }
+        </ev-sparql-query>
+</template>
+<script>Polymer({is:"site-coordinates-query",behaviors:[appConfig],properties:{response:{type:Object,notify:!0},sites:{type:Array}},execute:function(){this.$.query.execute()}})</script>
+</dom-module>

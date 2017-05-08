@@ -29,6 +29,8 @@ Flanders Emission Explorer
             * `step-definitions.js` - CucumberJS step definitions
         * `/fixtures`               - Spec fixtures
         * `/reports`                - Test runner reports
+* `/dist`                           - Latest production-ready release
+* `/scripts`                        - Build scripts
 * `/src`                            - Project module files
     * `/$MODULE`                    - module directory ("app" is used for the main application module)
         * `/doc`                    - module documentation

@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.7"/>
+<link rel="import" href="../ev-data-table/ev-data-table.html?1.0.7"/>
+<link rel="import" href="../ev-substance-selector/ev-substance-selector.html?1.0.7"/>
+<link rel="import" href="../ev-emission-vega-chart/ev-emission-vega-chart.html?1.0.7"/>
+<link rel="import" href="../app/queries/site-data-query.html?1.0.7"/>
+<link rel="import" href="../app/queries/site-emissions-query.html?1.0.7"/>
+<link rel="import" href="../app/app-styles.html?1.0.7"/>
+<link rel="import" href="../../config/app-config.html?1.0.7"/>
+<link rel="import" href="../app/behaviors/app-term-labels.html?1.0.7"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.0.7"/>
+<dom-module id="ev-site">
+<template>
+<style include="app-styles">:host{display:block}[w7a] .columns{@apply(--layout-horizontal)}.columns>*{padding:16px;box-sizing:border-box;overflow:hidden;min-height:350px}[w7a] .columns>*{flex:0 0 50%;@apply(--layout-self-stretch);min-width:0}.columns>:first-child{border-bottom:1px solid var(--ev-app-grey-6)}[w7a] .columns>:first-child{border-right:1px solid var(--ev-app-grey-6);border-bottom:none}</style>
+<site-data-query site="{{site}}" response="{{siteDataResponse}}"></site-data-query>
+<site-emissions-query site="{{site}}" response="{{emissionsResponse}}"></site-emissions-query>
+<ev-responsive>
+<div class="columns">
+<div id="data">
+<template is="dom-if" if="{{siteDataResponse}}" restamp="true">
+<ev-data-table table-title="{{localize('site_data')}}" data="{{siteDataResponse}}" term-labels="{{termLabels}}" ld-uri="{{site.uri}}"></ev-data-table>
+</template>
+</div>
+<div id="charts">
+<div>
+<template is="dom-if" if="{{emissions}}">
+<div class="controls">
+<ev-substance-selector substances="{{emissions.substances}}" substance="{{selectedSubstance}}"></ev-substance-selector>
+<span class="heading">{{localize('site_emissions')}}</span>
+</div>
+<div class="chart">
+<ev-emission-vega-chart data="{{emissions}}" substance="{{selectedSubstance}}"></ev-emission-vega-chart>
+</div>
+</template>
+<template is="dom-if" if="{{!emissions}}">
+<div class="no-emissions">
+{{localize('no_emission_data')}}
+</div>
+</template>
+</div>
+</div>
+</div>
+</ev-responsive>
+</template>
+<script>Polymer({is:"ev-site",behaviors:[appConfig,appTermLabels,appLocalization],properties:{site:{type:Object,observer:"onSiteChanged"},emissions:{type:Object}},observers:["onEmissionsLoaded(emissionsResponse)"],onSiteChanged:function(e){e&&this.async(function(){this.$$("site-data-query").execute(),this.$$("site-emissions-query").execute()},1)},onEmissionsLoaded:function(e){var s=this;this.set("emissions",null);var i=e?e.bindings:[],n={substances:[]};i.forEach(function(e){var i=e.year.value,t=s.getTermLabel(e.substance.value),a=parseFloat(e.amount.value),o=s.getTermLabel(e.unit.value),u=e.seeAlso?e.seeAlso.value:null;n[t]||(n[t]={},n.substances.push(t)),n[t][i]||(n[t][i]={unit:o,amount:0,link:u}),n[t][i].amount+=a}),n.substances.length&&this.set("emissions",n)}})</script>
+</dom-module>
