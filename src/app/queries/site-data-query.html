@@ -41,7 +41,9 @@
             },
 
             execute: function () {
-                this.$.query.execute();
+                if (this.site && this.site.uri) {
+                    this.$.query.execute();
+                }
             }
         });
     </script>
