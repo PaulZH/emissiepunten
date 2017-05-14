@@ -8,7 +8,7 @@
 
     <template>
         <ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
-            SELECT ?year ?substance ?amount ?unit ?seeAlso WHERE {
+            SELECT DISTINCT ?obs ?year ?substance ?amount ?unit ?seeAlso WHERE {
                 ?obs a cube:Observation ;
                      milieu:referentiegebied ?ep ;
                      milieu:tijdsperiode ?year ;
