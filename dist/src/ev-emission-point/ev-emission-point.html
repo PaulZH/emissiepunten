@@ -1,15 +1,16 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.7"/>
-<link rel="import" href="../ev-data-table/ev-data-table.html?1.0.7"/>
-<link rel="import" href="../ev-sparql-query/ev-sparql-query.html?1.0.7"/>
-<link rel="import" href="../ev-substance-selector/ev-substance-selector.html?1.0.7"/>
-<link rel="import" href="../ev-emission-vega-chart/ev-emission-vega-chart.html?1.0.7"/>
-<link rel="import" href="../app/queries/emission-point-data-query.html?1.0.7"/>
-<link rel="import" href="../app/queries/emission-point-emissions-query.html?1.0.7"/>
-<link rel="import" href="../app/app-styles.html?1.0.7"/>
-<link rel="import" href="../app/behaviors/app-term-labels.html?1.0.7"/>
-<link rel="import" href="../app/behaviors/app-localization.html?1.0.7"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.8"/>
+<link rel="import" href="../ev-data-table/ev-data-table.html?1.0.8"/>
+<link rel="import" href="../ev-sparql-query/ev-sparql-query.html?1.0.8"/>
+<link rel="import" href="../ev-substance-selector/ev-substance-selector.html?1.0.8"/>
+<link rel="import" href="../ev-emission-vega-chart/ev-emission-vega-chart.html?1.0.8"/>
+<link rel="import" href="../app/queries/emission-point-data-query.html?1.0.8"/>
+<link rel="import" href="../app/queries/emission-point-emissions-query.html?1.0.8"/>
+<link rel="import" href="../app/app-styles.html?1.0.8"/>
+<link rel="import" href="../app/behaviors/app-term-labels.html?1.0.8"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.0.8"/>
+<link rel="import" href="../app/behaviors/app-emissions-aggregator.html?1.0.8"/>
 <dom-module id="ev-emission-point">
 <template>
 <style include="app-styles">:host{display:block}[w7a] .columns{@apply(--layout-horizontal)}.columns>*{padding:16px;box-sizing:border-box;overflow:hidden;min-height:350px}[w7a] .columns>*{flex:0 0 50%;@apply(--layout-self-stretch);min-width:0}.columns>:first-child{border-bottom:1px solid var(--ev-app-grey-6)}[w7a] .columns>:first-child{border-right:1px solid var(--ev-app-grey-6);border-bottom:none}</style>
@@ -43,5 +44,5 @@
 </div>
 </ev-responsive>
 </template>
-<script>Polymer({is:"ev-emission-point",behaviors:[appTermLabels,appLocalization],properties:{emissionPoint:{type:Object,observer:"onEmissionPointChanged"},emissions:{type:Object}},observers:["onEmissionsLoaded(emissionsResponse)"],onEmissionPointChanged:function(s){s&&this.async(function(){this.$$("emission-point-data-query").execute(),this.$$("emission-point-emissions-query").execute()},1)},onEmissionsLoaded:function(s){var e=this;this.set("emissions",null);var i=s?s.bindings:[],n={substances:[]};i.forEach(function(s){var i=s.year.value,o=e.getTermLabel(s.substance.value),t=parseFloat(s.amount.value),a=e.getTermLabel(s.unit.value),u=s.seeAlso?s.seeAlso.value:null;n[o]||(n[o]={},n.substances.push(o)),n[o][i]||(n[o][i]={unit:a,amount:0,link:u}),n[o][i].amount+=t}),n.substances.length&&this.set("emissions",n)}})</script>
+<script>Polymer({is:"ev-emission-point",behaviors:[appTermLabels,appEmissionsAggregator,appLocalization],properties:{emissionPoint:{type:Object,observer:"onEmissionPointChanged"},emissions:{type:Object}},observers:["onEmissionsLoaded(emissionsResponse)"],onEmissionPointChanged:function(s){s&&this.async(function(){this.$$("emission-point-data-query").execute(),this.$$("emission-point-emissions-query").execute()},1)},onEmissionsLoaded:function(s){this.set("emissions",null);var i=s?s.bindings:[],e=this.aggregateEmissions(i);e.substances.length&&this.set("emissions",e)}})</script>
 </dom-module>

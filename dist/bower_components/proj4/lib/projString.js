@@ -1,19 +1,20 @@
-var D2R = 0.01745329251994329577;
-var PrimeMeridian = require('./constants/PrimeMeridian');
-var units = require('./constants/units');
+import {D2R} from './constants/values';
+import PrimeMeridian from './constants/PrimeMeridian';
+import units from './constants/units';
+import match from './match';
 
-module.exports = function(defData) {
+export default function(defData) {
   var self = {};
-  var paramObj = {};
-  defData.split("+").map(function(v) {
+  var paramObj = defData.split('+').map(function(v) {
     return v.trim();
   }).filter(function(a) {
     return a;
-  }).forEach(function(a) {
-    var split = a.split("=");
+  }).reduce(function(p, a) {
+    var split = a.split('=');
     split.push(true);
-    paramObj[split[0].toLowerCase()] = split[1];
-  });
+    p[split[0].toLowerCase()] = split[1];
+    return p;
+  }, {});
   var paramName, paramVal, paramOutname;
   var params = {
     proj: 'projName',
@@ -85,15 +86,17 @@ module.exports = function(defData) {
     },
     units: function(v) {
       self.units = v;
-      if (units[v]) {
-        self.to_meter = units[v].to_meter;
+      var unit = match(units, v);
+      if (unit) {
+        self.to_meter = unit.to_meter;
       }
     },
     from_greenwich: function(v) {
       self.from_greenwich = v * D2R;
     },
     pm: function(v) {
-      self.from_greenwich = (PrimeMeridian[v] ? PrimeMeridian[v] : parseFloat(v)) * D2R;
+      var pm = match(PrimeMeridian, v);
+      self.from_greenwich = (pm ? pm : parseFloat(v)) * D2R;
     },
     nadgrids: function(v) {
       if (v === '@null') {
@@ -129,4 +132,4 @@ module.exports = function(defData) {
     self.datumCode = self.datumCode.toLowerCase();
   }
   return self;
-};
+}
