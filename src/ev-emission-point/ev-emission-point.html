@@ -14,6 +14,7 @@
 <!-- behaviors -->
 <link rel="import" href="../app/behaviors/app-term-labels.html?##appVersion##"/>
 <link rel="import" href="../app/behaviors/app-localization.html?##appVersion##"/>
+<link rel="import" href="../app/behaviors/app-emissions-aggregator.html?##appVersion##"/>
 
 <dom-module id="ev-emission-point">
 
@@ -94,6 +95,7 @@
 
             behaviors: [
                 appTermLabels,
+                appEmissionsAggregator,
 				appLocalization
             ],
 
@@ -122,31 +124,11 @@
             },
 
             onEmissionsLoaded: function (emissionData) {
-                var self = this;
                 this.set('emissions', null);
                 var bindings = emissionData
                         ? emissionData.bindings
                         : [];
-                var emissions = { substances: []};
-                bindings.forEach(function (binding) {
-                    //noinspection JSUnresolvedVariable
-                    var year = binding.year.value;
-                    var substance = self.getTermLabel(binding.substance.value);
-                    var amount = parseFloat(binding.amount.value);
-                    var unit = self.getTermLabel(binding.unit.value);
-					//noinspection JSUnresolvedVariable
-					var substanceLink = binding.seeAlso
-                        ? binding.seeAlso.value
-                        : null;
-                    if (!emissions[substance]) {
-                        emissions[substance] = {};
-                        emissions.substances.push(substance);
-                    }
-                    if (!emissions[substance][year]) {
-						emissions[substance][year] = { unit: unit, amount: 0, link: substanceLink };
-                    }
-                    emissions[substance][year].amount += amount;
-                });
+                var emissions = this.aggregateEmissions(bindings);
                 if (emissions.substances.length) {
                     this.set('emissions', emissions);
                 }
