@@ -2,9 +2,9 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html"/>
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html"/>
 <link rel="import" href="../../bower_components/paper-item/paper-item.html"/>
-<link rel="import" href="../app/app-styles.html?1.0.8"/>
-<link rel="import" href="../app/app-fonts.html?1.0.8"/>
-<link rel="import" href="../app/behaviors/app-localization.html?1.0.8"/>
+<link rel="import" href="../app/app-styles.html?1.0.9"/>
+<link rel="import" href="../app/app-fonts.html?1.0.9"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.0.9"/>
 <dom-module id="ev-radius">
 <template>
 <style include="app-styles app-fonts">:host{display:block;position:absolute;right:.5em;top:.5em;font-family:"Flanders Sans",sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.15);background-color:rgba(255,255,255,.9);padding:0 4px;--paper-dropdown-menu-focus-color:var(--ev-app-green-2);--list-width:120px}paper-dropdown-menu-light{width:var(--list-width);--paper-dropdown-menu:{width:var(--list-width)};}paper-dropdown-menu-light paper-listbox{--paper-listbox:{width:var(--list-width)};}</style>
@@ -18,5 +18,5 @@
 </paper-listbox>
 </paper-dropdown-menu-light>
 </template>
-<script>Polymer({is:"ev-radius",behaviors:[appLocalization],properties:{selected:{type:Number,observer:"onSelectionChange"},radius:{type:Number,notify:!0}},attached:function(){this.preselectRadius()},preselectRadius:function(){for(var e=this.$.list.querySelectorAll("paper-item"),t=0;t<e.length;t++)parseInt(e[t].textContent)===this.radius&&this.set("selected",t)},onSelectionChange:function(e){var t=this.$$("#list paper-item:nth-child("+(e+1)+")");t&&this.set("radius",parseInt(t.textContent))}})</script>
+<script>Polymer({is:"ev-radius",behaviors:[appLocalization],properties:{selected:{type:Number,observer:"onSelectionChange"},radius:{type:Number,notify:!0,observer:"onRadiusChanged"}},attached:function(){this.preselectRadius()},preselectRadius:function(){for(var e=this.$.list.querySelectorAll("paper-item"),t=0;t<e.length;t++)parseInt(e[t].textContent)===this.radius&&this.set("selected",t)},onSelectionChange:function(e){var t=this.$$("#list paper-item:nth-child("+(e+1)+")");t&&this.set("radius",parseInt(t.textContent))},onRadiusChanged:function(e){this.debounce("onRadiusChanged",function(){this.preselectRadius()},250)}})</script>
 </dom-module>
