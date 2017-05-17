@@ -119,8 +119,8 @@
             observers: [
                 'onRouteChanged(routeData)',
                 'onRouteChanged(tailData)',
-                'onDataPaneActive(selectedSite,selectedEmissionPoint)',
-                'onSiteSelected(selectedSite)'
+                'onDataPaneActive(selectedSite, selectedEmissionPoint)',
+                'onAppStateChanged(location.point, location.radius, selectedSite, selectedEmissionPoint)'
             ],
 
             attached: function () {
@@ -200,9 +200,23 @@
                 app.activeView = this.view;
             },
 
-            onSiteSelected: function(site) {
-                if (site) {
-                    this.$$('app-location').set('__query', 'site=' + site.uri);
+            onAppStateChanged: function(point, radius, site, emissionPoint) {
+                var query = {
+                    x: point && point[0] ? point[0] : null,
+                    y: point && point[1] ? point[1] : null,
+                    r: radius ? radius : 10,
+                    site: site && site.uri ? site.uri.replace(/http:..id.milieuinfo.be.cbb.exploitatie.(.+)#id/, '$1') : null,
+                    ep: emissionPoint && emissionPoint.uri ? emissionPoint.uri.replace(/http:..id.milieuinfo.be.imjv.emissiepunt.(.+)#id/, '$1') : null
+                };
+                var queryString = '';
+                for (var arg in query) {
+                    if (query.hasOwnProperty(arg) && query[arg]) {
+                        queryString += queryString.length ? '&' : '';
+                        queryString += arg + '=' + query[arg];
+                    }
+                }
+                if (queryString.length && this.$$('app-location')) {
+                    this.$$('app-location').set('__query', queryString);
                 }
             }
         });
