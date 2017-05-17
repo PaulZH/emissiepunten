@@ -74,7 +74,8 @@
                 },
                 radius: {
                     type: Number,
-                    notify: true
+                    notify: true,
+                    observer: 'onRadiusChanged'
                 }
             },
 
@@ -97,10 +98,18 @@
                 if (selectedItem) {
                     this.set('radius', parseInt(selectedItem.textContent));
                 }
+            },
+
+            /**
+             * Updates the dropdown if the radius was changed programmatically
+             *
+             * @param {Number} radius
+             */
+            onRadiusChanged: function (radius) {
+                this.debounce('onRadiusChanged', function () {
+                    this.preselectRadius();
+                }, 250);
             }
-
         });
-
     </script>
-
 </dom-module>

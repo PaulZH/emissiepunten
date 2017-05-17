@@ -45,6 +45,10 @@
                 this.registerMapClicks();
             },
 
+            ready: function () {
+                this.updateFromInitialAppState();
+            },
+
             renderLocationLayer: function () {
                 //noinspection JSCheckFunctionSignatures
                 this.locationLayer = new ol.layer.Vector({
@@ -203,6 +207,27 @@
                     }
                 });
                 this.geolocation.setTracking(true);// trigger `change:position` events
+            },
+
+            /**
+             * Sets the location and radius once from the app's query string
+             */
+            updateFromInitialAppState: function () {
+                this.async(function () {
+                    var state = window.initialAppState || {};
+                    // exit if app state has no point information
+                    if (!state.x || !state.y) {
+                        return;
+                    }
+                    // exit if current point has been set already
+                    if (this.location && this.location.point) {
+                        return;
+                    }
+                    // set radius
+                    this.set('location.radius', state.r || 10);
+                    // set point
+                    this.updateLocationFromPoint([state.x, state.y]);
+                }, 250);
             }
         });
     </script>
