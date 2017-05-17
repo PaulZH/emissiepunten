@@ -122,6 +122,11 @@
                     type: Object,
                     notify: true,
                     observer: 'onEmissionPointChanged'
+                },
+                /** init once from query string */
+                updatedFromInitialAppState: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -150,6 +155,8 @@
                     return;
                 }
                 this.resetSelection();
+                // select emission point from query string once
+                this.updateFromInitialAppState();
             },
 
             zoomOut: function () {
@@ -264,6 +271,33 @@
                 for (var i = 0; i < items.length; i++) {
                     items[i].classList.remove('selected');
                 }
+            },
+
+            updateFromInitialAppState: function () {
+                this.async(function () {
+                    var state = window.initialAppState || {};
+                    // exit if app state has no emission point information
+                    if (!state.ep) {
+                        return;
+                    }
+                    // exit if app state has been initialized before
+                    if (this.updatedFromInitialAppState) {
+                        return;
+                    }
+                    // exit if no site is selected or eps are missing
+                    if (!this.site || !this.site.eps.length) {
+                        return;
+                    }
+                    // select emission point if part of selected site
+                    var epUri = 'http://id.milieuinfo.be/imjv/emissiepunt/' + state.ep + '#id';
+                    this.site.eps.forEach(function (ep) {
+                        if (ep.uri === epUri) {
+                            this.set('emissionPoint', ep);
+                        }
+                    }, this);
+                    this.updatedFromInitialAppState = true;
+                }, 250);
+
             }
         });
     </script>
