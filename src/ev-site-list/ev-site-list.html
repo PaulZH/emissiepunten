@@ -169,7 +169,8 @@
                 },
                 sites: {
                     type: Array,
-                    value: []
+                    value: [],
+                    observer: 'onSitesChanged'
                 },
                 selectedSite: {
                     type: Object,
@@ -183,6 +184,10 @@
                 geolocate: {
                     type: Boolean,
                     notify: true
+                },
+                updatedFromInitialAppState: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -193,6 +198,12 @@
             attached: function () {
                 // render deferred elements
                 this.async(this.renderDeferredElements, 100);
+            },
+
+            onSitesChanged: function (sites) {
+                if (sites.length) {
+                    this.updateFromInitialAppState();
+                }
             },
 
             /**
@@ -257,9 +268,28 @@
 
             onGeolocate: function () {
                 this.set('geolocate', true);
+            },
+
+            /**
+             * Sets the site once from the app's query string
+             */
+            updateFromInitialAppState: function () {
+                this.async(function () {
+                    var state = window.initialAppState || {};
+                    // exit if app state has no site information
+                    if (!state.site) {
+                        return;
+                    }
+                    // exit if app state has been initialized before
+                    if (this.updatedFromInitialAppState) {
+                        return;
+                    }
+                    // trigger site selection in list
+                    var site = { uri: 'http://id.milieuinfo.be/cbb/exploitatie/' + state.site + '#id' };
+                    this.onSiteSelected(site);
+                    this.updatedFromInitialAppState = true;
+                }, 250);
             }
         });
-
     </script>
-
 </dom-module>
