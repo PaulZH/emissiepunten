@@ -1,10 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-card/ev-card.html?1.0.9"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.9"/>
-<link rel="import" href="../app/app-styles.html?1.0.9"/>
-<link rel="import" href="../app/app-fonts.html?1.0.9"/>
-<link rel="import" href="../app/behaviors/app-lazyloading.html?1.0.9"/>
-<link rel="import" href="../app/behaviors/app-localization.html?1.0.9"/>
+<link rel="import" href="../ev-card/ev-card.html?1.0.10"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.0.10"/>
+<link rel="import" href="../app/app-styles.html?1.0.10"/>
+<link rel="import" href="../app/app-fonts.html?1.0.10"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.0.10"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.0.10"/>
 <dom-module id="ev-site-list">
 <template>
 <style include="app-styles app-fonts">:host{display:block}ev-card{--ev-card-title:{border-bottom:1px solid #fff};--ev-card-content:{max-height:360px};}[w7a] ev-card{--ev-card-content:{height:410px};}[w7a] p{padding:20px}p{padding:8px 20px;text-align:center;line-height:1.5}[w7a] p.intro{margin-top:20px}p.get-started .heading{display:block;font-weight:500;margin-bottom:16px}span.sub-info{display:block;margin-top:8px;color:var(--ev-app-grey-4)}paper-button{background-color:var(--ev-app-green-2);color:#fff;font-size:15px;font-weight:500;font-family:"Flanders Sans",sans-serif;padding-right:16px}iron-icon{margin-right:12px;--iron-icon-width:20px;--iron-icon-height:20px}iron-list{height:100%}.list-item{padding:16px 16px 16px 60px;min-height:60px;background:transparent url(img/site-icon-34x34.png) 16px 16px no-repeat;border-bottom:1px solid var(--ev-app-grey-6);background-size:34px;color:var(--ev-app-green-1);cursor:pointer}.list-item:hover{background-color:var(--ev-app-green-3)}.list-item.selected{background-color:var(--ev-app-green-2);color:#fff}.ep-count{font-size:.9em;padding-top:4px}</style>
@@ -23,7 +23,7 @@
 </p>
 </template>
 <template is="dom-if" if="{{sites.length}}" restamp="true">
-<iron-list items="{{sites}}" selection-enabled selected-item="{{selectedItem}}">
+<iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
 <template>
 <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
 [[item.label]]
@@ -36,5 +36,5 @@
 </ev-card>
 </ev-responsive>
 </template>
-<script>Polymer({is:"ev-site-list",behaviors:[appLazyloading,appLocalization],properties:{deferredElementsLoaded:{type:Boolean,value:!1},title:{type:String},location:{type:Object},sites:{type:Array,value:[],observer:"onSitesChanged"},selectedSite:{type:Object,observer:"onSiteSelected",notify:!0},selectedItem:{type:Object,observer:"onSelectionChanged"},geolocate:{type:Boolean,notify:!0},updatedFromInitialAppState:{type:Boolean,value:!1}},observers:["onSearch(location.*,sites)"],attached:function(){this.async(this.renderDeferredElements,100)},onSitesChanged:function(e){e.length&&this.updateFromInitialAppState()},renderDeferredElements:function(){var e=this;this.lazyload(["../../bower_components/paper-button/paper-button.html","../../bower_components/iron-icon/iron-icon.html","../../bower_components/iron-icons/maps-icons.html","../../bower_components/iron-list/iron-list.html"]).then(function(){e.set("deferredElementsLoaded",!0)})},onSearch:function(){if(this.localize){var e=this.$$("ev-card"),t=this.localize("intro_title");this.location.point&&(t=this.localize("sites_found","count",this.sites.length)),e.set("title",t)}},onSiteSelected:function(e){var t=this.$$("iron-list");if(t)return e?void(t.selectedItem&&t.selectedItem.uri===e.uri||this.sites.forEach(function(i){i.uri===e.uri&&(t.selectItem(i),t.scrollToItem(i))})):t.clearSelection()},getItemClass:function(e){return e?"list-item selected":"list-item"},onSelectionChanged:function(e){this.selectedSite=e},onGeolocate:function(){this.set("geolocate",!0)},updateFromInitialAppState:function(){this.async(function(){var e=window.initialAppState||{};if(e.site&&!this.updatedFromInitialAppState){var t={uri:"http://id.milieuinfo.be/cbb/exploitatie/"+e.site+"#id"};this.onSiteSelected(t),this.updatedFromInitialAppState=!0}},250)}})</script>
+<script>Polymer({is:"ev-site-list",behaviors:[appLazyloading,appLocalization],properties:{deferredElementsLoaded:{type:Boolean,value:!1},title:{type:String},location:{type:Object},sites:{type:Array,value:[]},selectedSite:{type:Object,observer:"onSiteSelected",notify:!0},selectedItem:{type:Object,observer:"onSelectionChanged"},geolocate:{type:Boolean,notify:!0},updatedFromInitialAppState:{type:Boolean,value:!1}},observers:["onSearch(location.*,sites)"],attached:function(){this.async(this.renderDeferredElements,100)},renderDeferredElements:function(){var t=this;this.lazyload(["../../bower_components/paper-button/paper-button.html","../../bower_components/iron-icon/iron-icon.html","../../bower_components/iron-icons/maps-icons.html","../../bower_components/iron-list/iron-list.html"]).then(function(){t.set("deferredElementsLoaded",!0)})},onSearch:function(){if(this.localize){var t=this.$$("ev-card"),e=this.localize("intro_title");this.location.point&&(e=this.localize("sites_found","count",this.sites.length)),t.set("title",e),this.sites.length&&this.updateFromInitialAppState()}},onSiteSelected:function(t){var e=this.$$("iron-list");if(e)return t?void(e.selectedItem&&e.selectedItem.uri===t.uri||this.sites.forEach(function(i){i.uri===t.uri&&(e.selectItem(i),e.scrollToItem(i))})):e.clearSelection()},getItemClass:function(t){return t?"list-item selected":"list-item"},onSelectionChanged:function(t){this.selectedSite=t},onGeolocate:function(){this.set("geolocate",!0)},updateFromInitialAppState:function(){this.async(function(){var t=window.initialAppState||{};if(t.site&&!this.updatedFromInitialAppState){var e=this.$$("iron-list"),i=e?e.querySelectorAll(".list-item").length:0;if(this.sites.length&&!i){var o=this.sites;return void this.async(function(){this.set("sites",[]),this.set("sites",o),this.updateFromInitialAppState()},250)}var n={uri:"http://id.milieuinfo.be/cbb/exploitatie/"+t.site+"#id"};this.onSiteSelected(n),this.updatedFromInitialAppState=!0}},250)}})</script>
 </dom-module>
