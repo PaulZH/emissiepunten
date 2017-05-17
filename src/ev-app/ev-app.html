@@ -139,6 +139,7 @@
                     "../../bower_components/app-route/app-route.html?##appVersion##"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
+                    self.async(self.rebuildAppState, 100);
                 });
             },
 
@@ -218,6 +219,25 @@
                 if (queryString.length && this.$$('app-location')) {
                     this.$$('app-location').set('__query', queryString);
                 }
+            },
+
+            rebuildAppState: function () {
+                var queryString = this.$$('app-location') ? this.$$('app-location').get('__query') : '';
+                if (!queryString) {
+                    return;
+                }
+                window.initialAppState = {
+                    x: parseFloat(this.readQueryArg(queryString, 'x', 0)),
+                    y: parseFloat(this.readQueryArg(queryString, 'y', 0)),
+                    r: parseInt(this.readQueryArg(queryString, 'r', 10)),
+                    site: this.readQueryArg(queryString, 'site'),
+                    ep: this.readQueryArg(queryString, 'ep')
+                };
+            },
+
+            readQueryArg: function (queryString, arg, defaultValue) {
+                var matches = queryString.match(new RegExp('(^|&)' + arg + '=([^&]+)'));
+                return matches ? matches[2] : defaultValue || '';
             }
         });
     </script>
