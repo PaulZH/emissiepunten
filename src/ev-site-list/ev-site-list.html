@@ -129,7 +129,7 @@
 
                     <!-- sites found -->
                     <template is="dom-if" if="{{sites.length}}" restamp="true">
-                        <iron-list items="{{sites}}" selection-enabled selected-item="{{selectedItem}}">
+                        <iron-list items="[[sites]]" selection-enabled selected-item="{{selectedItem}}">
                             <template>
                                 <div class$="[[getItemClass(selected)]]" data-uri$="[[item.uri]]">
                                     [[item.label]]
@@ -169,8 +169,7 @@
                 },
                 sites: {
                     type: Array,
-                    value: [],
-                    observer: 'onSitesChanged'
+                    value: []
                 },
                 selectedSite: {
                     type: Object,
@@ -200,12 +199,6 @@
                 this.async(this.renderDeferredElements, 100);
             },
 
-            onSitesChanged: function (sites) {
-                if (sites.length) {
-                    this.updateFromInitialAppState();
-                }
-            },
-
             /**
              * Defers expensive and/or less important elements
              */
@@ -231,6 +224,9 @@
             		 title = this.localize('sites_found', 'count', this.sites.length);
                 }
                 $card.set('title', title);
+            	if (this.sites.length) {
+                    this.updateFromInitialAppState();
+                }
             },
 
             onSiteSelected: function (site) {
@@ -282,6 +278,19 @@
                     }
                     // exit if app state has been initialized before
                     if (this.updatedFromInitialAppState) {
+                        return;
+                    }
+                    // fix iron-list if it didn't render properly
+                    var list = this.$$('iron-list');
+                    var listSize = list ? list.querySelectorAll('.list-item').length : 0;
+                    if (this.sites.length && !listSize) {
+                        var sites = this.sites;
+                        this.async(function () {
+                            this.set('sites', []);
+                            this.set('sites', sites);
+                            // try again
+                            this.updateFromInitialAppState();
+                        }, 250);
                         return;
                     }
                     // trigger site selection in list
