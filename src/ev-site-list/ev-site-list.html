@@ -6,6 +6,7 @@
 <link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <link rel="import" href="../app/app-fonts.html?##appVersion##"/>
 <!-- behaviors -->
+<link rel="import" href="../../config/app-config.html?##appVersion##"/>
 <link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 <link rel="import" href="../app/behaviors/app-localization.html?##appVersion##"/>
 
@@ -152,6 +153,7 @@
             is: 'ev-site-list',
 
             behaviors: [
+                appConfig,
                 appLazyloading,
 				appLocalization
             ],
@@ -294,7 +296,7 @@
                         return;
                     }
                     // trigger site selection in list
-                    var site = { uri: 'http://id.milieuinfo.be/cbb/exploitatie/' + state.site + '#id' };
+                    var site = { uri: this.config('siteUriBase') + state.site + '#id' };
                     this.onSiteSelected(site);
                     this.updatedFromInitialAppState = true;
                 }, 250);

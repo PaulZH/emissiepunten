@@ -8,6 +8,7 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <!-- behaviors -->
+<link rel="import" href="../../config/app-config.html?##appVersion##"/>
 <link rel="import" href="../app/behaviors/app-lazyloading.html?##appVersion##"/>
 
 <dom-module id="ev-app">
@@ -84,6 +85,7 @@
             is: 'ev-app',
 
             behaviors: [
+                appConfig,
                 appLazyloading
             ],
 
@@ -206,8 +208,8 @@
                     x: point && point[0] ? point[0] : null,
                     y: point && point[1] ? point[1] : null,
                     r: radius ? radius : 10,
-                    site: site && site.uri ? site.uri.replace(/http:..id.milieuinfo.be.cbb.exploitatie.(.+)#id/, '$1') : null,
-                    ep: emissionPoint && emissionPoint.uri ? emissionPoint.uri.replace(/http:..id.milieuinfo.be.imjv.emissiepunt.(.+)#id/, '$1') : null
+                    site: site && site.uri ? this.shortenUri(site.uri, this.config('siteUriBase')) : null,
+                    ep: emissionPoint && emissionPoint.uri ? this.shortenUri(emissionPoint.uri, this.config('emissionPointUriBase')) : null,
                 };
                 var queryString = '';
                 for (var arg in query) {
@@ -219,6 +221,12 @@
                 if (queryString.length && this.$$('app-location')) {
                     this.$$('app-location').set('__query', queryString);
                 }
+            },
+
+            shortenUri: function (uri, uriBase) {
+                return uri
+                        .replace(uriBase, '')
+                        .replace(/#id$/, '');
             },
 
             rebuildAppState: function () {

@@ -6,6 +6,7 @@
 <!-- styles -->
 <link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <!-- behaviors -->
+<link rel="import" href="../../config/app-config.html?##appVersion##"/>
 <link rel="import" href="../app/behaviors/app-localization.html?##appVersion##"/>
 
 <dom-module id="ev-map-emission-points-overlay">
@@ -106,6 +107,7 @@
             is: 'ev-map-emission-points-overlay',
 
 			behaviors: [
+                appConfig,
 				appLocalization
 			],
 
@@ -289,7 +291,7 @@
                         return;
                     }
                     // select emission point if part of selected site
-                    var epUri = 'http://id.milieuinfo.be/imjv/emissiepunt/' + state.ep + '#id';
+                    var epUri = this.config('emissionPointUriBase') + state.ep + '#id';
                     this.site.eps.forEach(function (ep) {
                         if (ep.uri === epUri) {
                             this.set('emissionPoint', ep);
