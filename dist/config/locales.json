@@ -17,7 +17,8 @@
     "site_data": "Exploitatiegegevens",
     "site_emissions": "Emissies van de site",
     "substance": "Stof",
-    "year": "Jaar"
+    "year": "Jaar",
+    "map_search": "Zoek een plaats"
   },
   "en": {
     "restart": "Restart",
@@ -37,6 +38,7 @@
     "site_data": "Site Data",
     "site_emissions": "Site Emissions",
     "substance": "Substance",
-    "year": "Year"
+    "year": "Year",
+    "map_search": "Find a place"
   }
 }

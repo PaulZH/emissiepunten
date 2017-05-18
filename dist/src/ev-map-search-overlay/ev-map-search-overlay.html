@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../bower_components/paper-input/paper-input.html"/>
+<link rel="import" href="../../bower_components/iron-jsonp-library/iron-jsonp-library.html"/>
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html"/>
+<link rel="import" href="../app/app-styles.html?1.1.0"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.1.0"/>
+<dom-module id="ev-map-search-overlay">
+<style include="app-styles">:host{--paper-input-container-focus-color:var(--ev-app-green-2)}#overlay{display:block;position:absolute;left:8px;top:8px;width:200px;max-height:394px;box-shadow:0 1px 2px rgba(0,0,0,.15);background-color:rgba(255,255,255,.9);padding:0 4px}.suggestions{overflow:scroll;max-height:332px;background-color:rgba(255,255,255,.7);position:relative}.suggestion{border-bottom:1px solid;padding:8px 16px;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--ev-app-grey-6);color:var(--ev-app-green-1);cursor:pointer;font-size:.95em}.suggestion:focus,.suggestion:hover{background-color:var(--ev-app-green-3);outline:0}</style>
+<template>
+<div id="overlay" hidden$="{{site}}">
+<iron-a11y-keys target="[[input]]" keys="down" on-keys-pressed="onInputDown"></iron-a11y-keys>
+<iron-a11y-keys target="[[input]]" keys="enter" on-keys-pressed="onInputEnter"></iron-a11y-keys>
+<iron-a11y-keys target="[[list]]" keys="down" on-keys-pressed="onListDown"></iron-a11y-keys>
+<iron-a11y-keys target="[[list]]" keys="up" on-keys-pressed="onListUp"></iron-a11y-keys>
+<iron-a11y-keys target="[[list]]" keys="enter" on-keys-pressed="onListEnter"></iron-a11y-keys>
+<paper-input autofocus autocomplete="off" always-float-label label="{{localize('map_search')}}" placeholder="..." value="{{value}}" on-value-changed="onChange"></paper-input>
+<div class="suggestions" hidden$="{{!suggestions.length}}">
+<template is="dom-repeat" items="{{suggestions}}">
+<div tabindex$="{{index}}" class="suggestion" suggestion$="[[item]]" title$="[[item]]" on-tap="onSuggestionClicked">
+[[item]]
+</div>
+</template>
+</div>
+</div>
+<iron-jsonp-library id="api" library-url="" notify-event="api-response" on-api-response="onApiResponse"></iron-jsonp-library>
+</template>
+<script>Polymer({is:"ev-map-search-overlay",behaviors:[appLocalization],properties:{location:{type:Object,notify:!0},site:Object,suggestion:String,value:String},ready:function(){this.set("input",this.$$("paper-input")),this.set("list",this.$$(".suggestions")),this.input.inputElement.spellcheck&&(this.input.inputElement.spellcheck=!1)},onChange:function(){this.value&&this.value!==this.suggestion?this.debounce("search",this.search,250):this.set("suggestions",[])},search:function(){this.$.api.set("libraryUrl","https://loc.geopunt.be/v3/suggestion?q="+encodeURIComponent(this.value)+"&c=25&callback=%%callback%%")},onApiResponse:function(t,e){if(e&&e.length){if(e[0].SuggestionResult)this.set("suggestions",e[0].SuggestionResult);else if(e[0].LocationResult&&e[0].LocationResult[0].Location){this.set("suggestions",[]);var s=e[0].LocationResult[0].Location;this.set("location",{lat:s.Lat_WGS84,lon:s.Lon_WGS84,point:[s.X_Lambert72,s.Y_Lambert72],radius:this.location.radius})}}else this.set("suggestions",[])},onSuggestionClicked:function(t){var e=Polymer.dom(t).rootTarget;this.suggestion=e.getAttribute("suggestion"),this.set("value",this.suggestion),this.$$("paper-input").focus(),this.$.api.set("libraryUrl","https://loc.geopunt.be/v3/location?q="+encodeURIComponent(this.suggestion)+"&c=1&callback=%%callback%%")},onInputEnter:function(){this.value&&this.debounce("search",this.search,250)},onInputDown:function(t){t.detail.keyboardEvent.preventDefault(),this.moveFocus("down")},onListDown:function(t){t.detail.keyboardEvent.preventDefault(),this.moveFocus("down")},onListUp:function(t){t.detail.keyboardEvent.preventDefault(),this.moveFocus("up")},moveFocus:function(t){var e,s=this.list.querySelectorAll(".suggestion"),i=this.list.querySelector(".suggestion:focus"),n=i?parseInt(i.getAttribute("tabindex")):-1;e="down"===t?s[n+1]||null:"up"===t&&0===n?this.input:s[n-1]||null,e&&(i?i.blur():this.input.blur(),e.focus())},onListEnter:function(t){t.detail.keyboardEvent.preventDefault();var e=this.list.querySelector(".suggestion:focus");e&&e.click()}})</script>
+</dom-module>
