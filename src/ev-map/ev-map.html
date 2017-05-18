@@ -105,6 +105,9 @@
                         location="{{location}}"
                         site="{{selectedSite}}"
                         emission-point="{{selectedEmissionPoint}}"></ev-map-emission-points-overlay>
+                <ev-map-search-overlay
+                        location="{{location}}"
+                        site="{{selectedSite}}"></ev-map-search-overlay>
             </template>
         </ev-card>
 
@@ -243,7 +246,8 @@
                     "../ev-radius/ev-radius.html?##appVersion##",
                     "../ev-map-location-layer/ev-map-location-layer.html?##appVersion##",
                     "../ev-map-markers-layer/ev-map-markers-layer.html?##appVersion##",
-                    "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html?##appVersion##"
+                    "../ev-map-emission-points-overlay/ev-map-emission-points-overlay.html?##appVersion##",
+                    "../ev-map-search-overlay/ev-map-search-overlay.html?##appVersion##"
                 ]).then(function () {
                     self.set('deferredElementsLoaded', true);
                     self.triggerResize();
