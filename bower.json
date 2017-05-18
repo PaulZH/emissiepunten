@@ -32,6 +32,7 @@
     "iron-icons": "^1.1.3",
     "iron-ajax": "^1.4.3",
     "paper-button": "^1.0.13",
+    "paper-input": "^1.1.0",
     "proj4": "^2.3.15",
     "ol3": "https://github.com/openlayers/ol3/releases/download/v3.18.2/v3.18.2-dist.zip",
     "paper-dropdown-menu": "^1.4.1",
@@ -45,7 +46,9 @@
     "vega-embed": "https://vega.github.io/vega-editor/vendor/vega-embed.min.js",
     "animejs": "^1.1.2",
     "polymer-cookie": "^1.1.1",
-    "app-localize-behavior": "PolymerElements/app-localize-behavior#^0.10.1"
+    "app-localize-behavior": "PolymerElements/app-localize-behavior#^0.10.1",
+    "iron-jsonp-library": "^2.0.0",
+    "iron-a11y-keys": "^2.0.0"
   },
   "devDependencies": {
     "living-cukes": "bnowack/living-cukes"
