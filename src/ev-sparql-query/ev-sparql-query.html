@@ -86,6 +86,7 @@
                 this.onQueryEnded(false);
                 if (this.$.api.lastResponse && this.$.api.lastResponse.results) {
                     this.set('results', this.$.api.lastResponse.results);
+                    this.fire('results', {results: this.results});
                 }
             },
 
