@@ -5,7 +5,6 @@
 <dom-module id="sites-query">
 
     <template>
-        <ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
             SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?epCount) WHERE {
                 SERVICE geo:search {
                     ?ep geo:search "inCircle";
@@ -14,6 +13,7 @@
                     geo:spatialCircleCenter "{{location.lat}}#{{location.lon}}";
                     geo:spatialCircleRadius "{{getQueryRadius(location.radius)}}" .
                 }
+        <ev-sparql-query query-id="sites" id="query" api="imjv" notify-map="true" results="{{response}}">
                 ?ep a milieu:Emissiepunt ;
                     milieu:exploitatie ?site .
                 ?site rdfs:label ?siteLabel .

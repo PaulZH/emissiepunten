@@ -7,7 +7,7 @@
 <dom-module id="ev-sparql-query">
 
     <template>
-        <iron-ajax id="api" url="{{apiUrl}}" method="POST" body='{{body}}' headers='{"Accept": "application/json"}'
+        <iron-ajax id="api" url="{{apiUrl}}#{{queryId}}" method="POST" body='{{body}}' headers='{"Accept": "application/sparql-results+json"}'
                    handle-as="json" on-response="onResponse" on-error="onError" debounce-duration="300" timeout="{{apis.timeout}}">
             <content></content>
         </iron-ajax>
@@ -24,6 +24,8 @@
             ],
 
             properties: {
+                /** Query ID, set by parent element, used for debugging in developer console */
+                queryId: String,
                 /** API name, set by parent element */
                 api: String,
                 /** API URL */
