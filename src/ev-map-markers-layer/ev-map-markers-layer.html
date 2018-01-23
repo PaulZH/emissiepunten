@@ -124,6 +124,10 @@
                 // create sites
                 var sites = [];
                 response.bindings.forEach(function (binding) {
+                    if (binding.epCount.value === '0') {
+                        return;
+                    }
+
                     var site = {
                         uri: binding.site.value,
                         label: binding.siteLabel.value,
