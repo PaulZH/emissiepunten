@@ -5,15 +5,11 @@
 <dom-module id="sites-query">
 
     <template>
-            SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?epCount) WHERE {
-                SERVICE geo:search {
-                    ?ep geo:search "inCircle";
-                    geo:searchDatatype geoliteral:lat-lon ;
-                    geo:predicate wgs84:lat_long;
-                    geo:spatialCircleCenter "{{location.lat}}#{{location.lon}}";
-                    geo:spatialCircleRadius "{{getQueryRadius(location.radius)}}" .
-                }
         <ev-sparql-query query-id="sites" id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?epCount)
+            FROM {{graph}}
+            WHERE {
+                ?ep spatial:nearby ({{location.lat}} {{location.lon}} {{getQueryRadius(location.radius)}} "km") .
                 ?ep a milieu:Emissiepunt ;
                     milieu:exploitatie ?site .
                 ?site rdfs:label ?siteLabel .
@@ -29,6 +25,10 @@
             is: 'sites-query',
 
             properties: {
+                graph: {
+                    type: String,
+                    value: '<urn:x-arq:UnionGraph>'
+                },
                 /** response */
                 response: {
                     type: Object,
