@@ -1,9 +1,12 @@
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.1.1"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.2.0"/>
 <dom-module id="emission-points-query">
 <template>
-<ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
-            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon  WHERE {
+<ev-sparql-query query-id="emission-points" id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon
+            FROM {{graph}}
+            WHERE {
                 ?ep a milieu:Emissiepunt ;
                     rdfs:label ?epLabel ;
                     wgs84_pos:lat ?epLat ;
@@ -15,5 +18,5 @@
             ORDER BY DESC(?epLat) DESC(?epLon)
         </ev-sparql-query>
 </template>
-<script>Polymer({is:"emission-points-query",properties:{response:{type:Object,notify:!0},site:{type:Object}},execute:function(){this.$.query.execute()}})</script>
+<script>Polymer({is:"emission-points-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},response:{type:Object,notify:!0},site:{type:Object}},execute:function(){this.$.query.execute()}})</script>
 </dom-module>

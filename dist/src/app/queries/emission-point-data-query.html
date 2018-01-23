@@ -1,14 +1,17 @@
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.1.1"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.2.0"/>
 <dom-module id="emission-point-data-query">
 <template>
-<ev-sparql-query id="query" api="imjv" notify-map="true" results="{{response}}">
-            SELECT DISTINCT ?p ?o ?oLabel WHERE {
+<ev-sparql-query query-id="ep-data" id="query" api="imjv" notify-map="true" results="{{response}}">
+            SELECT DISTINCT ?p ?o ?oLabel
+            FROM {{graph}}
+            WHERE {
                 &lt;{{emissionPoint.uri}}&gt; ?p ?o .
                 OPTIONAL { ?o rdfs:label ?oLabel . }
             }
             ORDER BY ?p
         </ev-sparql-query>
 </template>
-<script>Polymer({is:"emission-point-data-query",properties:{response:{type:Object,notify:!0},emissionPoint:{type:Object}},execute:function(){this.$.query.execute()}})</script>
+<script>Polymer({is:"emission-point-data-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},response:{type:Object,notify:!0},emissionPoint:{type:Object}},execute:function(){this.$.query.execute()}})</script>
 </dom-module>

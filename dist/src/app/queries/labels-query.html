@@ -1,30 +1,37 @@
+
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.1.1"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.2.0"/>
 <dom-module id="labels-query">
 <template>
-<ev-sparql-query id="query" api="imjv" results="{{response}}">
-            SELECT DISTINCT ?term ?label WHERE {
-                # emission point labels
-                {
-                    ?ep a milieu:Emissiepunt ;
-                    ?term ?o .
-                }
-                # substantie labels
-                UNION {
-                    ?obs milieu:substantie ?term .
-                }
-                # unit labels
-                UNION {
-                    ?obs sdmx:unitMeasure ?term .
-                }
-                # type labels
-                UNION {
-                    ?ep dct:type ?term .
-                }
-                ?term ?labelProp ?label .
-                FILTER (?labelProp = rdfs:label || ?labelProp = skos:prefLabel)
+<ev-sparql-query query-id="ep-prop-labels" api="imjv" on-results="onResults">
+            SELECT DISTINCT ?term ?label
+            FROM {{graph}}
+            WHERE {
+                ?ep a milieu:Emissiepunt .
+                ?ep ?term ?o .
+                ?term rdfs:label ?label .
+            }
+        </ev-sparql-query>
+
+<ev-sparql-query query-id="substance-labels" api="imjv" on-results="onResults">
+            SELECT DISTINCT ?term ?label
+            FROM {{graph}}
+            WHERE {
+                ?observation milieu:substantie ?term .
+                ?term skos:prefLabel ?label .
+            }
+        </ev-sparql-query>
+
+<ev-sparql-query query-id="concept-labels-{{language}}" api="imjv" on-results="onResults">
+            SELECT DISTINCT ?term ?label
+            FROM {{graph}}
+            WHERE {
+                ?term a skos:Concept .
+                #?observation sdmx:unitMeasure ?term . # disabled because of timeouts
+                ?term skos:prefLabel ?label .
+                FILTER(lang(?label) = '{{language}}')
             }
         </ev-sparql-query>
 </template>
-<script>Polymer({is:"labels-query",properties:{response:{type:Object,notify:!0}},execute:function(){this.$.query.execute()}})</script>
+<script>Polymer({is:"labels-query",properties:{language:{type:String,value:window.app.language},graph:{type:String,value:"<urn:x-arq:UnionGraph>"},response:{type:Object,notify:!0}},execute:function(){for(var e=Polymer.dom(this.root).querySelectorAll("ev-sparql-query"),s=0;s<e.length;s++)e[s].execute()},onResults:function(e){this.response?this.response={bindings:this.response.bindings.concat(e.detail.results.bindings)}:this.response=e.detail.results}})</script>
 </dom-module>

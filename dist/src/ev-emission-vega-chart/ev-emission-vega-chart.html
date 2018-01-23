@@ -1,8 +1,9 @@
+
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../vega/vega-assets.html?1.1.1"/>
-<link rel="import" href="../app/app-styles.html?1.1.1"/>
-<link rel="import" href="../app/app-fonts.html?1.1.1"/>
-<link rel="import" href="../app/behaviors/app-localization.html?1.1.1"/>
+<link rel="import" href="../vega/vega-assets.html?1.2.0"/>
+<link rel="import" href="../app/app-styles.html?1.2.0"/>
+<link rel="import" href="../app/app-fonts.html?1.2.0"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.2.0"/>
 <dom-module id="ev-emission-vega-chart">
 <template>
 <style include="app-styles app-fonts">:host{display:block;font-family:"Flanders Sans",sans-serif;min-height:300px;margin-top:20px;box-sizing:border-box}#chart{width:100%;height:100%}.chart-title{text-align:center;font-size:16px;font-weight:500;clear:both;padding-top:16px}.chart-title a{color:var(--ev-app-green-1)}</style>
@@ -10,5 +11,5 @@
 <div class="chart-title" hidden$="{{substanceLink}}">{{ substance }}</div>
 <div id="chart"></div>
 </template>
-<script>Polymer({is:"ev-emission-vega-chart",behaviors:[appLocalization],properties:{data:{type:Object,observer:"onDataChanged"},substance:{type:String,value:"Substance",observer:"onSubstanceChanged"},substanceLink:{type:String,value:null}},onSubstanceChanged:function(){this.updateChart()},onDataChanged:function(){this.updateChart()},updateChart:function(){if(this.data&&this.substance&&this.localize){var t=this.getChartData();this.set("substanceLink",t.link);var a=this.localize,e={data:t,mark:t.mark,width:this.$.chart.offsetWidth-80,encoding:{x:{field:"year",type:"ordinal",axis:{title:a("year"),labelAngle:0}},y:{field:"amount",type:"quantitative",axis:{title:t.unit,format:".2r"}}},config:{mark:{color:"#4da692"}}},i={mode:"vega-lite",spec:e,actions:!1};vg.embed(this.$.chart,i)}},getChartData:function(){var t,a,e=[],i=this.data[this.substance],n=!0;for(var r in i)i.hasOwnProperty(r)&&(e.push({amount:i[r].amount,year:r}),t=i[r].unit,a=i[r].link,0!==i[r].amount&&(n=!1));var s="area";return 1===e.length&&(s="bar"),n&&(s="point"),{values:e,unit:t,mark:s,link:a}}})</script>
+<script>Polymer({is:"ev-emission-vega-chart",behaviors:[appLocalization],properties:{data:{type:Object,observer:"onDataChanged"},substance:{type:String,value:"Substance",observer:"onSubstanceChanged"},substanceLink:{type:String,value:null}},onSubstanceChanged:function(){this.updateChart()},onDataChanged:function(){this.updateChart()},updateChart:function(){if(this.data&&this.substance&&this.localize){var t=this.getChartData();this.set("substanceLink",t.link);var a=this.localize,e={mode:"vega-lite",spec:{data:t,mark:t.mark,width:this.$.chart.offsetWidth-80,encoding:{x:{field:"year",type:"ordinal",axis:{title:a("year"),labelAngle:0}},y:{field:"amount",type:"quantitative",axis:{title:t.unit,format:".2r"}}},config:{mark:{color:"#4da692"}}},actions:!1};vg.embed(this.$.chart,e)}},getChartData:function(){var t,a,e=[],i=this.data[this.substance],n=!0;for(var r in i)i.hasOwnProperty(r)&&(e.push({amount:i[r].amount,year:r}),t=i[r].unit,a=i[r].link,0!==i[r].amount&&(n=!1));var s="area";return 1===e.length&&(s="bar"),n&&(s="point"),{values:e,unit:t,mark:s,link:a}}})</script>
 </dom-module>

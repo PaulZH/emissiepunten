@@ -51,7 +51,7 @@ Flanders Emission Explorer
 * `npm install`
 * `bower install`
 * `cp bower_components/vega-lite-sourcemap/index.map bower_components/vega-lite/vega-lite.min.js.map` (optional)
-* `npm run polymer-serve` => `http://localhost:8080/` (or any alternative web server setup)
+* `npm run app` => `http://localhost:8080/` (or any alternative web server setup)
 
 ## SPARQL Endpoint Configuration
   
