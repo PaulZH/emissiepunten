@@ -6,7 +6,7 @@
     "npm-fresh": "rm -rf ./node_modules && npm install",
     "bower-fresh": "rm -rf ./bower_components && bower install",
     "bower-fresh-o": "rm -rf ./bower_components && bower install -o",
-    "polymer-serve": "./node_modules/.bin/polymer serve",
+    "app": "./node_modules/.bin/polymer serve",
     "test-e2e": "./node_modules/.bin/karma start dev/e2e/config/karma.conf.js",
     "test-js": "./node_modules/.bin/karma start dev/js-specs/config/karma.conf.js",
     "build": "node scripts/build.js"
