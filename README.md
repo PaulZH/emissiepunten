@@ -66,11 +66,14 @@ Flanders Emission Explorer
 
 * Data Tables (labels and skippable predicates) can be configured in the `dataTableProperties` section in `/config/app-config.html`.
 
-## Deployment
+## Building a release
 
 * Switch to the `master` branch
 * Update the dependencies
     * `bower install` or `bower update`
 * Run the build script
     * `npm run build`
+
+## Deployment
+* Align settings in `/dist/config/app-config.html` with target server setup.
 * Copy the contents of the `dist` directory to the target web server
