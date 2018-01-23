@@ -6,7 +6,9 @@
 
     <template>
         <ev-sparql-query query-id="emission-points" id="query" api="imjv" notify-map="true" results="{{response}}">
-            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon  WHERE {
+            SELECT DISTINCT ?site ?siteLabel ?ep ?epLabel ?epLat ?epLon
+            FROM {{graph}}
+            WHERE {
                 ?ep a milieu:Emissiepunt ;
                     rdfs:label ?epLabel ;
                     wgs84_pos:lat ?epLat ;
@@ -26,6 +28,10 @@
             is: 'emission-points-query',
 
             properties: {
+                graph: {
+                    type: String,
+                    value: '<urn:x-arq:UnionGraph>'
+                },
                 /** response */
                 response: {
                     type: Object,
