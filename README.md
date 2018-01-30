@@ -15,8 +15,9 @@ Flanders Emission Explorer
 * `/bower_components`               - Client-side dependencies
 * `/node_modules`                   - NodeJS development dependencies
 * `/config`                         - Configuration files
-    * `app-config.html`             - Configuration options for APIs, SPARQL prefixes, LD base URLs, map markers
-    * `manisfest.json`              - Manifest file for "add to homescreen"-apps
+    * `app-config.html`             - Configuration component ()
+    * `app-config.json`             - Configuration options for APIs, SPARQL prefixes, LD base URLs, map markers
+    * `manifest.json`               - Manifest file for "add to homescreen"-apps
 * `/dev`                            - Development files
     * `/e2e`                        - Files for End-to-End tests
         * `/config`                 - Configuration files

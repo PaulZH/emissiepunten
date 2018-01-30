@@ -24,6 +24,7 @@
             ],
 
             properties: {
+                apis: Object,
                 /** Query ID, set by parent element, used for debugging in developer console */
                 queryId: String,
                 /** API name, set by parent element */
@@ -45,6 +46,10 @@
                     type: Boolean,
                     value: false
                 }
+            },
+
+            attached: function() {
+                this.apis = this.config('apis');
             },
 
             getSparqlPrologue: function () {

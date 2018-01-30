@@ -39,6 +39,7 @@
             ],
 
             properties: {
+                apis: Object,
                 /** response */
                 response: {
                     type: Object,
@@ -48,6 +49,10 @@
                 sites: {
                     type: Array
                 }
+            },
+
+            attached: function() {
+                this.apis = this.config('apis');
             },
 
             execute: function () {

@@ -217,10 +217,10 @@
                     site: site,
                     geometry: new ol.geom.Point([site.x, site.y]),
                     defaultStyle: new ol.style.Style({
-                        image: new ol.style.Icon(this.markerStyles.site)
+                        image: new ol.style.Icon(this.config('markerStyles').site)
                     }),
                     selectedStyle: new ol.style.Style({
-                        image: new ol.style.Icon(this.markerStyles.selectedSite)
+                        image: new ol.style.Icon(this.config('markerStyles').selectedSite)
                     }),
                     currentStyle: 'defaultStyle'
                 });
@@ -372,7 +372,7 @@
                         image: ''
                     }),
                     visibleStyle: new ol.style.Style({
-                        stroke: new ol.style.Stroke(this.markerStyles.connector)
+                        stroke: new ol.style.Stroke(this.config('markerStyles').connector)
                     }),
                     currentStyle: 'defaultStyle'
                 });
@@ -391,10 +391,10 @@
                         image: ''
                     }),
                     visibleStyle: new ol.style.Style({
-                        image: new ol.style.Icon(this.markerStyles.emissionPoint)
+                        image: new ol.style.Icon(this.config('markerStyles').emissionPoint)
                     }),
                     selectedStyle: new ol.style.Style({
-                        image: new ol.style.Icon(this.markerStyles.selectedEmissionPoint)
+                        image: new ol.style.Icon(this.config('markerStyles').selectedEmissionPoint)
                     }),
                     currentStyle: 'defaultStyle'
                 });

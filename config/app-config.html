@@ -1,104 +1,13 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html"/>
+
 <script>
     /**
      * Polymer behavior for shared config options
      */
     appConfig = {
 
-        properties: {
-            apis: {
-                type: Object,
-                value: {
-                    //imjv: 'http://rdfstoreomv-on-1.vm.cumuli.be:3030/blazegraph/namespace/lne/sparql',
-                    imjv: 'https://id-ontwikkel.milieuinfo.be/imjv/sparql',
-                    cbb: 'http://lodcbbomv-on-1.vm.cumuli.be:8080/lodomv/repositories/cbb',
-                    timeout: 15000
-                }
-            },
-            prefixes: {
-                type: Object,
-                value: {
-                    cube: 'http://purl.org/linked-data/cube#',
-                    dct: 'http://purl.org/dc/terms/',
-                    milieu: 'https://id.milieuinfo.be/def#',
-                    protontop: 'http://www.ontotext.com/protontop#',
-                	rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                    rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-                    sdmx: 'http://purl.org/linked-data/sdmx/2009/attribute#',
-                    skos: 'http://www.w3.org/2004/02/skos/core#',
-                    spatial: 'http://jena.apache.org/spatial#',
-                    wgs84: 'http://www.proxml.be/blazegeo/wgs84_pos#',
-                    wgs84_pos: 'http://www.w3.org/2003/01/geo/wgs84_pos#'
-                }
-            },
-            siteUriBase: {// used for short shareable URLs
-                type: String,
-                value: 'https://id.milieuinfo.be/cbb/exploitatie/'
-            },
-            emissionPointUriBase: {// used for short shareable URLs
-                type: String,
-                value: 'https://id.milieuinfo.be/imjv/emissiepunt/'
-            },
-            markerStyles: {
-                type: Object,
-                value: {
-                    'site': {
-                        anchor: [0.5, 0.9],
-                        size: [80, 90],
-                        opacity: 1,
-                        scale: 0.5,
-                        src: window.app.base + 'src/ev-map-markers-layer/img/site-marker.png'
-                    },
-                    'selectedSite': {
-                        anchor: [0.5, 0.9],
-                        size: [80, 90],
-                        opacity: 1,
-                        scale: 0.75,
-                        src: window.app.base + 'src/ev-map-markers-layer/img/site-marker-selected.png'
-                    },
-                    'emissionPoint': {
-                        anchor: [0.5, 0.9],
-                        size: [48, 54],
-                        opacity: 1,
-                        scale: 0.5,
-                        src: window.app.base + 'src/ev-map-markers-layer/img/ep-marker.png'
-                    },
-                    'selectedEmissionPoint': {
-                        anchor: [0.5, 0.9],
-                        size: [48, 54],
-                        opacity: 1,
-                        scale: 0.75,
-                        src: window.app.base + 'src/ev-map-markers-layer/img/ep-marker-selected.png'
-                    },
-                    'connector': {
-                        color: [255, 255, 255, 0.5],
-                        width: 3
-                    }
-                }
-            },
-            dataTableProperties: {
-				type: Object,
-				value : {
-                    labels: [
-                    	'http://www.w3.org/2000/01/rdf-schema#label',
-                        'http://purl.org/dc/terms/title'
-                    ],
-					skip: [
-						'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-						'https://id.milieuinfo.be/def#lambert72_x',
-						'https://id.milieuinfo.be/def#lambert72_y',
-                        'http://www.proxml.be/blazegeo/wgs84_pos#lat_long',
-                        'http://www.w3.org/2003/01/geo/wgs84_pos#lat',
-                        'http://www.w3.org/2003/01/geo/wgs84_pos#long'
-                    ]
-                }
-            },
-            linkedDataServers: {
-            	type: Object,
-                value : {
-            	    'id.milieuinfo.be': 'id-ontwikkel.milieuinfo.be'
-                }
-            }
-        },
+        _configState: null,
+        _config: {},
 
         /**
          * Returns a config value
@@ -109,9 +18,40 @@
          * @return {*|null}
          */
         config: function (name, defaultValue) {
-            return (typeof this[name] !== 'undefined')
-                    ? this[name]
+            return (typeof appConfig._config[name] !== 'undefined')
+                    ? appConfig._config[name]
                     : defaultValue || null;
+        },
+
+        attached: function() {
+            this._initConfig();
+        },
+
+        /**
+         * Loads JSON config file (once), and sets loaded or cached config in any component using this behaviour
+         *
+         * @private
+         */
+        _initConfig: function () {
+            if (!appConfig._configState) {
+                appConfig._configState = 'loading';
+                this._loadConfig();
+            }
+        },
+
+        _loadConfig: function() {
+            var $ajax = document.createElement('iron-ajax');
+            $ajax.handleAs = 'text';
+            $ajax.url = app.base + 'config/app-config.json';
+            var request = $ajax.generateRequest();
+
+            request.completes.then(function() {
+                appConfig._configState = 'loaded';
+                appConfig._config = JSON.parse($ajax.lastResponse.replace(/\{base\}/g, app.base));
+            }, function () {
+                appConfig._configState = 'error';
+                console.log('Error: Could not load config from ', $ajax.url);
+            });
         }
     }
 </script>
