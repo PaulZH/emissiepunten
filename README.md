@@ -15,7 +15,6 @@ Flanders Emission Explorer
 * `/bower_components`               - Client-side dependencies
 * `/node_modules`                   - NodeJS development dependencies
 * `/config`                         - Configuration files
-    * `app-config.html`             - Configuration component ()
     * `app-config.json`             - Configuration options for APIs, SPARQL prefixes, LD base URLs, map markers
     * `manifest.json`               - Manifest file for "add to homescreen"-apps
 * `/dev`                            - Development files
@@ -56,16 +55,16 @@ Flanders Emission Explorer
 
 ## SPARQL Endpoint Configuration
   
-* Endpoints can be configured in the `apis` section in `/config/app-config.html`.
+* Endpoints can be configured in the `apis` section in `/config/app-config.json`.
 
 ## Linked Data HREF Configuration
 
 * To replace selected LD URLs in link hrefs, e.g. "id.milieuinfo.be" with "id-ontwikkel.milieuinfo.be,
-  adjust the `linkedDataServers` section in `/config/app-config.html`.
+  adjust the `linkedDataServers` section in `/config/app-config.json`.
 
 ## Site and Emission Point Table Configuration
 
-* Data Tables (labels and skippable predicates) can be configured in the `dataTableProperties` section in `/config/app-config.html`.
+* Data Tables (labels and skippable predicates) can be configured in the `dataTableProperties` section in `/config/app-config.json`.
 
 ## Building a release
 
@@ -76,5 +75,5 @@ Flanders Emission Explorer
     * `npm run build`
 
 ## Deployment
-* Align settings in `/dist/config/app-config.html` with target server setup.
+* Align settings in `/dist/config/app-config.json` with target server setup.
 * Copy the contents of the `dist` directory to the target web server
