@@ -1,6 +1,6 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../app/behaviors/app-lazyloading.html?1.3.0"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.3.1"/>
 <dom-module id="ev-data-pane">
 <template>
 <style>:host{display:block;--ev-card-content:{min-height:350px};}ev-card{display:none}ev-card.active{display:block}</style>
@@ -16,5 +16,5 @@
 </ev-card>
 </template>
 </template>
-<script>Polymer({is:"ev-data-pane",behaviors:[appLazyloading],properties:{site:{type:Object,notify:!0,value:null},emissionPoint:{type:Object,notify:!0}},observers:["onLabelsLoaded(labelResponse)"],attached:function(){this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-card/ev-card.html?1.3.0","../ev-site/ev-site.html?1.3.0","../ev-emission-point/ev-emission-point.html?1.3.0","../app/queries/labels-query.html?1.3.0"]).then(function(){e.set("deferredElementsLoaded",!0),e.async(function(){e.$$("labels-query").execute()},1)})},getCardTitle:function(e,t){return e&&t?t.label:e?e.label:""},getCardClass:function(e){return e?"active":"hidden"},showSitePane:function(e,t){return!(!e||t)},showEmissionPointPane:function(e){return!!e},onLabelsLoaded:function(e){var t={};e.bindings.forEach(function(e){var n=e.term.value;t[n]=e.label.value}),this.set("termLabels",t)}})</script>
+<script>Polymer({is:"ev-data-pane",behaviors:[appLazyloading],properties:{site:{type:Object,notify:!0,value:null},emissionPoint:{type:Object,notify:!0}},observers:["onLabelsLoaded(labelResponse)"],attached:function(){this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-card/ev-card.html?1.3.1","../ev-site/ev-site.html?1.3.1","../ev-emission-point/ev-emission-point.html?1.3.1","../app/queries/labels-query.html?1.3.1"]).then(function(){e.set("deferredElementsLoaded",!0),e.async(function(){e.$$("labels-query").execute()},1)})},getCardTitle:function(e,t){return e&&t?t.label:e?e.label:""},getCardClass:function(e){return e?"active":"hidden"},showSitePane:function(e,t){return!(!e||t)},showEmissionPointPane:function(e){return!!e},onLabelsLoaded:function(e){var t={};e.bindings.forEach(function(e){var n=e.term.value;t[n]=e.label.value}),this.set("termLabels",t)}})</script>
 </dom-module>
