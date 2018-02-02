@@ -1,6 +1,6 @@
 
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.3.1"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.3.2"/>
 <dom-module id="sites-query">
 <template>
 <ev-sparql-query query-id="sites" id="query" api="imjv" notify-map="true" results="{{response}}">
@@ -15,5 +15,5 @@
             GROUP BY ?site ?siteLabel
         </ev-sparql-query>
 </template>
-<script>Polymer({is:"sites-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},response:{type:Object,notify:!0},location:{type:Object}},getQueryRadius:function(e){return e<=5?1.5*e:1.1*e},execute:function(){this.$.query.execute()}})</script>
+<script>Polymer({is:"sites-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},response:{type:Object,notify:!0},location:{type:Object}},getQueryRadius:function(e){return e<=5?Math.round(1.5*e):Math.round(1.1*e)},execute:function(){this.$.query.execute()}})</script>
 </dom-module>
