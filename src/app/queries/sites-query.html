@@ -47,9 +47,10 @@
              */
             getQueryRadius: function (radius) {
                 if (radius <= 5) {
-                    return radius * 1.5;
+                    return Math.round(radius * 1.5);
                 }
-                return radius * 1.1;
+
+                return Math.round(radius * 1.1);
             },
 
             execute: function () {
