@@ -314,6 +314,7 @@
             onEmissionPointsLoaded: function (response) {
                 var site = null;// site uri used to generate this response
                 var eps = [];
+                var added = {};// cache for detecting dupes (caused by EPs with 2 labels)
                 response.bindings.forEach(function (binding) {
                     site = binding.site.value;
                     var ep = {
@@ -322,6 +323,14 @@
                         lon: parseFloat(binding.epLon.value),
                         lat: parseFloat(binding.epLat.value)
                     };
+
+                    // de-dupe
+                    if (added[ep.uri]) {
+                        return;
+                    } else {
+                        added[ep.uri] = true;
+                    }
+
                     // add shortened EP label (site label prefix removed)
                     ep.shortLabel = ep.label.replace(new RegExp('^' + binding.siteLabel.value + '\\s*:\\s*'), '');
                     // add x/y info
