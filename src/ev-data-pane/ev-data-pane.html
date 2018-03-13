@@ -30,7 +30,7 @@
         <template is="dom-if" if="[[deferredElementsLoaded]]">
             <labels-query response="{{labelResponse}}"></labels-query>
 
-            <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site)]]">
+            <ev-card title="[[getCardTitle(site,emissionPoint)]]" class$="[[getCardClass(site)]]" csv-download="site-emissions">
                 <template is="dom-if" if="[[showSitePane(site,emissionPoint)]]" restamp="true">
                     <ev-site site="[[site]]" term-labels="{{termLabels}}"></ev-site>
                 </template>
