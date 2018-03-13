@@ -18,7 +18,9 @@
     "site_emissions": "Emissies van de site",
     "substance": "Stof",
     "year": "Jaar",
-    "map_search": "Zoek een plaats"
+    "map_search": "Zoek een plaats",
+    "export_sites": "Exploitaties exporteren",
+    "export_site_emissions": "Emissies exporteren"
   },
   "en": {
     "restart": "Restart",
@@ -39,6 +41,8 @@
     "site_emissions": "Site Emissions",
     "substance": "Substance",
     "year": "Year",
-    "map_search": "Find a place"
+    "map_search": "Find a place",
+    "export_sites": "Export sites",
+    "export_site_emissions": "Export site emissions"
   }
 }

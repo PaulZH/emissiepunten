@@ -1,0 +1,14 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../app/queries/sites-download-query.html?1.4.0"/>
+<link rel="import" href="../app/queries/site-emissions-download-query.html?1.4.0"/>
+<link rel="import" href="../app/behaviors/app-localization.html?1.4.0"/>
+<dom-module id="ev-csv-link">
+<template>
+<style include="app-styles">:host{display:inline-block;position:absolute;right:16px;font-weight:300}a{display:inline-block;line-height:40px;cursor:pointer;color:#fff;text-decoration:none;background:transparent url(csv-icon.png) left center no-repeat;padding-left:24px}</style>
+<a href$="{{linkHref}}" target="_download" hidden$="{{!hasExportData}}">{{linkLabel}}</a>
+<sites-download-query location="[[location]]" href="{{sitesCsvHref}}"></sites-download-query>
+<site-emissions-download-query site="[[selectedSite]]" href="{{siteEmissionsCsvHref}}"></site-emissions-download-query>
+</template>
+<script>Polymer({is:"ev-csv-link",behaviors:[appLocalization],properties:{csvDownload:{type:String},hasExportData:{type:Boolean,value:!1},location:Object,selectedSite:Object,linkLabel:String,linkHref:String,sitesCsvHref:String,siteEmissionsCsvHref:String},attached:function(){this.observeLinkDependencies()},observeLinkDependencies:function(){var t=this;evApp.addEventListener("app-state-changed",function(){t.async(function(){t.set("location",evApp.location),t.set("selectedSite",evApp.selectedSite),t.notifyObject("location"),t.notifyObject("selectedSite"),t.checkExportState()},500)}),evApp.fire("app-state-changed")},notifyObject:function(t){var e=this[t];for(var i in e)e.hasOwnProperty(i)&&this.notifyPath(t+"."+i)},checkExportState:function(){switch(this.csvDownload){case"sites":this.linkLabel=this.localize?this.localize("export_sites"):"Export sites",this.hasExportData=!!this.location.point,this.linkHref=this.sitesCsvHref;break;case"site-emissions":this.linkLabel=this.localize?this.localize("export_site_emissions"):"Export site emissions",this.hasExportData=!!this.selectedSite,this.linkHref=this.siteEmissionsCsvHref;break;default:this.hasExportData=!1}}})</script>
+</dom-module>

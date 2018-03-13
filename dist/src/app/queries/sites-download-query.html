@@ -1,0 +1,19 @@
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.4.0"/>
+<dom-module id="sites-download-query">
+<template>
+<ev-sparql-query query-id="sites-download" id="query" api="imjv">
+            SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?emissionPointCount)
+            FROM {{graph}}
+            WHERE {
+                ?ep spatial:nearby ({{location.lat}} {{location.lon}} {{getQueryRadius(location.radius)}} "km") .
+                ?ep a milieu:Emissiepunt ;
+                    milieu:exploitatie ?site .
+                ?site rdfs:label ?siteLabel .
+            }
+            GROUP BY ?site ?siteLabel
+        </ev-sparql-query>
+</template>
+<script>Polymer({is:"sites-download-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},location:{type:Object},href:{type:String,notify:!0,value:""}},observers:["onLocationChange(location, location.*)"],onLocationChange:function(){this.href=this.$.query.getCsvHref()},getQueryRadius:function(e){return e<=5?Math.round(1.5*e):Math.round(1.1*e)}})</script>
+</dom-module>
