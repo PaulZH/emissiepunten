@@ -121,6 +121,15 @@
                 if (this.notifyMap && window.evMap) {
                     window.evMap.onQueryEnded();
                 }
+            },
+
+            getCsvHref: function () {
+                if (!this.config('apis')) {
+                    return '';
+                }
+                var apiUrl = this.config('apis')[this.api];
+                var query = this.getSparqlPrologue() + Polymer.dom(this).textContent;
+                return apiUrl + '?query=' + encodeURIComponent(query.trim()) + '&output=csv';
             }
         });
     </script>
