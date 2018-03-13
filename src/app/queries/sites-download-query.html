@@ -1,0 +1,67 @@
+<!-- elements -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?##appVersion##"/>
+
+<dom-module id="sites-download-query">
+
+    <template>
+        <ev-sparql-query query-id="sites-download" id="query" api="imjv">
+            SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?emissionPointCount)
+            FROM {{graph}}
+            WHERE {
+                ?ep spatial:nearby ({{location.lat}} {{location.lon}} {{getQueryRadius(location.radius)}} "km") .
+                ?ep a milieu:Emissiepunt ;
+                    milieu:exploitatie ?site .
+                ?site rdfs:label ?siteLabel .
+            }
+            GROUP BY ?site ?siteLabel
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'sites-download-query',
+
+            properties: {
+                graph: {
+                    type: String,
+                    value: '<urn:x-arq:UnionGraph>'
+                },
+                /** selected map location */
+                location: {
+                    type: Object // lat, lon, radius, point,
+                },
+                href: {
+                    type: String,
+                    notify: true,
+                    value: ''
+                }
+            },
+
+            observers: [
+                "onLocationChange(location, location.*)"
+            ],
+
+            onLocationChange: function ()
+            {
+                this.href = this.$.query.getCsvHref();
+            },
+
+            /**
+             * Returns a slightly increased location radius
+             *
+             * The query radius includes sites whose EPs are *just* outside of the location radius
+             */
+            getQueryRadius: function (radius) {
+                if (radius <= 5) {
+                    return Math.round(radius * 1.5);
+                }
+
+                return Math.round(radius * 1.1);
+            }
+        });
+    </script>
+
+</dom-module>
