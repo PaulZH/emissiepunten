@@ -1,0 +1,74 @@
+<!-- elements -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?##appVersion##"/>
+
+<dom-module id="site-emissions-download-query">
+
+    <template>
+        <ev-sparql-query query-id="site-emissions-download" id="query" api="imjv">
+            SELECT DISTINCT
+                ?site ?siteLabel
+                ?emissionPoint ?emissionPointLabel
+                ?observation ?year
+                ?substance ?substanceLabel
+                ?amount
+                ?unit ?unitLabel
+                ?seeAlso
+            FROM {{graph}}
+            WHERE {
+                VALUES ?site { &lt;{{site.uri}}&gt; }
+
+                ?emissionPoint milieu:exploitatie ?site ;
+                    rdfs:label ?emissionPointLabel .
+
+                ?site rdfs:label ?siteLabel .
+
+                ?observation milieu:referentiegebied ?emissionPoint ;
+                    a cube:Observation ;
+                    milieu:tijdsperiode ?year ;
+                    milieu:substantie ?substance ;
+                    milieu:hoeveelheid ?amount ;
+                    sdmx:unitMeasure ?unit .
+
+                ?substance skos:prefLabel ?substanceLabel .
+                ?unit skos:prefLabel ?unitLabel .
+
+                OPTIONAL {
+                    ?substance rdfs:seeAlso ?seeAlso .
+                }
+            }
+            ORDER BY ?site ?emissionPoint ?observation ?year ?substance
+        </ev-sparql-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'site-emissions-download-query',
+
+            properties: {
+                graph: {
+                    type: String,
+                    value: '<urn:x-arq:UnionGraph>'
+                },
+                site: Object,
+                href: {
+                    type: String,
+                    notify: true,
+                    value: ''
+                }
+            },
+
+            observers: [
+                "onSiteChange(site, site.*)"
+            ],
+
+            onSiteChange: function ()
+            {
+                this.href = this.$.query.getCsvHref();
+            }
+        });
+    </script>
+
+</dom-module>
