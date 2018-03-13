@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../app/app-styles.html?##appVersion##"/>
 <link rel="import" href="../app/app-fonts.html?##appVersion##"/>
+<link rel="import" href="../ev-csv-link/ev-csv-link.html?##appVersion##"/>
 
 <dom-module id="ev-card">
 
@@ -11,6 +12,7 @@
 
             :host {
                 display: block;
+                position: relative;
                 font-family: "Flanders Sans", sans-serif;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
                 color: var(--ev-app-grey-3);
@@ -83,6 +85,9 @@
                 <a class="toggle" on-tap="onToggle"></a>
             </template>
             <span>{{title}}</span>
+            <template is="dom-if" if="{{csvDownload}}">
+                <ev-csv-link csv-download="{{csvDownload}}"></ev-csv-link>
+            </template>
         </h4>
         <div class="content">
             <content></content>
@@ -100,7 +105,11 @@
                     type: String,
                     value: ''
                 },
-                toggle: Boolean
+                toggle: Boolean,
+                csvDownload: {
+                    type: String,
+                    value: ''
+                }
             },
 
             onToggle: function() {
@@ -108,7 +117,6 @@
                 this.$$('.title').classList.toggle('toggled');
                 this.$$('.content').classList.toggle('toggled');
             }
-
         });
     </script>
 
