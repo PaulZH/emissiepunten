@@ -1,0 +1,117 @@
+<!-- elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html"/>
+<link rel="import" href="../app/queries/sites-download-query.html?##appVersion##"/>
+<link rel="import" href="../app/queries/site-emissions-download-query.html?##appVersion##"/>
+<link rel="import" href="../app/behaviors/app-localization.html?##appVersion##"/>
+
+<dom-module id="ev-csv-link">
+
+    <template>
+
+        <style include="app-styles">
+            :host {
+                display: inline-block;
+                position: absolute;
+                right: 16px;
+                font-weight: 300;
+            }
+            a {
+                display: inline-block;
+                line-height: 40px;
+                cursor: pointer;
+                color: #fff;
+                text-decoration: none;
+                background: transparent url("csv-icon.png") left center no-repeat;
+                padding-left: 24px;
+            }
+        </style>
+
+        <a href$="{{linkHref}}" target="_download" hidden$="{{!hasExportData}}">{{linkLabel}}</a>
+
+        <sites-download-query location="[[location]]" href="{{sitesCsvHref}}"></sites-download-query>
+        <site-emissions-download-query site="[[selectedSite]]" href="{{siteEmissionsCsvHref}}"></site-emissions-download-query>
+    </template>
+
+    <script>
+        //noinspection JSUnusedGlobalSymbols
+        Polymer({
+
+            is: 'ev-csv-link',
+
+            behaviors: [
+                appLocalization
+            ],
+
+            properties: {
+                csvDownload: {
+                    type: String
+                },
+                hasExportData: {
+                    type: Boolean,
+                    value: false
+                },
+                location: Object,
+                selectedSite: Object,
+                linkLabel: String,
+                linkHref: String,
+                sitesCsvHref: String,
+                siteEmissionsCsvHref: String
+            },
+
+            attached: function () {
+                this.observeLinkDependencies();
+            },
+
+            /**
+             * Works around Polymer's limited data-binding system and handles selected changes on `ev-app`
+             */
+            observeLinkDependencies: function () {
+                // subscribe
+                var self = this;
+                evApp.addEventListener('app-state-changed', function() {
+                    self.async(function() {
+                        self.set('location', evApp.location);
+                        self.set('selectedSite', evApp.selectedSite);
+                        self.notifyObject('location');
+                        self.notifyObject('selectedSite');
+                        self.checkExportState();
+                    }, 500)
+                });
+
+                // run once at start
+                evApp.fire('app-state-changed');
+            },
+
+            /**
+             * Helper method to propagate object changes that Polymer doesn't detect
+             *
+             * @param objName
+             */
+            notifyObject: function (objName) {
+                var obj = this[objName];
+                for (var prop in obj) {
+                    if (obj.hasOwnProperty(prop)) {
+                        this.notifyPath(objName + '.' + prop);
+                    }
+                }
+            },
+
+            checkExportState: function () {
+                switch (this.csvDownload) {
+                    case 'sites':
+                        this.linkLabel = this.localize ? this.localize('export_sites') : 'Export sites';
+                        this.hasExportData = !!this.location.point;
+                        this.linkHref = this.sitesCsvHref;
+                        break;
+                    case 'site-emissions':
+                        this.linkLabel = this.localize ? this.localize('export_site_emissions') : 'Export site emissions';
+                        this.hasExportData = !!this.selectedSite;
+                        this.linkHref = this.siteEmissionsCsvHref;
+                        break;
+                    default:
+                        this.hasExportData = false
+                }
+            }
+        });
+    </script>
+</dom-module>
