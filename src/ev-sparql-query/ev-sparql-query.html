@@ -55,10 +55,18 @@
             getSparqlPrologue: function () {
                 var result = '';
                 var prefixes = this.config('prefixes');
+                var query = Polymer.dom(this).textContent;
                 for (var prefix in prefixes) {
-                    if (prefixes.hasOwnProperty(prefix)) {
-                        result += 'PREFIX ' + prefix + ': <' + prefixes[prefix] + '> ' + "\n";
+                    if (!prefixes.hasOwnProperty(prefix)) {
+                        continue;
                     }
+
+                    // skip unused prefixes
+                    if (query.indexOf(prefix + ':') === -1) {
+                        continue;
+                    }
+
+                    result += 'PREFIX ' + prefix + ': <' + prefixes[prefix] + '> ' + "\n";
                 }
                 return result;
             },
