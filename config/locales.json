@@ -23,7 +23,16 @@
     "export_site_emissions": "Emissies exporteren",
     "var_site_id": "exploitatieId",
     "var_site_label": "exploitatie",
-    "var_ep_count": "aantalEmissiepunten"
+    "var_ep_count": "aantalEmissiepunten",
+    "var_ep_id": "emissiepuntId",
+    "var_ep_label": "emissiepunt",
+    "var_observation_id": "observatieId",
+    "var_year": "jaar",
+    "var_substance_id": "stofId",
+    "var_substance_label": "stof",
+    "var_amount": "hoeveelheid",
+    "var_unit_id": "meeteenheidId",
+    "var_unit_label": "meeteenheid"
   },
   "en": {
     "restart": "Restart",
@@ -49,6 +58,15 @@
     "export_site_emissions": "Export site emissions",
     "var_site_id": "siteId",
     "var_site_label": "site",
-    "var_ep_count": "emissionPointCount"
+    "var_ep_count": "emissionPointCount",
+    "var_ep_id": "emissionPointId",
+    "var_ep_label": "emissionPoint",
+    "var_observation_id": "observationId",
+    "var_year": "year",
+    "var_substance_id": "substanceId",
+    "var_substance_label": "substance",
+    "var_amount": "amount",
+    "var_unit_id": "unitId",
+    "var_unit_label": "unit"
   }
 }
