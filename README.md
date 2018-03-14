@@ -56,6 +56,7 @@ Flanders Emission Explorer
 ## SPARQL Endpoint Configuration
   
 * Endpoints can be configured in the `apis` section in `/config/app-config.json`.
+* The `imjv-export` entry is used by the CSV export link.
 
 ## Linked Data HREF Configuration
 
