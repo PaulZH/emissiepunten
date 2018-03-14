@@ -20,7 +20,10 @@
     "year": "Jaar",
     "map_search": "Zoek een plaats",
     "export_sites": "Exploitaties exporteren",
-    "export_site_emissions": "Emissies exporteren"
+    "export_site_emissions": "Emissies exporteren",
+    "var_site_id": "exploitatieId",
+    "var_site_label": "exploitatie",
+    "var_ep_count": "aantalEmissiepunten"
   },
   "en": {
     "restart": "Restart",
@@ -43,6 +46,9 @@
     "year": "Year",
     "map_search": "Find a place",
     "export_sites": "Export sites",
-    "export_site_emissions": "Export site emissions"
+    "export_site_emissions": "Export site emissions",
+    "var_site_id": "siteId",
+    "var_site_label": "site",
+    "var_ep_count": "emissionPointCount"
   }
 }
