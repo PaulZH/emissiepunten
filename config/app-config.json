@@ -1,6 +1,7 @@
 {
   "apis": {
     "imjv": "https://id-ontwikkel.milieuinfo.be/imjv/sparql",
+    "imjv-export": "https://id-ontwikkel.milieuinfo.be/imjv/data",
     "cbb": "http://lodcbbomv-on-1.vm.cumuli.be:8080/lodomv/repositories/cbb",
     "timeout": 15000
   },

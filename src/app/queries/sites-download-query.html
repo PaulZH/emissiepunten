@@ -5,7 +5,7 @@
 <dom-module id="sites-download-query">
 
     <template>
-        <ev-sparql-query query-id="sites-download" id="query" api="imjv">
+        <ev-sparql-query query-id="sites-download" id="query" api="imjv-export">
             SELECT DISTINCT ?site ?siteLabel (COUNT(DISTINCT ?ep) AS ?emissionPointCount)
             FROM {{graph}}
             WHERE {
