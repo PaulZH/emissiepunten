@@ -1,42 +1,43 @@
 
 <link rel="import" href="../../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.4.0"/>
+<link rel="import" href="../../ev-sparql-query/ev-sparql-query.html?1.5.0"/>
+<link rel="import" href="../behaviors/app-localization.html?1.5.0"/>
 <dom-module id="site-emissions-download-query">
 <template>
-<ev-sparql-query query-id="site-emissions-download" id="query" api="imjv">
+<ev-sparql-query query-id="site-emissions-download" id="query" api="imjv-export">
             SELECT DISTINCT
-                ?site ?siteLabel
-                ?emissionPoint ?emissionPointLabel
-                ?observation ?year
-                ?substance ?substanceLabel
-                ?amount
-                ?unit ?unitLabel
-                ?seeAlso
+                (?siteResource AS ?{{localize("var_site_id")}})
+                (?siteLabel AS ?{{localize("var_site_label")}})
+                (?emissionPointResource AS ?{{localize("var_ep_id")}})
+                (?emissionPointLabel AS ?{{localize("var_ep_label")}})
+                (?observationResource AS ?{{localize("var_observation_id")}})
+                (?yearLabel AS ?{{localize("var_year")}})
+                (?substanceResource AS ?{{localize("var_substance_id")}})
+                (?substanceLabel AS ?{{localize("var_substance_label")}})
+                (?amountLabel AS ?{{localize("var_amount")}})
+                (?unitResource AS ?{{localize("var_unit_id")}})
+                (?unitLabel AS ?{{localize("var_unit_label")}})
             FROM {{graph}}
             WHERE {
-                VALUES ?site { &lt;{{site.uri}}&gt; }
+                VALUES ?siteResource { &lt;{{site.uri}}&gt; }
 
-                ?emissionPoint milieu:exploitatie ?site ;
+                ?emissionPointResource milieu:exploitatie ?siteResource ;
                     rdfs:label ?emissionPointLabel .
 
-                ?site rdfs:label ?siteLabel .
+                ?siteResource rdfs:label ?siteLabel .
 
-                ?observation milieu:referentiegebied ?emissionPoint ;
+                ?observationResource milieu:referentiegebied ?emissionPointResource ;
                     a cube:Observation ;
-                    milieu:tijdsperiode ?year ;
-                    milieu:substantie ?substance ;
-                    milieu:hoeveelheid ?amount ;
-                    sdmx:unitMeasure ?unit .
+                    milieu:tijdsperiode ?yearLabel ;
+                    milieu:substantie ?substanceResource ;
+                    milieu:hoeveelheid ?amountLabel ;
+                    sdmx:unitMeasure ?unitResource .
 
-                ?substance skos:prefLabel ?substanceLabel .
-                ?unit skos:prefLabel ?unitLabel .
-
-                OPTIONAL {
-                    ?substance rdfs:seeAlso ?seeAlso .
-                }
+                ?substanceResource skos:prefLabel ?substanceLabel .
+                ?unitResource skos:prefLabel ?unitLabel .
             }
-            ORDER BY ?site ?emissionPoint ?observation ?year ?substance
+            ORDER BY ?siteResource ?emissionPointResource ?observationResource ?yearLabel ?substanceLabel
         </ev-sparql-query>
 </template>
-<script>Polymer({is:"site-emissions-download-query",properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},site:Object,href:{type:String,notify:!0,value:""}},observers:["onSiteChange(site, site.*)"],onSiteChange:function(){this.href=this.$.query.getCsvHref()}})</script>
+<script>Polymer({is:"site-emissions-download-query",behaviors:[appLocalization],properties:{graph:{type:String,value:"<urn:x-arq:UnionGraph>"},site:Object,href:{type:String,notify:!0,value:""}},observers:["onSiteChange(site, site.*)"],onSiteChange:function(){this.href=this.$.query.getCsvHref()}})</script>
 </dom-module>

@@ -1,10 +1,10 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html?1.4.0"/>
-<link rel="import" href="../app/app-styles.html?1.4.0"/>
-<link rel="import" href="../app/app-fonts.html?1.4.0"/>
-<link rel="import" href="../app/behaviors/app-lazyloading.html?1.4.0"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.5.0"/>
+<link rel="import" href="../app/app-styles.html?1.5.0"/>
+<link rel="import" href="../app/app-fonts.html?1.5.0"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.5.0"/>
 <dom-module id="ev-global-header">
 <template>
 <style include="app-styles app-fonts">ev-responsive{@apply(--layout-horizontal);}.app-nav{@apply(--layout-flex-8);}.sys-nav{text-align:right;display:none}[w2b] .sys-nav{display:block}.sys-nav>*{text-align:left}:host{line-height:40px;font-family:"Flanders Sans",Roboto-Light,sans-serif;font-style:normal;font-weight:300;height:40px}.vlaanderen-be{display:none}[w4b] .vlaanderen-be{display:inline;font-weight:500;font-size:16px;color:var(--ev-global-header-link-color);text-decoration:none;cursor:pointer;border-right:1px solid var(--ev-app-grey-6);padding-right:12px;margin-right:12px}.project{color:var(--ev-global-header-link-color);text-decoration:none;cursor:pointer}</style>
@@ -16,5 +16,5 @@
 <div class="sys-nav"></div>
 </ev-responsive>
 </template>
-<script>Polymer({is:"ev-global-header",behaviors:[appLazyloading],properties:{appPath:{type:String,value:app.base||location.pathname}},attached:function(){this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-contact-link/ev-contact-link.html?1.4.0"]).then(function(){e.$$(".sys-nav").appendChild(document.createElement("ev-contact-link"))})},resetApp:function(){location.href=this.appPath}})</script>
+<script>Polymer({is:"ev-global-header",behaviors:[appLazyloading],properties:{appPath:{type:String,value:app.base||location.pathname}},attached:function(){this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-contact-link/ev-contact-link.html?1.5.0"]).then(function(){e.$$(".sys-nav").appendChild(document.createElement("ev-contact-link"))})},resetApp:function(){location.href=this.appPath}})</script>
 </dom-module>

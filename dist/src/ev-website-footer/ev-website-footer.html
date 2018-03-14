@@ -2,13 +2,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html"/>
-<link rel="import" href="../ev-responsive/ev-responsive.html?1.4.0"/>
-<link rel="import" href="../app/app-styles.html?1.4.0"/>
-<link rel="import" href="../app/app-fonts.html?1.4.0"/>
+<link rel="import" href="../ev-responsive/ev-responsive.html?1.5.0"/>
+<link rel="import" href="../app/app-styles.html?1.5.0"/>
+<link rel="import" href="../app/app-fonts.html?1.5.0"/>
 <dom-module id="ev-website-footer">
 <template>
 <style include="app-styles app-fonts">:host{display:block;background-color:var(--ev-website-footer-bg-color);font-family:"Flanders Sans",sans-serif}:host>footer{min-height:120px;@apply(--ev-app-container);}.credits{@apply(--layout-horizontal);@apply(--layout-wrap);height:80px}.credits>div{@apply(--layout-self-center);}.vlaanderen-be a{display:inline-block;background:transparent url(img/footer-logo.png) left center no-repeat;text-decoration:none;width:44px;height:51px;cursor:pointer}[w2a] .vlaanderen-be a{width:200px}.lne-be{@apply(--layout-flex-7);display:none}[w8b] .lne-be{display:block}.credits>.version{@apply(--layout-self-center);@apply(--layout-flex);height:42px;font-size:.9em;color:var(--ev-app-grey-3);text-align:right}p{margin:4px 0}a{color:var(--ev-app-blue-1)}.main-info{font-weight:500}.disclaimer{border-top:1px solid var(--ev-app-grey-6);line-height:40px;box-sizing:border-box;height:40px;overflow:hidden;font-weight:500;font-size:14px}.disclaimer a{color:var(--ev-app-grey-3);text-decoration:none;text-transform:uppercase}</style>
-<iron-ajax id="version" auto url="../../config/manifest.json?1.4.0" handle-as="json" on-response="onManifestJsonLoaded"></iron-ajax>
+<iron-ajax id="version" auto url="../../config/manifest.json?1.5.0" handle-as="json" on-response="onManifestJsonLoaded"></iron-ajax>
 <ev-responsive>
 <footer>
 <div class="credits">
