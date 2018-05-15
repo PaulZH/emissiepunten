@@ -28,12 +28,12 @@
   "homepage": "https://gitlab.com/bnowack/emissies-vlaanderen",
   "dependencies": {},
   "devDependencies": {
-    "bower": "^1.8.2",
-    "fs-extra": "latest",
+    "bower": "^1.8.4",
+    "fs-extra": "^6.0.1",
     "glob": "latest",
-    "html-minifier": "latest",
+    "html-minifier": "^3.5.15",
     "polymer-cli": "^0.12.0",
-    "replace-in-file": "latest",
+    "replace-in-file": "^3.4.0",
     "rimraf": "latest"
   }
 }
