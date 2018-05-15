@@ -1,10 +1,10 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html"/>
-<link rel="import" href="../ev-global-header/ev-global-header.html?1.5.0"/>
-<link rel="import" href="../ev-website-header/ev-website-header.html?1.5.0"/>
-<link rel="import" href="../ev-app-canvas/ev-app-canvas.html?1.5.0"/>
-<link rel="import" href="../app/app-styles.html?1.5.0"/>
-<link rel="import" href="../app/behaviors/app-lazyloading.html?1.5.0"/>
+<link rel="import" href="../ev-global-header/ev-global-header.html?1.5.1"/>
+<link rel="import" href="../ev-website-header/ev-website-header.html?1.5.1"/>
+<link rel="import" href="../ev-app-canvas/ev-app-canvas.html?1.5.1"/>
+<link rel="import" href="../app/app-styles.html?1.5.1"/>
+<link rel="import" href="../app/behaviors/app-lazyloading.html?1.5.1"/>
 <dom-module id="ev-layout">
 <template>
 <style include="app-styles">:host{display:block;min-height:100vh}ev-global-header,ev-website-footer{@apply(--ev-app-container);}ev-app-canvas{min-height:calc(100vh - 40px - 132px - 120px - 80px);padding-top:40px;padding-bottom:40px}</style>
@@ -12,5 +12,5 @@
 <ev-website-header></ev-website-header>
 <ev-app-canvas app="[[app]]"></ev-app-canvas>
 </template>
-<script>Polymer({is:"ev-layout",behaviors:[appLazyloading],properties:{app:String},attached:function(){document.querySelector("body").classList.remove("initializing"),this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-website-footer/ev-website-footer.html?1.5.0"]).then(function(){Polymer.dom(e.root).appendChild(document.createElement("ev-website-footer"))})}})</script>
+<script>Polymer({is:"ev-layout",behaviors:[appLazyloading],properties:{app:String},attached:function(){document.querySelector("body").classList.remove("initializing"),this.async(this.renderDeferredElements,1e3)},renderDeferredElements:function(){var e=this;this.lazyload(["../ev-website-footer/ev-website-footer.html?1.5.1"]).then(function(){Polymer.dom(e.root).appendChild(document.createElement("ev-website-footer"))})}})</script>
 </dom-module>
